@@ -1,11 +1,6 @@
 /*
 Todo:
-Transfer main gl classes
-Coursor class
-Hello triangle
-span
-multithreded file reading
-Every class has all necessary constructors
+
 */
 
 #include "Setup.hpp"

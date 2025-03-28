@@ -5,7 +5,6 @@
 #include <SDL2/SDL.h>
 
 #include "Core/Game.hpp"
-#include "Rendering/Renderer.hpp"
 #include "Utils/Logger.hpp"
 
 
@@ -25,7 +24,7 @@ Window::Window(Game &game) noexcept : game_(game)
                                  SDL_WINDOWPOS_CENTERED,
                                  width_,
                                  height_,
-                                 SDL_WINDOW_RESIZABLE | game_.GetRenderer().GetSDLWindowFlags());
+                                 SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
   
   GAME_ASSERT(sdl_window_ != nullptr) << "Couldn't create sdl window: " << SDL_GetError();
 }

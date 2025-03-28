@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.12)
 project(
-  Game
+  Game2D
   VERSION 0
 )
 
 # Options
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 
@@ -38,12 +38,9 @@ set(CMAKE_BUILD_TYPE ${REAL_BUILD_TYPE})
 set(GAME_OBJ_LIB_NAME "${PROJECT_NAME}objlib")
 add_library(${GAME_OBJ_LIB_NAME} STATIC
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/Game.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/EventHandler.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/Window.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/Renderer.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/FlagParser.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/Logger.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/OpenGL/Renderer.cpp
 )
 
 target_compile_options(
