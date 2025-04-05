@@ -39,8 +39,17 @@ set(GAME_OBJ_LIB_NAME "${PROJECT_NAME}objlib")
 add_library(${GAME_OBJ_LIB_NAME} STATIC
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/Game.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/Window.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/EventHandler.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/FlagParser.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/Logger.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/FileReader.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/Math.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Rendering/Renderer.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Rendering/Sprite.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Rendering/Shader.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Rendering/VAO.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Rendering/ResourceManager.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Game/Player.cpp
 )
 
 target_compile_options(
@@ -89,8 +98,13 @@ target_link_libraries(
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES OUTPUT_NAME ${CMAKE_PROJECT_NAME})
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_PROJECT_NAME})
 
+add_custom_target(
+  copy_resources ALL
+  DEPENDS copy_resources.fake_file
+)
+
 add_custom_command(
-  TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+  OUTPUT copy_resources.fake_file
   COMMAND cp -R ${CMAKE_CURRENT_SOURCE_DIR}/res ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}
 )
 
@@ -124,4 +138,5 @@ if(${GAME_ENABLE_TESTS})
   Test(FlagParserTest ${CMAKE_CURRENT_SOURCE_DIR}/test/FlagParser.cpp)
   Test(StringTest ${CMAKE_CURRENT_SOURCE_DIR}/test/String.cpp)
   Test(MathTest ${CMAKE_CURRENT_SOURCE_DIR}/test/Math.cpp)
+  
 endif()

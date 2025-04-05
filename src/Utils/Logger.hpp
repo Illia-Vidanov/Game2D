@@ -22,28 +22,39 @@
 */
 
 #if defined(NDEBUG) && !defined(TRACY_ENABLE)
-  #define GAME_DLOG(type) if constexpr (false) game::LogStream(LogData{__LINE__, __FILE__, LogType::None})
-  #define GAME_VDLOG(level, type) if constexpr (false) game::LogStream(LogData{__LINE__, __FILE__, LogType::None})
-  #define GAME_ASSERT(condition) if constexpr (false) game::LogStream(LogData{__LINE__, __FILE__, LogType::None})
+  #define GAME_DLOG(type) if constexpr (false) game::LogStream(LogData{__LINE__, __FILE__, LogType::kNone})
+  #define GAME_VDLOG(level, type) if constexpr (false) game::LogStream(LogData{__LINE__, __FILE__, LogType::kNone})
+  #define GAME_ASSERT(condition) if constexpr (false) game::LogStream(LogData{__LINE__, __FILE__, LogType::kNone})
   #define GAME_ASSERT_STD(condition, message)
+  #define GAME_DEBUG_LINE(command)
+  #define GAME_DLOG_IF(condition, type)
+  #define GAME_VDLOG_IF(condition, level, type)
 #else
   /// Log message only in when NDEBUG is 0
   #define GAME_DLOG(type) GAME_LOG(type)
   /// Log message only in when NDEBUG is 0 and verbose level is smaller than current Logger's verbose level
   #define GAME_VDLOG(level, type) GAME_VLOG(level, type)
   /// Assert if condition is false
-  #define GAME_ASSERT(condition) if(GAME_IS_UNLIKELY(!(!!(condition)))) GAME_DLOG(LogType::Fatal)
-  #define GAME_ASSERT_STD(condition, message) assert(((void)(message), (condition)))
+  #define GAME_ASSERT(condition) if(GAME_IS_UNLIKELY(!(static_cast<bool>(condition)))) GAME_DLOG(LogType::kFatal)
+  /// Assert using deafult assert function
+  #define GAME_ASSERT_STD(condition, message) assert(((void)(message), static_cast<bool>(condition)))
+  /// Remove line on build
+  #define GAME_DEBUG_LINE(command) do { command; } while(0)
+  /// Debug log if condition is true
+  #define GAME_DLOG_IF(condition, type) if(static_cast<bool>(condition)) GAME_DLOG(type)
+  #define GAME_VDLOG_IF(condition, level, type) if(static_cast<bool>(condition)) GAME_VDLOG(level, type)
 #endif
 
 #define GAME_LOG(type) game::LogStream(LogData{__LINE__, __FILE__, type})
 #define GAME_VLOG(level, type) if(level < game::Logger::Get().GetVerboseLevel()) GAME_LOG(type)
+#define GAME_LOG_IF(condition, type) if(static_cast<bool>(condition)) GAME_LOG(type)
+#define GAME_VLOG_IF(condition, level, type) if(static_cast<bool>(condition)) GAME_VLOG(level, type)
 
 namespace game
 {
 enum class LogType : uint8_t
 {
-  None, Fatal, Error, Warning, Info
+  kNone, kFatal, kError, kWarning, kInfo
 };
 
 
@@ -77,10 +88,10 @@ public:
   /// Get string with name of LogType
   [[nodiscard]] static inline auto GetLogTypeName(LogType type) noexcept -> std::string { static const std::string kLogTypeNameMap[] = { "Fatal", "Error", "Warning", "Info" }; return kLogTypeNameMap[ToUnderlying(type)]; }
 
-  static inline const std::filesystem::path kDefLogPath{"./logs/"};
-  static inline const std::string kDefLogFileName{"last_log.txt"};
-  static inline const std::basic_ostream<StreamCharT> kDefStream{std::cout.rdbuf()};
-  static constexpr inline VerboseLevelT kDefVerboseLevel{0};
+  static inline const std::filesystem::path kDefLogPath = "./logs/";
+  static inline const std::string kDefLogFileName = "last_log.txt";
+  static inline const std::basic_ostream<StreamCharT> kDefStream = std::basic_ostream<StreamCharT>{std::cout.rdbuf()};
+  static constexpr inline VerboseLevelT kDefVerboseLevel = 0;
 
 private:
   Logger() noexcept;
@@ -88,7 +99,7 @@ private:
 
   std::basic_ostream<StreamCharT> stream_{kDefStream.rdbuf()};
   bool output_to_file_ = true;
-  VerboseLevelT verbose_level_{0};
+  VerboseLevelT verbose_level_ = 0;
   std::string file_path_{kDefLogPath.generic_u8string() + kDefLogFileName};
 	std::basic_ofstream<StreamCharT> file_;
 };
@@ -106,7 +117,7 @@ struct LogData
 class LogStream
 {
 public:
-  LogStream(const LogData &log_data) noexcept : fatal_(log_data.type == LogType::Fatal) { GAME_ASSERT_STD(log_data.type != LogType::None, "LogType::None"); }
+  LogStream(const LogData &log_data) noexcept : fatal_(log_data.type == LogType::kFatal) { GAME_ASSERT_STD(log_data.type != LogType::kNone, "LogType::kNone"); }
   ~LogStream() noexcept;
 	
   /// Input value to be printed

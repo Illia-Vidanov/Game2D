@@ -53,7 +53,7 @@ auto Flags::ParseFlag(ConstArgvType flag_begin, const ConstArgvType possible_fla
         if(in_state == 0)
         {
           // Parse error
-          GAME_LOG(LogType::Warning) << "Flag parsing error: expected key, got null terminator in flag " << *flag_begin << '\n';
+          GAME_LOG(LogType::kError) << "Expected key, got null terminator in flag \'" << *flag_begin << "\'\n";
           return MapType::value_type();
         }
 
@@ -65,7 +65,7 @@ auto Flags::ParseFlag(ConstArgvType flag_begin, const ConstArgvType possible_fla
         if(in_state == 0)
         {
           // Parse error
-          GAME_LOG(LogType::Warning) << "Flag parsing error: expected key name before value delimetr in flag" << *flag_begin << '\n';
+          GAME_LOG(LogType::kError) << "Expected key name before value delimetr in flag \'" << *flag_begin << "\'\n";
           return MapType::value_type();
         }
 
@@ -83,7 +83,7 @@ auto Flags::ParseFlag(ConstArgvType flag_begin, const ConstArgvType possible_fla
       if((*flag_begin)[str_index] == '\0')
       {
         // Parse error
-        GAME_LOG(LogType::Warning) << "Flag parsing error: expected delimetr, got null terminator in flag " << *flag_begin << '\n';
+        GAME_LOG(LogType::kError) << "Expected delimetr, got null terminator in flag \'" << *flag_begin << "\'\n";
         return MapType::value_type();
       }
 
@@ -98,7 +98,7 @@ auto Flags::ParseFlag(ConstArgvType flag_begin, const ConstArgvType possible_fla
       if((*flag_begin)[str_index] != delim[in_state])
       {
         // Parse error
-        GAME_LOG(LogType::Warning) << "Flag parsing error: invalid delimetr. Expected " << in_state << ' ' << delim << " got " << std::string(&(*flag_begin)[str_index - in_state], in_state + 1) << " in flag " << *flag_begin << '\n';
+        GAME_LOG(LogType::kError) << "Invalid delimetr. Expected \'" << delim << "\' got \'" << std::string(&(*flag_begin)[str_index - in_state], in_state + 1) << " in flag \'" << *flag_begin << "\'\n";
         return MapType::value_type();
       }
 
@@ -113,7 +113,7 @@ auto Flags::ParseFlag(ConstArgvType flag_begin, const ConstArgvType possible_fla
       else if((*flag_begin)[str_index] == '\0') // it stays under, because other variants are more likely
       {
         // Parse error
-        GAME_LOG(LogType::Warning) << "Flag parsing error: expected value, got null terminator in flag" << *flag_begin << '\n';
+        GAME_LOG(LogType::kError) << "Expected value, got null terminator in flag \'" << *flag_begin << "\'\n";
         return MapType::value_type();
       }
 
@@ -130,7 +130,7 @@ auto Flags::ParseFlag(ConstArgvType flag_begin, const ConstArgvType possible_fla
         if(flag_begin >= possible_flag_end)
         {
           // Parse error
-          GAME_LOG(LogType::Warning) << "Flag parsing error: expected quotation mark, got null terminator in flag" << *(flag_begin - 1) << '\n';
+          GAME_LOG(LogType::kError) << "Expected quotation mark, got null terminator in flag \'" << *(flag_begin - 1) << "\'\n";
           return MapType::value_type();
         }
 
@@ -164,7 +164,7 @@ auto Flags::ParseFlag(ConstArgvType flag_begin, const ConstArgvType possible_fla
         if(flag_begin >= possible_flag_end)
         {
           // Parse error
-          GAME_LOG(LogType::Warning) << "Flag parsing error: expected quotation mark, got null terminator in flag " << *(flag_begin - 1) << '\n';
+          GAME_LOG(LogType::kError) << "Expected quotation mark, got null terminator in flag \'" << *(flag_begin - 1) << "\'\n";
           return MapType::value_type();
         }
 
@@ -184,7 +184,7 @@ auto Flags::ParseFlag(ConstArgvType flag_begin, const ConstArgvType possible_fla
         return std::make_pair(key, value);
       
       // Parse error
-      GAME_LOG(LogType::Warning) << "Flag parsing error: expected null terminator after quotation mark, got " << (*flag_begin)[str_index] << " in flag " << *flag_begin << '\n';
+      GAME_LOG(LogType::kError) << "Expected null terminator after quotation mark, got \'" << (*flag_begin)[str_index] << "\' in flag \'" << *flag_begin << "\'\n";
       return MapType::value_type();
     case kUnquotedValue:
       if(strings_used)

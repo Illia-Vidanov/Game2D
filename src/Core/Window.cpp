@@ -3,15 +3,21 @@
 #include "Setup.hpp"
 
 #include <SDL2/SDL.h>
+#include <glad/glad.h>
 
 #include "Core/Game.hpp"
 #include "Utils/Logger.hpp"
+#include "Core/EventHandler.hpp"
 
 
 namespace game
 {
-Window::Window(Game &game) noexcept : game_(game)
+Window::Window(Game &game) noexcept
+  : game_(game)
+  , event_cleaner_(game_.GetEventHandler())
 {
+  ZoneScopedC(0x00FFF2);
+
   SDL_Init(SDL_INIT_EVERYTHING);
 
   SDL_DisplayMode display_mode;
@@ -31,12 +37,82 @@ Window::Window(Game &game) noexcept : game_(game)
 
 void Window::Exit() noexcept
 {
+  ZoneScopedC(0x00FFF2);
+
   SDL_DestroyWindow(sdl_window_);
   SDL_Quit();
 }
 
+void Window::InitEvents() noexcept
+{
+  game_.GetEventHandler().AddListener(event_cleaner_, EventType::kWindowResize, this, [](const Event &event, void *window) -> bool { return reinterpret_cast<Window*>(window)->WindowResizedEvent(event); });
+
+  game_.GetEventHandler().DispatchEvent(Event{Event::WindowResize{0, 0, static_cast<uint16_t>(width_), static_cast<uint16_t>(height_)}});
+}
+
+void Window::DispatchSDLEvents() noexcept
+{
+  ZoneScopedC(0xe8bb25);
+
+  SDL_Event event;
+  #ifndef TRACY_ENABLE
+  while(SDL_PollEvent(&event))
+  {
+  #else
+  while(true)
+  {
+    {
+      ZoneScopedNC("Poll SDL event", 0xe8bb25);
+      int state = SDL_PollEvent(&event);
+      if(!state)
+        break;
+      ZoneValue(event.type);
+    }
+  #endif
+    switch(event.type)
+    {
+    case SDL_QUIT:
+      game_.GetEventHandler().DispatchEvent(Event{Event::Quit{}});
+      break;
+    case SDL_KEYDOWN:
+      game_.GetEventHandler().DispatchEvent(Event{Event::KeyDown{Event::Keyboard{
+        static_cast<uint16_t>(event.key.keysym.sym),
+        static_cast<uint16_t>(event.key.keysym.scancode),
+        static_cast<uint16_t>(event.key.keysym.mod)
+      }}});
+      break;
+    case SDL_KEYUP:
+      game_.GetEventHandler().DispatchEvent(Event{Event::KeyDown{Event::Keyboard{
+        static_cast<uint16_t>(event.key.keysym.sym),
+        static_cast<uint16_t>(event.key.keysym.scancode),
+        static_cast<uint16_t>(event.key.keysym.mod)
+      }}});
+      break;
+    case SDL_WINDOWEVENT:
+      switch(event.window.event)
+      {
+      case SDL_WINDOWEVENT_RESIZED:
+      case SDL_WINDOWEVENT_SIZE_CHANGED:
+        if(width_ != event.window.data1 || height_ != event.window.data2)
+        {
+          GAME_LOG(LogType::kInfo) << "Resized to " << event.window.data1 << ' ' << event.window.data2;
+          game_.GetEventHandler().DispatchEvent(Event{Event::WindowResize{static_cast<uint16_t>(width_), static_cast<uint16_t>(height_), static_cast<uint16_t>(event.window.data1), static_cast<uint16_t>(event.window.data2)}});
+        }
+        break;
+      default:
+        break;
+      }
+      break;
+    default:
+      break;
+    }
+  }
+}
+
 void Window::SetResolution(const Eigen::Vector2i &resolution) noexcept
 {
+  ZoneScopedC(0x00FFF2);
+
   width_ = resolution(0);
   height_ = resolution(1);
 
@@ -46,9 +122,29 @@ void Window::SetResolution(const Eigen::Vector2i &resolution) noexcept
 }
 
 void Window::SetTitle(const std::string &title) noexcept
-{  
+{
+  ZoneScopedC(0x00FFF2);
+
   title_ = title;
 
   SDL_SetWindowTitle(sdl_window_, title_.c_str());
+}
+
+bool Window::WindowResizedEvent(const Event &event) noexcept
+{
+  width_ = event.GetNewResolutionX();
+  height_ = event.GetNewResolutionY();
+
+  uint16_t smaller_axis = std::min(width_, height_);
+  render_width_ = smaller_axis;
+  render_height_ = smaller_axis;
+
+  glViewport(
+    (width_ - smaller_axis) / 2,
+    (height_ - smaller_axis) / 2,
+    smaller_axis,
+    smaller_axis
+  );
+  return false;
 }
 }

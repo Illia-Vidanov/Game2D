@@ -7,28 +7,28 @@
 #include <cmath>
 
 #include <gcem/gcem.hpp>
+#include <Eigen/Dense>
 
-#include "Math/Constants.hpp"
+#include "Utils/MathConstants.hpp"
 
 namespace game
 {
 // If type is custom it's better to leave it as is
 template<typename T>
 using ReturnFloatType = std::conditional_t<std::is_integral_v<T>, DefFloatType, T>;
+using Vector3 = Eigen::Vector3<DefFloatType>;
+using Vector2 = Eigen::Vector3<DefFloatType>;
 
 
 template<typename T>
-constexpr inline ReturnFloatType<T> DegreesToRadians(T degrees)
-{ return degrees * (kPI / 180); }
+constexpr inline ReturnFloatType<T> DegreesToRadians(T degrees) { return degrees * (kPI / 180); }
 
 template<typename T>
-constexpr inline ReturnFloatType<T> RadiansToDegrees(T radians)
-{ return radians * (180 / kPI); }
+constexpr inline ReturnFloatType<T> RadiansToDegrees(T radians) { return radians * (180 / kPI); }
 
 
 template<typename T, typename U>
-constexpr inline bool AreSame(T t, U u)
-{ return gcem::abs(t - u) < kElipson; }
+constexpr inline bool AreSame(T t, U u) { return gcem::abs(t - u) < kElipson; }
 
 // Shorthand of writing (std::numeric_limits<T>::digits10 + 1)
 template<typename T>
@@ -61,7 +61,7 @@ constexpr inline DefFloatType kFastPower10NegativeLookup[20] =
 // If exponent might be floatin-point specialize return value
 // Example: FastPower10<float>(2.3);
 // If exp > 19 or exp < -19, 1 is returned
-template<typename T = DefUIntType, typename U>
+template<typename T = uint32_t, typename U>
 constexpr inline T FastPower10(const U exp)
 {
     if constexpr(!std::is_integral_v<U>)
@@ -137,11 +137,11 @@ constexpr inline T GetDigitSubstring(const T number, const U first, const U last
 namespace detail
 {
 template <typename T>
-constexpr inline DefUIntType DigitCountImpl(T t)
+constexpr inline uint32_t DigitCountImpl(T t)
 {
     if(t < T(0))
         return DigitCountImpl(-t);
-    DefUIntType digits = 0;
+    uint32_t digits = 0;
     while(T(0) < t)
     {
         digits++;
@@ -151,7 +151,7 @@ constexpr inline DefUIntType DigitCountImpl(T t)
 }
 
 template<>
-inline DefUIntType DigitCountImpl<char>(char t)
+inline uint32_t DigitCountImpl<char>(char t)
 {
     if(t < 0)
         return DigitCountImpl<char>(-t);
@@ -160,14 +160,14 @@ inline DefUIntType DigitCountImpl<char>(char t)
     return x[static_cast<unsigned char>(t)];
 }
 template<>
-inline DefUIntType DigitCountImpl<unsigned char>(unsigned char t)
+inline uint32_t DigitCountImpl<unsigned char>(unsigned char t)
 {
     static const unsigned char x[256] = { 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 };
     return x[t];
 }
 
 template<>
-constexpr inline DefUIntType DigitCountImpl<short>(short t)
+constexpr inline uint32_t DigitCountImpl<short>(short t)
 {
     if(t < 0)
         return DigitCountImpl<short>(-t);
@@ -190,7 +190,7 @@ constexpr inline DefUIntType DigitCountImpl<short>(short t)
     }
 }
 template<>
-constexpr inline DefUIntType DigitCountImpl<unsigned short>(unsigned short t)
+constexpr inline uint32_t DigitCountImpl<unsigned short>(unsigned short t)
 {
     if(t >= 100)
     {
@@ -211,7 +211,7 @@ constexpr inline DefUIntType DigitCountImpl<unsigned short>(unsigned short t)
 }
 
 template<>
-constexpr inline DefUIntType DigitCountImpl<int>(int t)
+constexpr inline uint32_t DigitCountImpl<int>(int t)
 {
     if(t < 0) return DigitCountImpl<int>(-t);
 
@@ -247,7 +247,7 @@ constexpr inline DefUIntType DigitCountImpl<int>(int t)
 }
 
 template<>
-constexpr inline DefUIntType DigitCountImpl<unsigned int>(unsigned int t)
+constexpr inline uint32_t DigitCountImpl<unsigned int>(unsigned int t)
 {
     if(t >= 100000)
     {
@@ -281,7 +281,7 @@ constexpr inline DefUIntType DigitCountImpl<unsigned int>(unsigned int t)
 }
 
 template<>
-constexpr inline DefUIntType DigitCountImpl<long long>(long long t)
+constexpr inline uint32_t DigitCountImpl<long long>(long long t)
 {
     if(t < 0)
         return DigitCountImpl<long long>(-t);
@@ -345,7 +345,7 @@ constexpr inline DefUIntType DigitCountImpl<long long>(long long t)
     return 1;
 }
 template<>
-constexpr inline DefUIntType DigitCountImpl<unsigned long long>(unsigned long long t)
+constexpr inline uint32_t DigitCountImpl<unsigned long long>(unsigned long long t)
 {
     if(t >= 10000000000)
     {
@@ -413,28 +413,17 @@ constexpr inline DefUIntType DigitCountImpl<unsigned long long>(unsigned long lo
 
 // Get number of whole digits in any type
 // 0 = 0 digits
-template<typename T = DefUIntType, typename U>
+template<typename T = uint32_t, typename U>
 constexpr inline T DigitCount(U number)
 {
     return number == 0 ? 0 : static_cast<T>(detail::DigitCountImpl(number));
 }
 
+template<typename T = int, typename U>
+constexpr inline T Bitmask(U bit) noexcept { GAME_ASSERT(bit < (sizeof(T) * CHAR_BIT)) << "Too large bit: " << bit; return static_cast<T>(1) << bit; }
 
-//template<typename T>
-//constexpr inline bool IsMathematicallyIntegral(T t)
-//{
-//    DefFloatType result = gcem::cos(2 * t * GCEM_PI);
-//    return result == 1;
-//}
-//
-//
-//template<typename T = DefUIntType, typename U>
-//constexpr inline T DigitCountAfterPoint(U number)
-//{
-//    T result = T(0);
-//    while(!IsMathematicallyIntegral(number))
-//}
-
+auto OrthographicProjection(float left, float right, float bottom, float top, float near, float far) noexcept -> Eigen::Matrix4<DefFloatType>;
+auto OrthographicProjection2D(float left, float right, float bottom, float top) noexcept -> Eigen::Matrix3<DefFloatType>;
 } // game
 
 

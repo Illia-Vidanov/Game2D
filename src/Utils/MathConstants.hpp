@@ -3,11 +3,13 @@
 
 #include "Setup.hpp"
 
+#include <Eigen/Dense>
+#include <Eigen/Geometry>
+
 namespace game
 {
 using DefFloatType = float;
-using DefIntType = int;
-using DefUIntType = uint32_t;
+using Transform = Eigen::Transform<DefFloatType, 3, 2>;
 
 constexpr inline DefFloatType kPI = static_cast<DefFloatType>(3.141592);
 constexpr inline DefFloatType kHalfPI = kPI / static_cast<DefFloatType>(2);

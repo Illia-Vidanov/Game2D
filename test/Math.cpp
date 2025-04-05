@@ -1,6 +1,7 @@
 #include "Utils/Math.hpp"
 
 #include "TestSetup.hpp"
+#include "Math.hpp"
 
 TEST(DigitCountTest, NmberDigitsReturn)
 {

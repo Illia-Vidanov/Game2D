@@ -5,6 +5,10 @@
 
 #include "Utils/FlagParser.hpp"
 #include "Core/Window.hpp"
+#include "Core/EventHandler.hpp"
+#include "Rendering/Renderer.hpp"
+#include "Rendering/ResourceManager.hpp"
+#include "Game/Player.hpp"
 
 
 class SDL_Window;
@@ -22,6 +26,12 @@ public:
   [[nodiscard]] constexpr inline auto GetFlags() const noexcept -> const Flags& { return flags_; }
   [[nodiscard]] constexpr inline auto GetWindow() noexcept -> Window& { return window_; }
   [[nodiscard]] constexpr inline auto GetWindow() const noexcept -> const Window& { return window_; }
+  [[nodiscard]] constexpr inline auto GetRenderer() noexcept -> Renderer& { return renderer_; }
+  [[nodiscard]] constexpr inline auto GetRenderer() const noexcept -> const Renderer& { return renderer_; }
+  [[nodiscard]] constexpr inline auto GetEventHandler() noexcept -> EventHandler& { return event_handler_; }
+  [[nodiscard]] constexpr inline auto GetEventHandler() const noexcept -> const EventHandler& { return event_handler_; }
+  [[nodiscard]] constexpr inline auto GetResourceManager() noexcept -> ResourceManager& { return resource_manager_; }
+  [[nodiscard]] constexpr inline auto GetResourceManager() const noexcept -> const ResourceManager& { return resource_manager_; }
 
 private:
   /// Initializes game
@@ -32,9 +42,18 @@ private:
   /// Close application
   void Exit() noexcept;
 
+  /// Function to executre on Quit event
+  auto QuitEvent() noexcept -> bool;
+
   bool running_ = false;
   Flags flags_;
   Window window_;
+  Renderer renderer_;
+  ResourceManager resource_manager_;
+  EventHandler event_handler_;
+  EventCleaner event_cleaner_;
+
+  Player player_;
 };
 } // game
 

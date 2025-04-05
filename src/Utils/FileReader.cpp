@@ -9,11 +9,15 @@
 #include <windows.h>
 #endif
 
+#include <tracy/Tracy.hpp>
+
 
 namespace game
 {
 std::string FileReader::Txt(const std::string &path) noexcept
 {
+  ZoneScopedC(0xDD008C);
+
   /// Use platform specific, because it is usually much faster
   #if defined(GAME_WIN_OS)
     OFSTRUCT info;
@@ -24,9 +28,10 @@ std::string FileReader::Txt(const std::string &path) noexcept
     return str;
   #else
     std::ifstream file{path};
-		static std::stringstream str;
-		str << file.rdbuf();
-    return str.str();
+		static std::stringstream string;
+    string.str("");
+		string << file.rdbuf();
+    return string.str();
   #endif
 }
 } // game
