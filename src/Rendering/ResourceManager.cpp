@@ -33,6 +33,8 @@ ResourceManager::ResourceManager(Game &game) noexcept
   sprite_vao_.AddEBO(sprite_ebo_);
 
   LoadShader(ShaderType::kDefault, {"res/Shaders/Default.vert", "res/Shaders/Default.frag"});
+  const Matrix4 orthographic_projection = OrthographicProjection(0, Window::kUnitsPerScreenX, 0, Window::kUnitsPerScreenY, -1, 1);
+  GetShader(ShaderType::kDefault).SetUniformMatrix4("projection", 1, false, orthographic_projection.data());
 }
 
 void ResourceManager::Exit() noexcept
@@ -49,7 +51,7 @@ void ResourceManager::Exit() noexcept
 
 void ResourceManager::InitEvents() noexcept
 {
-  game_.GetEventHandler().AddListener(event_cleaner_, EventType::kWindowResize, this, [](const Event &event, void *resource_manager){ return reinterpret_cast<ResourceManager*>(resource_manager)->ResizeEvent(event); });
+  
 }
 
 auto ResourceManager::LoadShader(ShaderType type, const std::string *begin, const std::string *end) noexcept -> Shader &
@@ -63,23 +65,5 @@ auto ResourceManager::LoadShader(ShaderType type, const std::string *begin, cons
   shader.LinkProgram();
 
   return shader;
-}
-
-auto ResourceManager::ResizeEvent(const Event &event) noexcept -> bool
-{ 
-  Transform orthographic_projection = Transform{OrthographicProjection(
-    0,
-    game_.GetWindow().GetRenderWidth(),
-    0,
-    game_.GetWindow().GetRenderHeight(),
-    -1, 1)};
-  //orthographic_projection.translation() += Vector3{
-  //  (event.GetNewResolutionX() - game_.GetWindow().GetRenderWidth()) / 2,
-  //  (event.GetNewResolutionY() - game_.GetWindow().GetRenderHeight()) / 2
-  //};
-  
-  GetShader(ShaderType::kDefault).SetUniformMatrix4("projection", 1, false, orthographic_projection.data());
-  
-  return false;
 }
 } // game

@@ -34,7 +34,7 @@ Renderer::Renderer(Game &game) noexcept
 
   PrintDebugInfo();
 
-  GL_CALL(glClearColor(1.0f, 1.0f, 1.0f, 1.0f));
+  GL_CALL(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
 }
 
 void Renderer::PrintDebugInfo() const noexcept

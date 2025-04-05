@@ -23,155 +23,89 @@ enum class EventType : uint32_t
   kNone = 0,
   kKeyDown,
   kKeyUp,
-  kKeyPressed,
   kWindowResize,
+  kRenderAreaResize,
   kQuit
 };
 
 union Event
 {
 public:
-  static constexpr inline std::underlying_type_t<EventType> kCustomTypeBitMask = std::underlying_type_t<EventType>{1} << (sizeof(EventType) * CHAR_BIT - 1);
-
-  
-  [[nodiscard]] constexpr inline auto GetType() const noexcept -> EventType { return common.type; }
-  /// Get name of event according to type
-  /// If type is custom "Other: (type value)" is returned
-  /// Mainly debuging feature
-  [[nodiscard]] auto GetName() const noexcept -> std::string;
-	
-	[[nodiscard]] inline auto GetKeycode() const noexcept -> uint16_t
-  {
-    GAME_ASSERT_STD(common.type == EventType::kKeyDown
-                 || common.type == EventType::kKeyUp
-                 || common.type == EventType::kKeyPressed
-                 , "Acces data from wrong event type. Expected: kKeyDown/kKeyUp/kKeyPressed");
-    return keyboard.keycode;
-  }
-	[[nodiscard]] inline auto GetScancode() const noexcept -> uint16_t
-  {
-    GAME_ASSERT_STD(common.type == EventType::kKeyDown
-                 || common.type == EventType::kKeyUp
-                 || common.type == EventType::kKeyPressed
-                 , "Acces data from wrong event type. Expected: kKeyDown/kKeyUp/kKeyPressed");
-    return keyboard.scancode;
-  }
-	[[nodiscard]] inline auto GetModKeys() const noexcept -> uint16_t
-  {
-    GAME_ASSERT_STD(common.type == EventType::kKeyDown
-                 || common.type == EventType::kKeyUp
-                 || common.type == EventType::kKeyPressed
-                 , "Acces data from wrong event type. Expected: kKeyDown/kKeyUp/kKeyPressed");
-    return keyboard.mod_keys;
-  }
-	[[nodiscard]] inline auto GetCustomData() const noexcept -> void*
-  {
-    GAME_ASSERT_STD(GetType() & kCustomTypeBitMask, "Acces data from wrong event type. Expected: to contain kCustomTypeBitMask");
-    return custom.data;
-  }
-  [[nodiscard]] inline auto GetOldResolutionX() const noexcept -> uint16_t
-  {
-    GAME_ASSERT_STD(common.type == EventType::kWindowResize, "Acces data from wrong event type. Expected: kWindowResize");
-    return window_resize.old_resolution_x;
-  }
-  [[nodiscard]] inline auto GetOldResolutionY() const noexcept -> uint16_t
-  {
-    GAME_ASSERT_STD(common.type == EventType::kWindowResize, "Acces data from wrong event type. Expected: kWindowResize");
-    return window_resize.old_resolution_y;
-  }
-  [[nodiscard]] inline auto GetNewResolutionX() const noexcept -> uint16_t
-  {
-    GAME_ASSERT_STD(common.type == EventType::kWindowResize, "Acces data from wrong event type. Expected: kWindowResize");
-    return window_resize.new_resolution_x;
-  }
-  [[nodiscard]] inline auto GetNewResolutionY() const noexcept -> uint16_t
-  {
-    GAME_ASSERT_STD(common.type == EventType::kWindowResize, "Acces data from wrong event type. Expected: kWindowResize");
-    return window_resize.new_resolution_y;
-  }
-
-
   struct Common
   {
     friend Event;
   public:
-    explicit constexpr inline Common(EventType type_data) noexcept
-    : type(type_data)
+    explicit constexpr inline Common(EventType new_type) noexcept
+    : type{new_type}
     {}
 
   // private here is used as const to make it immutable by users
   private:
     EventType type;
   };
-	
 
+
+private:
   struct Keyboard
   {
-    constexpr inline Keyboard(uint16_t new_keycode, uint16_t new_scancode, uint16_t new_mod_keys) noexcept
+    explicit constexpr inline Keyboard(uint16_t new_keycode, uint16_t new_scancode, uint16_t new_mod_keys) noexcept
     : keycode{new_keycode}
     , scancode{new_scancode}
     , mod_keys{new_mod_keys}
     {}
     uint16_t keycode;
-		uint16_t scancode;
-		uint16_t mod_keys;
+    uint16_t scancode;
+    uint16_t mod_keys;
     uint16_t padding = 0;
   };
+  struct CommonKeyboard : Common, Keyboard
+  {};
 
 
-	struct KeyDown : Common, Keyboard
-	{
-    explicit constexpr inline KeyDown(const Keyboard &keyboard_data) noexcept
+public:
+  struct KeyDown : Common, Keyboard
+  {
+    explicit constexpr inline KeyDown(uint16_t new_keycode, uint16_t new_scancode, uint16_t new_mod_keys) noexcept
     : Common{EventType::kKeyDown}
-    , Keyboard{keyboard_data}
+    , Keyboard{new_keycode, new_scancode, new_mod_keys}
     {}
-	};
-	constexpr inline Event(const KeyDown &key_down_data) noexcept
-  : key_down{key_down_data}
+  };
+  constexpr inline Event(const KeyDown &key_down) noexcept
+  : key_down_{key_down}
   {}
 
 
   struct KeyUp : Common, Keyboard
-	{
-    explicit constexpr inline KeyUp(const Keyboard &keyboard_data) noexcept
+  {
+    explicit constexpr inline KeyUp(uint16_t new_keycode, uint16_t new_scancode, uint16_t new_mod_keys) noexcept
     : Common{EventType::kKeyUp}
-    , Keyboard{keyboard_data}
+    , Keyboard{new_keycode, new_scancode, new_mod_keys}
     {}
-	};
-	constexpr inline Event(const KeyUp &key_up_data) noexcept
-  : key_up{key_up_data}
+  };
+  constexpr inline Event(const KeyUp &key_up) noexcept
+  : key_up_{key_up}
   {}
-
-
-  struct KeyPressed : Common, Keyboard
-	{
-    explicit constexpr inline KeyPressed(const Keyboard &keyboard_data) noexcept
-    : Common{EventType::kKeyPressed}
-    , Keyboard{keyboard_data}
-    {}
-	};
-	constexpr inline Event(const KeyPressed &key_pressed_data) noexcept : key_pressed{key_pressed_data} {}
 
 
   struct Quit : Common
-	{
-		explicit constexpr inline Quit() noexcept
-      : Common(EventType::kQuit)
+  {
+    explicit constexpr inline Quit() noexcept
+      : Common{EventType::kQuit}
     {}
-	};
-	inline Event(const Quit &quit_data) noexcept
-    : quit{quit_data}
+  };
+  inline Event(const Quit &quit) noexcept
+    : quit_{quit}
   {}
 
 
-  struct WindowResize : Common
+private:
+  struct AreaResize
   {
-    explicit constexpr inline WindowResize(uint16_t new_old_resolution_x, uint16_t new_old_resolution_y, uint16_t new_new_resolution_x, uint16_t new_new_resolution_y) noexcept
-      : Common(EventType::kWindowResize)
-      , old_resolution_x(new_old_resolution_x)
-      , old_resolution_y(new_old_resolution_y)
-      , new_resolution_x(new_new_resolution_x)
-      , new_resolution_y(new_new_resolution_y)
+  explicit constexpr inline AreaResize(uint16_t new_old_resolution_x, uint16_t new_old_resolution_y, uint16_t new_new_resolution_x, uint16_t new_new_resolution_y) noexcept
+    : old_resolution_x{new_old_resolution_x}
+    , old_resolution_y{new_old_resolution_y}
+    , new_resolution_x{new_new_resolution_x}
+    , new_resolution_y{new_new_resolution_y}
     {}
 
     uint16_t old_resolution_x;
@@ -179,40 +113,123 @@ public:
     uint16_t new_resolution_x;
     uint16_t new_resolution_y;
   };
-  inline Event(const WindowResize &window_resize_data) noexcept
-    : window_resize{window_resize_data}
-  {}
-	
+  struct CommonAreaResize : Common, AreaResize
+  {};
 
-	/// Custom type should specify it's type for listeners and it's last bit should be 1 or contain just use kCustomTypeBitMask
-	struct Custom : Common
-	{
-    explicit constexpr inline Custom(EventType custom_type, void *data_data) noexcept
-    : Common(custom_type)
-    , data(data_data)
+
+public:
+  struct WindowResize : Common, AreaResize
+  {
+    explicit constexpr inline WindowResize(uint16_t new_old_resolution_x, uint16_t new_old_resolution_y, uint16_t new_new_resolution_x, uint16_t new_new_resolution_y) noexcept
+      : Common{EventType::kWindowResize}
+      , AreaResize{new_old_resolution_x, new_old_resolution_y, new_new_resolution_x, new_new_resolution_y}
+    {}
+  };
+  inline Event(const WindowResize &window_resize) noexcept
+    : window_resize_{window_resize}
+  {}
+
+
+  struct RenderAreaResize : Common, AreaResize
+  {
+    explicit constexpr inline RenderAreaResize(uint16_t new_old_resolution_x, uint16_t new_old_resolution_y, uint16_t new_new_resolution_x, uint16_t new_new_resolution_y) noexcept
+      : Common{EventType::kRenderAreaResize}
+      , AreaResize{new_old_resolution_x, new_old_resolution_y, new_new_resolution_x, new_new_resolution_y}
+    {}
+  };
+  inline Event(const RenderAreaResize &render_area_resize) noexcept
+    : render_area_resize_{render_area_resize}
+  {}
+
+
+  /// Custom type should specify it's type for listeners and it's last bit should be 1 or contain just use kCustomTypeBitMask
+  struct Custom : Common
+  {
+    explicit constexpr inline Custom(EventType custom_type, void *new_data) noexcept
+    : Common{custom_type}
+    , data{new_data}
     {
       GAME_ASSERT_STD(custom_type & kCustomTypeBitMask, "Custom type's should contain kCustomTypeBitMask");
     }
-		void *data;
-	};
-	inline Event(const Custom &custom_data) noexcept
-  : custom{custom_data}
+    void *data;
+  };
+  inline Event(const Custom &custom) noexcept
+  : custom_{custom}
   {}
+
+public:
+  static constexpr inline std::underlying_type_t<EventType> kCustomTypeBitMask = std::underlying_type_t<EventType>{1} << (sizeof(EventType) * CHAR_BIT - 1);
+
+  
+  [[nodiscard]] constexpr inline auto GetType() const noexcept -> EventType { return common_.type; }
+  /// Get name of event according to type
+  /// If type is custom "Other: (type value)" is returned
+  /// Mainly debuging feature
+  [[nodiscard]] auto GetName() const noexcept -> std::string;
+	
+	[[nodiscard]] inline auto GetKeycode() const noexcept -> uint16_t
+  {
+    GAME_ASSERT_STD(common_.type == EventType::kKeyDown
+                 || common_.type == EventType::kKeyUp
+                 , "Acces data from wrong event type. Expected: kKeyDown/kKeyUp/kKeyPressed");
+    return keyboard_.keycode;
+  }
+	[[nodiscard]] inline auto GetScancode() const noexcept -> uint16_t
+  {
+    GAME_ASSERT_STD(common_.type == EventType::kKeyDown
+                 || common_.type == EventType::kKeyUp
+                 , "Acces data from wrong event type. Expected: kKeyDown/kKeyUp/kKeyPressed");
+    return keyboard_.scancode;
+  }
+	[[nodiscard]] inline auto GetModKeys() const noexcept -> uint16_t
+  {
+    GAME_ASSERT_STD(common_.type == EventType::kKeyDown
+                 || common_.type == EventType::kKeyUp
+                 , "Acces data from wrong event type. Expected: kKeyDown/kKeyUp/kKeyPressed");
+    return keyboard_.mod_keys;
+  }
+	[[nodiscard]] inline auto GetCustomData() const noexcept -> void*
+  {
+    GAME_ASSERT_STD(GetType() & kCustomTypeBitMask, "Acces data from wrong event type. Expected: to contain kCustomTypeBitMask");
+    return custom_.data;
+  }
+  [[nodiscard]] inline auto GetOldResolutionX() const noexcept -> uint16_t
+  {
+    GAME_ASSERT_STD(common_.type == EventType::kWindowResize
+                 || common_.type == EventType::kRenderAreaResize, "Acces data from wrong event type. Expected: kWindowResize or kRenderAreaResize");
+    return area_resize_.old_resolution_x;
+  }
+  [[nodiscard]] inline auto GetOldResolutionY() const noexcept -> uint16_t
+  {
+    GAME_ASSERT_STD(common_.type == EventType::kWindowResize
+                 || common_.type == EventType::kRenderAreaResize, "Acces data from wrong event type. Expected: kWindowResize or kRenderAreaResize");
+    return area_resize_.old_resolution_y;
+  }
+  [[nodiscard]] inline auto GetNewResolutionX() const noexcept -> uint16_t
+  {
+    GAME_ASSERT_STD(common_.type == EventType::kWindowResize
+                 || common_.type == EventType::kRenderAreaResize, "Acces data from wrong event type. Expected: kWindowResize or kRenderAreaResize");
+    return area_resize_.new_resolution_x;
+  }
+  [[nodiscard]] inline auto GetNewResolutionY() const noexcept -> uint16_t
+  {
+    GAME_ASSERT_STD(common_.type == EventType::kWindowResize
+                 || common_.type == EventType::kRenderAreaResize, "Acces data from wrong event type. Expected: kWindowResize or kRenderAreaResize");
+    return area_resize_.new_resolution_y;
+  }
 
 
 // private here is used as const to make it immutable by users
 private:
-  struct CommonKeyboard : Common, Keyboard
-  {};
-
-  Common common;
-  CommonKeyboard keyboard;
-	KeyDown key_down;
-	KeyUp key_up;
-	KeyPressed key_pressed;
-	Quit quit;
-  WindowResize window_resize;
-	Custom custom;
+  Common common_;
+  CommonKeyboard keyboard_;
+	KeyDown key_down_;
+	KeyUp key_up_;
+	Quit quit_;
+  CommonAreaResize area_resize_;
+  WindowResize window_resize_;
+  RenderAreaResize render_area_resize_;
+	Custom custom_;
 };
 
 

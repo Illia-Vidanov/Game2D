@@ -23,10 +23,11 @@ Game::Game(const int argc, const char * const *argv) noexcept
       Logger::Get().SetVerboseLevel(10);
     }(), false)) // pre initialization functions
   , flags_(argc, argv) // args are UTF8 encoded because we use SDL2main
+  , event_cleaner_(event_handler_)
   , window_(*this)
   , renderer_(*this)
   , resource_manager_(*this)
-  , event_cleaner_(event_handler_)
+  , input_(*this)
   , player_(*this)
 {
   ZoneScopedC(0xb3041b);
@@ -38,6 +39,7 @@ Game::Game(const int argc, const char * const *argv) noexcept
 
   window_.InitEvents();
   resource_manager_.InitEvents();
+  input_.InitEvents();
 }
 
 void Game::Run() noexcept
@@ -52,6 +54,7 @@ void Game::Run() noexcept
     
     renderer_.StartFrame();
 
+    input_.Update();
     player_.Update();
 
     renderer_.EndFrame();

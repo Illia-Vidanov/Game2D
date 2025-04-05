@@ -40,8 +40,6 @@ public:
   
 private:
   using ShaderContainerType = std::unordered_map<ShaderType, Shader>;
-
-  auto ResizeEvent(const Event &event) noexcept -> bool;
   
   ShaderContainerType shaders_;
   VBO sprite_vbo_;

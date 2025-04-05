@@ -9,6 +9,7 @@
 #include "Rendering/Renderer.hpp"
 #include "Rendering/ResourceManager.hpp"
 #include "Game/Player.hpp"
+#include "Game/Input.hpp"
 
 
 class SDL_Window;
@@ -24,6 +25,8 @@ class Game
 public:
   [[nodiscard]] constexpr inline auto GetFlags() noexcept -> Flags& { return flags_; }
   [[nodiscard]] constexpr inline auto GetFlags() const noexcept -> const Flags& { return flags_; }
+  [[nodiscard]] constexpr inline auto GetInput() noexcept -> Input& { return input_; }
+  [[nodiscard]] constexpr inline auto GetInput() const noexcept -> const Input& { return input_; }
   [[nodiscard]] constexpr inline auto GetWindow() noexcept -> Window& { return window_; }
   [[nodiscard]] constexpr inline auto GetWindow() const noexcept -> const Window& { return window_; }
   [[nodiscard]] constexpr inline auto GetRenderer() noexcept -> Renderer& { return renderer_; }
@@ -47,12 +50,13 @@ private:
 
   bool running_ = false;
   Flags flags_;
+  EventHandler event_handler_;
+  EventCleaner event_cleaner_;
   Window window_;
   Renderer renderer_;
   ResourceManager resource_manager_;
-  EventHandler event_handler_;
-  EventCleaner event_cleaner_;
 
+  Input input_;
   Player player_;
 };
 } // game

@@ -22,36 +22,18 @@ Player::Player(Game &game) noexcept
   , event_cleaner_{game_.GetEventHandler()}
 {
   sprite_.GetShader().SetUniform("spriteColor", 1.0f, 1.0f, 0.0f);
-
-  game_.GetEventHandler().AddListener(event_cleaner_, EventType::kKeyDown, this, [](const Event &event, void *player) -> bool { return reinterpret_cast<Player*>(player)->KeyDownEvent(event); });
 }
 
 void Player::Update() noexcept
 {
   game_.GetRenderer().AddToRenderQueue(sprite_);
-}
 
-auto Player::KeyDownEvent(const Event &event) noexcept -> bool
-{
+  transform_.translation() += Vector3{
+    (static_cast<float>(game_.GetInput().GetKey(SDL_SCANCODE_D)) - static_cast<float>(game_.GetInput().GetKey(SDL_SCANCODE_A))) * 0.01f,
+    (static_cast<float>(game_.GetInput().GetKey(SDL_SCANCODE_W)) - static_cast<float>(game_.GetInput().GetKey(SDL_SCANCODE_S))) * 0.01f,
+    0.0f
+  };
+
   GAME_LOG(LogType::kInfo) << transform_.translation().transpose();
-  switch (event.GetKeycode())
-  {
-  case SDLK_w:
-    transform_.translation() += Vector3{0, 1, 0};  
-    break;
-  case SDLK_a:
-    transform_.translation() += Vector3{-1, 0, 0};  
-    break;
-  case SDLK_s:
-    transform_.translation() += Vector3{0, -1, 0};  
-    break;
-  case SDLK_d:
-    transform_.translation() += Vector3{1, 0, 0};  
-    break;
-  default:
-    break;
-  }
-
-  return false;
 }
 } // game

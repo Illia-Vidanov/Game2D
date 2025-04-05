@@ -16,9 +16,9 @@ namespace game
 // If type is custom it's better to leave it as is
 template<typename T>
 using ReturnFloatType = std::conditional_t<std::is_integral_v<T>, DefFloatType, T>;
-using Vector3 = Eigen::Vector3<DefFloatType>;
-using Vector2 = Eigen::Vector3<DefFloatType>;
 
+template<typename T>
+constexpr inline T NotNull(T t) { return t == 0 ? T{1} : t; }
 
 template<typename T>
 constexpr inline ReturnFloatType<T> DegreesToRadians(T degrees) { return degrees * (kPI / 180); }

@@ -24,10 +24,10 @@ auto Event::GetName() const noexcept -> std::string
     return "Key Down";
   case EventType::kKeyUp:
     return "Key Up";
-  case EventType::kKeyPressed:
-    return "Key Pressed";
   case EventType::kWindowResize:
     return "Window Resize";
+    case EventType::kRenderAreaResize:
+    return "Render Area Resize";
   default:
     return "Other: " + std::to_string(ToUnderlying(GetType()));
   }
