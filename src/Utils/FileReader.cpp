@@ -5,11 +5,13 @@
 #include <string>
 #include <fstream>
 #include <sstream>
-#if defined(GAME_WIN_OS)
 #include <windows.h>
-#endif
 
 #include <tracy/Tracy.hpp>
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
+#include "Utils/Logger.hpp"
 
 
 namespace game
@@ -17,21 +19,33 @@ namespace game
 std::string FileReader::Txt(const std::string &path) noexcept
 {
   ZoneScopedC(0xDD008C);
+  GAME_ASSERT(std::filesystem::exists(path)) << "File \'" << path << "\' doesn't exist!";
 
-  /// Use platform specific, because it is usually much faster
-  #if defined(GAME_WIN_OS)
-    OFSTRUCT info;
-		HANDLE f = CreateFileA(path.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_READONLY | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
-		std::string str(info.cBytes, '\0');
-		ReadFile(f, str.data(), info.cBytes, NULL, NULL);
-		CloseHandle(f);
-    return str;
-  #else
-    std::ifstream file{path};
-		static std::stringstream string;
-    string.str("");
-		string << file.rdbuf();
-    return string.str();
-  #endif
+  std::ifstream file{path};
+	static std::stringstream buffer;
+  buffer.str("");
+	buffer << file.rdbuf();
+  return std::string{buffer.str()};
+}
+
+auto FileReader::Image(const std::string &path) noexcept -> ImageData
+{
+  ZoneScopedC(0xDD008C);
+  GAME_ASSERT(std::filesystem::exists(path)) << "File \'" << path << "\' doesn't exist!";
+
+  ImageData image_data;
+  if(!(image_data.data = stbi_load(path.c_str(), &image_data.width, &image_data.height, &image_data.channel_number, 0)))
+  {
+    GAME_LOG(LogType::kError) << "Wasn't able to load image \'" << path << '\'';
+    image_data.data = nullptr;
+    return image_data;
+  }
+  
+  return image_data;
+}
+
+void ImageData::Free() noexcept
+{
+  stbi_image_free(data);
 }
 } // game
