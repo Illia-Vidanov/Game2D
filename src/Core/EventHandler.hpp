@@ -48,15 +48,14 @@ public:
 private:
   struct Keyboard
   {
-    explicit constexpr inline Keyboard(uint16_t new_keycode, uint16_t new_scancode, uint16_t new_mod_keys) noexcept
+    explicit constexpr inline Keyboard(int new_keycode, int new_scancode, uint16_t new_mod_keys) noexcept
     : keycode{new_keycode}
     , scancode{new_scancode}
     , mod_keys{new_mod_keys}
     {}
-    uint16_t keycode;
-    uint16_t scancode;
+    int keycode;
+    int scancode;
     uint16_t mod_keys;
-    uint16_t padding = 0;
   };
   struct CommonKeyboard : Common, Keyboard
   {};
@@ -65,7 +64,7 @@ private:
 public:
   struct KeyDown : Common, Keyboard
   {
-    explicit constexpr inline KeyDown(uint16_t new_keycode, uint16_t new_scancode, uint16_t new_mod_keys) noexcept
+    explicit constexpr inline KeyDown(int new_keycode, int new_scancode, uint16_t new_mod_keys) noexcept
     : Common{EventType::kKeyDown}
     , Keyboard{new_keycode, new_scancode, new_mod_keys}
     {}
@@ -77,7 +76,7 @@ public:
 
   struct KeyUp : Common, Keyboard
   {
-    explicit constexpr inline KeyUp(uint16_t new_keycode, uint16_t new_scancode, uint16_t new_mod_keys) noexcept
+    explicit constexpr inline KeyUp(int new_keycode, int new_scancode, uint16_t new_mod_keys) noexcept
     : Common{EventType::kKeyUp}
     , Keyboard{new_keycode, new_scancode, new_mod_keys}
     {}
@@ -101,17 +100,17 @@ public:
 private:
   struct AreaResize
   {
-  explicit constexpr inline AreaResize(uint16_t new_old_resolution_x, uint16_t new_old_resolution_y, uint16_t new_new_resolution_x, uint16_t new_new_resolution_y) noexcept
+  explicit constexpr inline AreaResize(int new_old_resolution_x, int new_old_resolution_y, int new_new_resolution_x, int new_new_resolution_y) noexcept
     : old_resolution_x{new_old_resolution_x}
     , old_resolution_y{new_old_resolution_y}
     , new_resolution_x{new_new_resolution_x}
     , new_resolution_y{new_new_resolution_y}
     {}
 
-    uint16_t old_resolution_x;
-    uint16_t old_resolution_y;
-    uint16_t new_resolution_x;
-    uint16_t new_resolution_y;
+    int old_resolution_x;
+    int old_resolution_y;
+    int new_resolution_x;
+    int new_resolution_y;
   };
   struct CommonAreaResize : Common, AreaResize
   {};
@@ -120,7 +119,7 @@ private:
 public:
   struct WindowResize : Common, AreaResize
   {
-    explicit constexpr inline WindowResize(uint16_t new_old_resolution_x, uint16_t new_old_resolution_y, uint16_t new_new_resolution_x, uint16_t new_new_resolution_y) noexcept
+    explicit constexpr inline WindowResize(int new_old_resolution_x, int new_old_resolution_y, int new_new_resolution_x, int new_new_resolution_y) noexcept
       : Common{EventType::kWindowResize}
       , AreaResize{new_old_resolution_x, new_old_resolution_y, new_new_resolution_x, new_new_resolution_y}
     {}
@@ -132,7 +131,7 @@ public:
 
   struct RenderAreaResize : Common, AreaResize
   {
-    explicit constexpr inline RenderAreaResize(uint16_t new_old_resolution_x, uint16_t new_old_resolution_y, uint16_t new_new_resolution_x, uint16_t new_new_resolution_y) noexcept
+    explicit constexpr inline RenderAreaResize(int new_old_resolution_x, int new_old_resolution_y, int new_new_resolution_x, int new_new_resolution_y) noexcept
       : Common{EventType::kRenderAreaResize}
       , AreaResize{new_old_resolution_x, new_old_resolution_y, new_new_resolution_x, new_new_resolution_y}
     {}
@@ -167,14 +166,14 @@ public:
   /// Mainly debuging feature
   [[nodiscard]] auto GetName() const noexcept -> std::string;
 	
-	[[nodiscard]] inline auto GetKeycode() const noexcept -> uint16_t
+	[[nodiscard]] inline auto GetKeycode() const noexcept -> int
   {
     GAME_ASSERT_STD(common_.type == EventType::kKeyDown
                  || common_.type == EventType::kKeyUp
                  , "Acces data from wrong event type. Expected: kKeyDown/kKeyUp/kKeyPressed");
     return keyboard_.keycode;
   }
-	[[nodiscard]] inline auto GetScancode() const noexcept -> uint16_t
+	[[nodiscard]] inline auto GetScancode() const noexcept -> int
   {
     GAME_ASSERT_STD(common_.type == EventType::kKeyDown
                  || common_.type == EventType::kKeyUp
@@ -193,25 +192,25 @@ public:
     GAME_ASSERT_STD(GetType() & kCustomTypeBitMask, "Acces data from wrong event type. Expected: to contain kCustomTypeBitMask");
     return custom_.data;
   }
-  [[nodiscard]] inline auto GetOldResolutionX() const noexcept -> uint16_t
+  [[nodiscard]] inline auto GetOldResolutionX() const noexcept -> int
   {
     GAME_ASSERT_STD(common_.type == EventType::kWindowResize
                  || common_.type == EventType::kRenderAreaResize, "Acces data from wrong event type. Expected: kWindowResize or kRenderAreaResize");
     return area_resize_.old_resolution_x;
   }
-  [[nodiscard]] inline auto GetOldResolutionY() const noexcept -> uint16_t
+  [[nodiscard]] inline auto GetOldResolutionY() const noexcept -> int
   {
     GAME_ASSERT_STD(common_.type == EventType::kWindowResize
                  || common_.type == EventType::kRenderAreaResize, "Acces data from wrong event type. Expected: kWindowResize or kRenderAreaResize");
     return area_resize_.old_resolution_y;
   }
-  [[nodiscard]] inline auto GetNewResolutionX() const noexcept -> uint16_t
+  [[nodiscard]] inline auto GetNewResolutionX() const noexcept -> int
   {
     GAME_ASSERT_STD(common_.type == EventType::kWindowResize
                  || common_.type == EventType::kRenderAreaResize, "Acces data from wrong event type. Expected: kWindowResize or kRenderAreaResize");
     return area_resize_.new_resolution_x;
   }
-  [[nodiscard]] inline auto GetNewResolutionY() const noexcept -> uint16_t
+  [[nodiscard]] inline auto GetNewResolutionY() const noexcept -> int
   {
     GAME_ASSERT_STD(common_.type == EventType::kWindowResize
                  || common_.type == EventType::kRenderAreaResize, "Acces data from wrong event type. Expected: kWindowResize or kRenderAreaResize");

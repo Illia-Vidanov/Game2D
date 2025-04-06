@@ -32,10 +32,10 @@ Game::Game(const int argc, const char * const *argv) noexcept
 {
   ZoneScopedC(0xb3041b);
 
-  GAME_VDLOG(1, LogType::kInfo) << "Running!!!";
+  GAME_LOG(LogType::kInfo) << "Running!!!";
 
   event_handler_.AddListener(event_cleaner_, EventType::kQuit, this, [](const Event &event, void *game){ return reinterpret_cast<Game*>(game)->QuitEvent(); });
-  event_handler_.AddListener(event_cleaner_, EventType::kKeyDown, this, [](const Event &event, void *game){ if(event.GetKeycode() == SDLK_ESCAPE) { reinterpret_cast<Game*>(game)->QuitEvent(); } return false; });
+  event_handler_.AddListener(event_cleaner_, EventType::kKeyDown, this, [](const Event &event, void *game){ if(event.GetKeycode() == static_cast<int>(SDLK_ESCAPE)) { reinterpret_cast<Game*>(game)->QuitEvent(); } return false; });
 
   window_.InitEvents();
   resource_manager_.InitEvents();

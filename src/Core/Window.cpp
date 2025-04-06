@@ -49,7 +49,7 @@ void Window::Exit() noexcept
 
 void Window::InitEvents() noexcept
 {
-  game_.GetEventHandler().DispatchEvent(Event{Event::WindowResize{0, 0, static_cast<uint16_t>(width_), static_cast<uint16_t>(height_)}});
+  game_.GetEventHandler().DispatchEvent(Event{Event::WindowResize{0, 0, static_cast<int>(width_), static_cast<int>(height_)}});
 }
 
 void Window::DispatchSDLEvents() noexcept
@@ -78,16 +78,16 @@ void Window::DispatchSDLEvents() noexcept
       break;
     case SDL_KEYDOWN:
       game_.GetEventHandler().DispatchEvent(Event{Event::KeyDown{
-        static_cast<uint16_t>(event.key.keysym.sym),
-        static_cast<uint16_t>(event.key.keysym.scancode),
-        static_cast<uint16_t>(event.key.keysym.mod)
+        event.key.keysym.sym,
+        event.key.keysym.scancode,
+        event.key.keysym.mod
       }});
       break;
     case SDL_KEYUP:
       game_.GetEventHandler().DispatchEvent(Event{Event::KeyUp{
-        static_cast<uint16_t>(event.key.keysym.sym),
-        static_cast<uint16_t>(event.key.keysym.scancode),
-        static_cast<uint16_t>(event.key.keysym.mod)
+        event.key.keysym.sym,
+        event.key.keysym.scancode,
+        event.key.keysym.mod
       }});
       break;
     case SDL_WINDOWEVENT:
@@ -95,7 +95,7 @@ void Window::DispatchSDLEvents() noexcept
       {
       case SDL_WINDOWEVENT_SIZE_CHANGED:
         if(width_ != event.window.data1 || height_ != event.window.data2)
-          game_.GetEventHandler().DispatchEvent(Event{Event::WindowResize{static_cast<uint16_t>(width_), static_cast<uint16_t>(height_), static_cast<uint16_t>(event.window.data1), static_cast<uint16_t>(event.window.data2)}});
+          game_.GetEventHandler().DispatchEvent(Event{Event::WindowResize{width_, height_, event.window.data1, event.window.data2}});
         break;
       default:
         break;
@@ -119,7 +119,7 @@ void Window::SetResolution(const int width, const int height) noexcept
   SDL_SetWindowSize(sdl_window_, width_, height_);
 }
 
-void Window::SetRenderResolution(const uint16_t render_width, const uint16_t render_height) noexcept
+void Window::SetRenderResolution(const int render_width, const int render_height) noexcept
 {
   GL_CALL(glViewport(
     (width_ - render_width) / 2,
@@ -154,7 +154,7 @@ auto Window::WindowResizedEvent(const Event &event) noexcept -> bool
   width_ = event.GetNewResolutionX();
   height_ = event.GetNewResolutionY();
   
-  uint16_t smaller_axis = std::min(width_, height_);
+  int smaller_axis = std::min(width_, height_);
   SetRenderResolution(smaller_axis, smaller_axis);
 
   return false;
