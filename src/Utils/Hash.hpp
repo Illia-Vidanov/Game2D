@@ -63,10 +63,10 @@ constexpr uint32_t Crc32<std::size_t(-1)>(__attribute__((unused)) const char *st
 { return 0xFFFFFFFF; }
 } // detail
 
-/// Constexpr hash of a string
+// Constexpr hash of a string
 #define HASH_STRING(x) (detail::Crc32<sizeof(x) - 1>(x))
 
-/// Hash given type
+// Hash given type
 template<typename T> constexpr inline std::size_t HeshType()
 { return HASH_STRING(__PRETTY_FUNCTION__); }
 
@@ -85,12 +85,12 @@ struct NumToStrImpl<false, 0, digits...>
 { static constexpr char value[sizeof...(digits)] = { ('0' + digits)... }; };
 } // detail
 
-/// Constexpr convertion of number to const char array
+// Constexpr convertion of number to const char array
 template<auto Number>
 struct NumToStr : detail::NumToStrImpl<(Number < 0), (Number < 0 ? -Number : Number) / 10, (Number < 0 ? -Number : Number) % 10>
 { static_assert(std::is_integral_v<decltype(Number)>, "Can't convert non integral values"); };
 
-/// Constexpr convertion of number to const char array
+// Constexpr convertion of number to const char array
 template<auto Number>
 constexpr char *kNumToStr = NumToStr<Number>::value;
 } // game

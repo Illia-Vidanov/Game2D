@@ -20,8 +20,8 @@ namespace detail
   using ConstRawStrArray = const CharT * const *;
 }
 
-/// Add current path to string
-/// return current path + '/' + str
+// Add current path to string
+// return current path + '/' + str
 template<typename CharT>
 inline auto AddCurrentPathToString(const std::basic_string<CharT> &str) -> std::basic_string<CharT>
 { return std::filesystem::current_path().generic_string<CharT>() + std::basic_string<CharT>(1, static_cast<CharT>('/')) + str; }
@@ -29,31 +29,31 @@ inline auto AddCurrentPathToString(const std::basic_string<CharT> &str) -> std::
 template<typename CharT>
 inline auto RemoveCurrentPathFromString(const std::basic_string<CharT> &str) -> std::basic_string<CharT>;
 
-/// Split string by delimetr in vector of strings
-/// default delim = " "
+// Split string by delimetr in vector of strings
+// default delim = " "
 template<typename CharT>
 inline auto SplitString(const std::basic_string<CharT> &str, const std::basic_string<CharT> &delim = " ") noexcept -> std::vector<std::basic_string<CharT>>;
-/// Split string by delimetr in vector of strings
-/// default delim = " "
+// Split string by delimetr in vector of strings
+// default delim = " "
 template<typename CharT>
 inline auto SplitString(const std::basic_string<CharT> &str, CharT delim) noexcept -> std::vector<std::basic_string<CharT>>
 { return SplitString(str, std::basic_string<CharT>(1, delim)); }
 
-/// Check if string starts with certain prefix
-/// Doesn't perform bounds checking so if prefix.size() > string.size() behaviour is undefined
+// Check if string starts with certain prefix
+// Doesn't perform bounds checking so if prefix.size() > string.size() behaviour is undefined
 template<typename CharT>
 inline auto StringStartsWith(const std::basic_string<CharT> &prefix, const std::basic_string<CharT> &str) noexcept -> bool;
 
 template<typename CharT>
 inline auto SubstringCount(const std::basic_string<CharT> &str, const std::basic_string<CharT> &substr) noexcept -> std::size_t;
 
-/// Get charachter count of all strings in array
+// Get charachter count of all strings in array
 template<typename CharT>
 constexpr inline auto RawStringArrayLength(detail::ConstRawStrArray<CharT> first, const detail::ConstRawStrArray<CharT> last) noexcept -> std::size_t; 
 
-/// Connect raw string array into single string with delimetr
-/// default delim = ""
-/// return string with elements from first to last separated by delim 
+// Connect raw string array into single string with delimetr
+// default delim = ""
+// return string with elements from first to last separated by delim 
 template<typename CharT>
 inline auto ConcatStringArray(detail::ConstRawStrArray<CharT> first, const detail::ConstRawStrArray<CharT> last, const std::basic_string<CharT> &delim = "") noexcept -> std::basic_string<CharT>;
 

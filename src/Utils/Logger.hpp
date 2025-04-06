@@ -30,17 +30,17 @@
   #define GAME_DLOG_IF(condition, type)
   #define GAME_VDLOG_IF(condition, level, type)
 #else
-  /// Log message only in when NDEBUG is 0
+  // Log message only in when NDEBUG is 0
   #define GAME_DLOG(type) GAME_LOG(type)
-  /// Log message only in when NDEBUG is 0 and verbose level is smaller than current Logger's verbose level
+  // Log message only in when NDEBUG is 0 and verbose level is smaller than current Logger's verbose level
   #define GAME_VDLOG(level, type) GAME_VLOG(level, type)
-  /// Assert if condition is false
+  // Assert if condition is false
   #define GAME_ASSERT(condition) if(GAME_IS_UNLIKELY(!(static_cast<bool>(condition)))) GAME_DLOG(LogType::kFatal)
-  /// Assert using deafult assert function
+  // Assert using deafult assert function
   #define GAME_ASSERT_STD(condition, message) assert(((void)(message), static_cast<bool>(condition)))
-  /// Remove line on build
+  // Remove line on build
   #define GAME_DEBUG_LINE(command) do { command; } while(0)
-  /// Debug log if condition is true
+  // Debug log if condition is true
   #define GAME_DLOG_IF(condition, type) if(static_cast<bool>(condition)) GAME_DLOG(type)
   #define GAME_VDLOG_IF(condition, level, type) if(static_cast<bool>(condition)) GAME_VDLOG(level, type)
 #endif
@@ -65,7 +65,7 @@ public:
 	using StreamCharT = char;
   using VerboseLevelT = int;
 
-  /// Global instance of logger
+  // Global instance of logger
   [[nodiscard]] static inline auto Get() -> Logger& { static Logger instance; return instance; }
 
   [[nodiscard]] constexpr inline auto GetStream() noexcept -> std::basic_ostream<StreamCharT>& { return stream_; }
@@ -73,19 +73,19 @@ public:
   [[nodiscard]] constexpr inline auto IsOutputToFile() const noexcept -> bool { return output_to_file_; }
   [[nodiscard]] constexpr inline auto GetVerboseLevel() const noexcept -> int { return verbose_level_; }
 
-  /// Sets verbose levels such that values with heigher level won't be printed
+  // Sets verbose levels such that values with heigher level won't be printed
   constexpr inline void SetVerboseLevel(VerboseLevelT verbose_level) noexcept { verbose_level_ = verbose_level; }
-  /// If true output is also writen to file
-  /// Default value is true 
+  // If true output is also writen to file
+  // Default value is true 
   constexpr inline void SetOutputToFile(bool output_to_file) noexcept { output_to_file_ = output_to_file; }
-  /// Set buffer of underlying stream
-  /// Set to:
-  /// std::cerr.rdbuf() to use std::cerr
-  /// std::cout.rdbuf() to use std::cout
-  /// etc.
+  // Set buffer of underlying stream
+  // Set to:
+  // std::cerr.rdbuf() to use std::cerr
+  // std::cout.rdbuf() to use std::cout
+  // etc.
   inline void SetOutStreamBuffer(std::basic_ostream<StreamCharT> &stream) noexcept { stream_.rdbuf(stream.rdbuf()); }
 
-  /// Get string with name of LogType
+  // Get string with name of LogType
   [[nodiscard]] static inline auto GetLogTypeName(LogType type) noexcept -> std::string { static const std::string kLogTypeNameMap[] = { "Fatal", "Error", "Warning", "Info" }; return kLogTypeNameMap[ToUnderlying(type)]; }
 
   static inline const std::filesystem::path kDefLogPath = "./logs/";
@@ -113,14 +113,14 @@ struct LogData
 };
 
 
-/// Stream that uses global information from Logger to log
+// Stream that uses global information from Logger to log
 class LogStream
 {
 public:
   LogStream(const LogData &log_data) noexcept : fatal_(log_data.type == LogType::kFatal) { GAME_ASSERT_STD(log_data.type != LogType::kNone, "LogType::kNone"); }
   ~LogStream() noexcept;
 	
-  /// Input value to be printed
+  // Input value to be printed
   template<typename T>
 	inline LogStream &operator<<(T &&t) noexcept;
 

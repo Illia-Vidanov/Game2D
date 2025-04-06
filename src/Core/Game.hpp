@@ -18,7 +18,7 @@ int main(int argc, char **argv);
 
 namespace game
 {
-/// Main class of a game
+// Main class of a game
 class Game
 {
   friend int ::main(int argc, char **argv);
@@ -37,15 +37,15 @@ public:
   [[nodiscard]] constexpr inline auto GetResourceManager() const noexcept -> const ResourceManager& { return resource_manager_; }
 
 private:
-  /// Initializes game
+  // Initializes game
   Game(const int argc, const char * const *argv) noexcept;
 
-  /// Main game loop
+  // Main game loop
   void Run() noexcept;
-  /// Close application
+  // Close application
   void Exit() noexcept;
 
-  /// Function to executre on Quit event
+  // Function to executre on Quit event
   auto QuitEvent() noexcept -> bool;
 
   bool running_ = false;

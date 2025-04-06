@@ -49,7 +49,6 @@ public:
   Game &game_;
   
   static constexpr inline int kStartupResDivFactor = 3;
-  /// Use int instead of uint16_t as elsewhere because SDL requires pointers to int to fetch screen resolution
   int width_;
   int height_;
   int render_width_ = 0;

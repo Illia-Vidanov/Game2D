@@ -141,7 +141,7 @@ public:
   {}
 
 
-  /// Custom type should specify it's type for listeners and it's last bit should be 1 or contain just use kCustomTypeBitMask
+  // Custom type should specify it's type for listeners and it's last bit should be 1 or contain just use kCustomTypeBitMask
   struct Custom : Common
   {
     explicit constexpr inline Custom(EventType custom_type, void *new_data) noexcept
@@ -161,9 +161,9 @@ public:
 
   
   [[nodiscard]] constexpr inline auto GetType() const noexcept -> EventType { return common_.type; }
-  /// Get name of event according to type
-  /// If type is custom "Other: (type value)" is returned
-  /// Mainly debuging feature
+  // Get name of event according to type
+  // If type is custom "Other: (type value)" is returned
+  // Mainly debuging feature
   [[nodiscard]] auto GetName() const noexcept -> std::string;
 	
 	[[nodiscard]] inline auto GetKeycode() const noexcept -> int
@@ -236,8 +236,8 @@ private:
 class EventCleaner;
 class Game;
 
-/// Add listener to an event and dispatch events with specific type
-/// If callback returns true then event is handeled and doesn't spread further
+// Add listener to an event and dispatch events with specific type
+// If callback returns true then event is handeled and doesn't spread further
 class EventHandler
 {
   friend EventCleaner;
@@ -249,24 +249,24 @@ public:
   using QueueType = std::queue<Event>;
 
 
-  /// Add to type event listener that will be trigered when event fires
-  /// First in is first to be called when event happens
-  /// UID is returned that can be used to remvoe listener
+  // Add to type event listener that will be trigered when event fires
+  // First in is first to be called when event happens
+  // UID is returned that can be used to remvoe listener
   inline auto AddListener(EventCleaner &cleaner, EventType type, void *data, CallbackType callback) noexcept -> std::size_t;
   inline void RemoveListener(EventCleaner &cleaner, std::size_t uid) noexcept;
-  /// Remove all listeners of specified type
+  // Remove all listeners of specified type
   inline void ClearListeners(EventType type) noexcept;
-  /// Clear all listeners
+  // Clear all listeners
   inline void ClearListeners() noexcept { listeners_.clear(); events_.clear(); }
  
-  /// Instantly dispatch event
+  // Instantly dispatch event
   inline void DispatchEvent(const Event &event) noexcept;
   inline void EnqueEvent(const Event &event) noexcept { queue_.push(event); }
   inline void DispatchEnquedEvents() noexcept { ZoneScopedC(0xe8bb25); while(queue_.size()) { DispatchEvent(queue_.front()); queue_.pop(); } }
 
 
 private:
-  /// Used in event cleaner to directly remove listener when EventCleaner is destroyed
+  // Used in event cleaner to directly remove listener when EventCleaner is destroyed
   inline void RemoveListener(std::size_t uid) noexcept { listeners_.erase(uid); }
 
   QueueType queue_;
@@ -279,8 +279,8 @@ private:
 
 
 
-/// Class that manages lifetime of event listeners
-/// It removes listeners that were created using it from EventHandler on destruction
+// Class that manages lifetime of event listeners
+// It removes listeners that were created using it from EventHandler on destruction
 class EventCleaner
 {
   friend EventHandler;
@@ -288,11 +288,11 @@ public:
   inline EventCleaner(EventHandler &event_handler) noexcept : event_handler_{event_handler} {}
   inline ~EventCleaner() noexcept { ZoneScopedC(0xe8bb25); for(auto uid : uids_) event_handler_.RemoveListener(uid); }
 
-  /// Add position (you can get it when adding listener in EventHandler) to EventClener that will be removed from EventHandler on the destruction
+  // Add position (you can get it when adding listener in EventHandler) to EventClener that will be removed from EventHandler on the destruction
   inline void AddUid(std::size_t uid) noexcept { uids_.push_back(uid); }
-  /// Remove position (you can get it when adding listener in EventHandler) from EventCleaner to not remove it on the destruction of a cleaner
+  // Remove position (you can get it when adding listener in EventHandler) from EventCleaner to not remove it on the destruction of a cleaner
   inline void RemoveUid(std::size_t uid) noexcept { std::swap(uids_.back(), *std::find(uids_.begin(), uids_.end(), uid)); uids_.pop_back(); }
-  /// Remove all positions from cleaner so they won't be removed on destruction of EventCleaner
+  // Remove all positions from cleaner so they won't be removed on destruction of EventCleaner
   inline void ClearUids() noexcept { uids_.clear(); }
 
 private:
