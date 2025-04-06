@@ -34,6 +34,8 @@ Renderer::Renderer(Game &game) noexcept
 
   PrintDebugInfo();
 
+  GL_CALL(glEnable(GL_SCISSOR_TEST));
+  
   GL_CALL(glClearColor(0.224f, 0.298f, 0.302f, 1.0f));
 }
 
@@ -61,7 +63,7 @@ void Renderer::StartFrame() noexcept
 {
   ZoneScopedC(0x07dbd4);
 
-  GL_CALL(glClear(GL_COLOR_BUFFER_BIT));
+  GL_CALL(glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT));
 }
 
 void Renderer::EndFrame() noexcept

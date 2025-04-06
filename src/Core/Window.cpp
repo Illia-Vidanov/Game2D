@@ -128,6 +128,20 @@ void Window::SetRenderResolution(const int render_width, const int render_height
     render_height
   ));
 
+  GL_CALL(glScissor(0, 0, width_, height_));
+
+  // glClearColor are temporary before we figure out how to make background
+  GL_CALL(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
+  GL_CALL(glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT));
+  GL_CALL(glClearColor(0.224f, 0.298f, 0.302f, 1.0f));
+
+  GL_CALL(glScissor(
+    (width_ - render_width) / 2,
+    (height_ - render_height) / 2,
+    render_width,
+    render_height
+  ));
+
   if(render_width_ == render_width && render_height_ == render_height)
     return;
     
