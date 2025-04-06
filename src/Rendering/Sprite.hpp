@@ -13,20 +13,21 @@
 
 namespace game
 {
-class VAO;
+class Texture;
 class Shader;
 
 class Sprite
 {
 public:
-  Sprite(const Shader &shader, const Transform &transform) noexcept;
+  Sprite(const Shader &shader, const Texture &texture, const Transform &transform) noexcept;
 
   [[nodiscard]] constexpr inline auto GetShader() const noexcept -> const Shader & { return shader_; }
   [[nodiscard]] constexpr inline auto GetTransform() const noexcept -> const Transform & { return transform_; }
+  [[nodiscard]] constexpr inline auto GetTexture() const noexcept -> const Texture & { return texture_; }
 
   private:
-  //const Texture &texture_;
   const Shader &shader_;
+  const Texture &texture_;
   const Transform &transform_;
   
 };

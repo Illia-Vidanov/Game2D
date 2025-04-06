@@ -18,10 +18,11 @@ namespace game
 {
 Player::Player(Game &game) noexcept
   : game_{game}
-  , sprite_{game_.GetResourceManager().GetShader(ShaderType::kDefault), transform_}
+  , sprite_{game_.GetResourceManager().GetShader(ShaderType::kDefault), game_.GetResourceManager().GetTexture(TextureType::kNoImage64), transform_}
   , event_cleaner_{game_.GetEventHandler()}
 {
-  sprite_.GetShader().SetUniform("spriteColor", 1.0f, 1.0f, 0.0f);
+  //sprite_.GetShader().SetUniform("spriteColor", 1.0f, 1.0f, 1.0f);
+  transform_.linear().diagonal() *= 10;
 }
 
 void Player::Update() noexcept
@@ -34,6 +35,6 @@ void Player::Update() noexcept
     0.0f
   };
 
-  GAME_LOG(LogType::kInfo) << transform_.translation().transpose();
+  //GAME_LOG(LogType::kInfo) << transform_.translation().transpose();
 }
 } // game

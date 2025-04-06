@@ -12,8 +12,9 @@
 
 namespace game
 {
-Sprite::Sprite(const Shader &shader, const Transform &transform) noexcept
+Sprite::Sprite(const Shader &shader, const Texture &texture, const Transform &transform) noexcept
   : shader_{shader}
+  , texture_{texture}
   , transform_{transform}
 {}
 } // game

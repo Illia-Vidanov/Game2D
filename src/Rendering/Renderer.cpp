@@ -34,7 +34,7 @@ Renderer::Renderer(Game &game) noexcept
 
   PrintDebugInfo();
 
-  GL_CALL(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
+  GL_CALL(glClearColor(0.224f, 0.298f, 0.302f, 1.0f));
 }
 
 void Renderer::PrintDebugInfo() const noexcept
@@ -50,6 +50,8 @@ void Renderer::Render(const Sprite &sprite) noexcept
 {
   ZoneScopedC(0x07dbd4);
 
+  GL_CALL(glActiveTexture(GL_TEXTURE0));
+  sprite.GetTexture().Bind();
   sprite.GetShader().Use();
   sprite.GetShader().SetUniformMatrix4("model", 1, false, sprite.GetTransform().data());
   GL_CALL(glDrawElements(GL_TRIANGLES, game_.GetResourceManager().GetSpriteIndexCount(), GL_UNSIGNED_INT, 0));
