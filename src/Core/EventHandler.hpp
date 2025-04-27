@@ -347,11 +347,11 @@ inline auto EventHandler::AddListener(EventCleaner &cleaner, EventType type, voi
   GAME_ASSERT(this == &cleaner.event_handler_) << "Same cleaner used for multiple EventHandlers:\n"
                                                   "This handler: " << this
                                                << "\nHandler which EventCleaner is bound to: " << &cleaner.event_handler_;
-  std::size_t uid = last_uid++;
-  listeners_.emplace(uid, ListenerMapValueType(data, callback));
-  events_.emplace(type, uid);
-  cleaner.AddUid(uid);
-  return uid;
+  ++last_uid;
+  listeners_.emplace(last_uid, ListenerMapValueType(data, callback));
+  events_.emplace(type, last_uid);
+  cleaner.AddUid(last_uid);
+  return last_uid;
 }
 } // game
 
