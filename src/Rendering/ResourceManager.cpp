@@ -37,8 +37,8 @@ ResourceManager::ResourceManager(Game &game) noexcept
 
   LoadShader(ShaderType::kDefault, {"res/Shaders/Default.vert", "res/Shaders/Default.frag"});
 
-  Transform orthographic_projection = Transform{OrthographicProjection(0, Window::kUnitsPerScreenX, 0, Window::kUnitsPerScreenY, -1, 1)};
-  orthographic_projection.translation() += Vector3{1.0f, 1.0f, 0.0f}; // shift projection such that 0 0 is at the center
+  Matrix4 orthographic_projection = OrthographicProjection(0, Window::kUnitsPerScreenX, 0, Window::kUnitsPerScreenY, -1, 1);
+  orthographic_projection.block<2, 1>(0, 3) += Vector2{1.0f, 1.0f}; // shift projection such that 0 0 is at the center
   GetShader(ShaderType::kDefault).SetUniformMatrix4("projection", 1, false, orthographic_projection.data());
 
   LoadTexture(TextureType::kNoImage64, GL_TEXTURE_2D, "res/Textures/NoTexture64.png");

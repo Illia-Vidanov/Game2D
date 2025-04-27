@@ -52,6 +52,8 @@ add_library(${GAME_OBJ_LIB_NAME} STATIC
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Rendering/Texture.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Game/Player.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Game/Input.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Physics/Physics.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Physics/Collider.cpp
 )
 
 target_compile_options(

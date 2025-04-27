@@ -9,11 +9,14 @@
 namespace game
 {
 using DefFloatType = float;
-using Transform = Eigen::Transform<DefFloatType, 3, 2>;
+using Transform = Eigen::Transform<DefFloatType, 2, 2>;
+using Vector2 = Eigen::Vector2<DefFloatType>;
 using Vector3 = Eigen::Vector3<DefFloatType>;
-using Vector2 = Eigen::Vector3<DefFloatType>;
+using Vector4 = Eigen::Vector4<DefFloatType>;
 using Vector2i = Eigen::Vector2<int>;
 using Vector3i = Eigen::Vector3<int>;
+using Vector4i = Eigen::Vector4<int>;
+using Matrix3 = Eigen::Matrix3<DefFloatType>;
 using Matrix4 = Eigen::Matrix4<DefFloatType>;
 
 constexpr inline DefFloatType kPI = static_cast<DefFloatType>(3.141592);

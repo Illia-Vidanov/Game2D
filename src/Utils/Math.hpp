@@ -422,8 +422,9 @@ constexpr inline T DigitCount(U number)
 template<typename T = int, typename U>
 constexpr inline T Bitmask(U bit) noexcept { GAME_ASSERT(bit < (sizeof(T) * CHAR_BIT)) << "Too large bit: " << bit; return static_cast<T>(1) << bit; }
 
-auto OrthographicProjection(float left, float right, float bottom, float top, float near, float far) noexcept -> Eigen::Matrix4<DefFloatType>;
-auto OrthographicProjection2D(float left, float right, float bottom, float top) noexcept -> Eigen::Matrix3<DefFloatType>;
+auto OrthographicProjection(float left, float right, float bottom, float top, float near, float far) noexcept -> Matrix4;
+auto OrthographicProjection2D(float left, float right, float bottom, float top) noexcept -> Matrix3;
+auto TransformTo4x4TransformationMatrix(const Transform &transform) noexcept -> Matrix4;
 } // game
 
 

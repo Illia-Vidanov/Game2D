@@ -29,7 +29,6 @@ public:
   const Shader &shader_;
   const Texture &texture_;
   const Transform &transform_;
-  
 };
 } // game
 

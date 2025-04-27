@@ -9,6 +9,7 @@
 #include "Core/Game.hpp"
 #include "Core/Window.hpp"
 #include "Utils/Logger.hpp"
+#include "Utils/Math.hpp"
 #include "Rendering/Utils.hpp"
 #include "Rendering/Sprite.hpp"
 
@@ -55,7 +56,7 @@ void Renderer::Render(const Sprite &sprite) noexcept
   GL_CALL(glActiveTexture(GL_TEXTURE0));
   sprite.GetTexture().Bind();
   sprite.GetShader().Use();
-  sprite.GetShader().SetUniformMatrix4("model", 1, false, sprite.GetTransform().data());
+  sprite.GetShader().SetUniformMatrix4("model", 1, false, TransformTo4x4TransformationMatrix(sprite.GetTransform()).data());
   GL_CALL(glDrawElements(GL_TRIANGLES, game_.GetResourceManager().GetSpriteIndexCount(), GL_UNSIGNED_INT, 0));
 }
 

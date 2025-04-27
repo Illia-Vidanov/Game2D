@@ -13,9 +13,9 @@
 
 namespace game
 {
-auto OrthographicProjection(float left, float right, float bottom, float top, float near, float far) noexcept -> Eigen::Matrix4<DefFloatType>
+auto OrthographicProjection(float left, float right, float bottom, float top, float near, float far) noexcept -> Matrix4
 {
-  Eigen::Matrix4<DefFloatType> projection = Eigen::Matrix4<DefFloatType>::Identity();
+  Matrix4 projection = Matrix4::Identity();
   
   projection(0, 0) = 2.0f / (right - left);
   projection(1, 1) = 2.0f / (top - bottom);
@@ -28,9 +28,9 @@ auto OrthographicProjection(float left, float right, float bottom, float top, fl
   return projection;
 }
 
-auto OrthographicProjection2D(float left, float right, float bottom, float top) noexcept -> Eigen::Matrix3<DefFloatType>
+auto OrthographicProjection2D(float left, float right, float bottom, float top) noexcept -> Matrix3
 {
-  Eigen::Matrix3<DefFloatType> projection = Eigen::Matrix3<DefFloatType>::Identity();
+  Matrix3 projection = Matrix3::Identity();
   
   projection(0, 0) = 2.0f / (right - left);
   projection(1, 1) = 2.0f / (top - bottom);
@@ -39,5 +39,14 @@ auto OrthographicProjection2D(float left, float right, float bottom, float top) 
   projection(1, 2) = -(top + bottom) / (top - bottom);
 
   return projection;
+}
+
+auto TransformTo4x4TransformationMatrix(const Transform &transform) noexcept -> Matrix4
+{
+  Matrix4 result = Matrix4::Identity();
+  result.block<2, 2>(0, 0) = transform.linear();
+  result.block<2, 1>(0, 3) = transform.translation();
+
+  return result;
 }
 } // game

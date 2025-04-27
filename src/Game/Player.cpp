@@ -35,6 +35,6 @@ void Player::Update() noexcept
     0.0f
   };
 
-  //GAME_LOG(LogType::kInfo) << transform_.translation().transpose();
+  //GAME_DLOG(LogType::kInfo) << transform_.translation().transpose();
 }
 } // game

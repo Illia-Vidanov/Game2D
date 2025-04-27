@@ -30,8 +30,6 @@ private:
   Sprite sprite_;
   Transform transform_ = Transform::Identity();
   EventCleaner event_cleaner_;
-
-  auto KeyDownEvent(const Event &event) noexcept -> bool;
 };
 }
 
