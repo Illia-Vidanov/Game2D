@@ -10,6 +10,7 @@
 #include "Utils/MathConstants.hpp"
 #include "Rendering/Sprite.hpp"
 #include "Core/EventHandler.hpp"
+#include "Physics/Collider.hpp"
 
 namespace game
 {
@@ -29,6 +30,7 @@ private:
   Game &game_;
   Sprite sprite_;
   Transform transform_ = Transform::Identity();
+  SquareCollider collider_;
   EventCleaner event_cleaner_;
 };
 }

@@ -10,6 +10,7 @@
 #include "Rendering/ResourceManager.hpp"
 #include "Game/Player.hpp"
 #include "Game/Input.hpp"
+#include "Physics/Physics.hpp"
 
 
 class SDL_Window;
@@ -29,6 +30,8 @@ public:
   [[nodiscard]] constexpr inline auto GetInput() const noexcept -> const Input& { return input_; }
   [[nodiscard]] constexpr inline auto GetWindow() noexcept -> Window& { return window_; }
   [[nodiscard]] constexpr inline auto GetWindow() const noexcept -> const Window& { return window_; }
+  [[nodiscard]] constexpr inline auto GetPhysics() noexcept -> Physics& { return physics_; }
+  [[nodiscard]] constexpr inline auto GetPhysics() const noexcept -> const Physics& { return physics_; }
   [[nodiscard]] constexpr inline auto GetRenderer() noexcept -> Renderer& { return renderer_; }
   [[nodiscard]] constexpr inline auto GetRenderer() const noexcept -> const Renderer& { return renderer_; }
   [[nodiscard]] constexpr inline auto GetEventHandler() noexcept -> EventHandler& { return event_handler_; }
@@ -57,7 +60,10 @@ private:
   ResourceManager resource_manager_;
 
   Input input_;
+  Physics physics_;
   Player player_;
+  
+  
 };
 } // game
 

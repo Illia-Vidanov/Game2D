@@ -55,6 +55,7 @@ void Game::Run() noexcept
     renderer_.StartFrame();
 
     input_.Update();
+    physics_.Update();
     player_.Update();
 
     renderer_.EndFrame();
