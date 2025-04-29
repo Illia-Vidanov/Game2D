@@ -21,7 +21,7 @@ ResourceManager::ResourceManager(Game &game) noexcept
   ZoneScopedC(0xC4DD00);
 
   sprite_vbo_.BufferData({
-    {-1, -1, 0, 0}, {1, -1, 1, 0}, {-1, 1, 0, 1}, {1, 1, 1, 1}
+    {-0.5f, -0.5f, 0, 0}, {0.5f, -0.5f, 1, 0}, {-0.5f, 0.5f, 0, 1}, {0.5f, 0.5f, 1, 1}
   });
   sprite_ebo_.BufferData({
     0, 1, 2,
@@ -32,7 +32,7 @@ ResourceManager::ResourceManager(Game &game) noexcept
 
   LoadShader(ShaderType::kDefault, {"res/Shaders/Default.vert", "res/Shaders/Default.frag"});
 
-  Matrix4 orthographic_projection = OrthographicProjection(0, Window::kUnitsPerScreenX, 0, Window::kUnitsPerScreenY, -1, 1);
+  Matrix4 orthographic_projection = TransformComponent::OrthographicProjection(0, Window::kUnitsPerScreenX, 0, Window::kUnitsPerScreenY, -1, 1);
   orthographic_projection.block<2, 1>(0, 3) += Vector2{1.0f, 1.0f}; // shift projection such that 0 0 is at the center
   GetShader(ShaderType::kDefault).SetUniformMatrix4("projection", 1, false, orthographic_projection.data());
 

@@ -46,6 +46,7 @@ private:
   
   entt::registry registry_;
   entt::entity player_;
+  entt::entity box_;
 
   EventSystem event_system_;
   EventCleaner event_cleaner_;

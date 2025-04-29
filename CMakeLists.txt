@@ -54,6 +54,7 @@ add_library(${GAME_OBJ_LIB_NAME} STATIC
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Player/InputSystem.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Physics/PhysicsSystem.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Physics/ColliderComponents.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Physics/TransformComponent.cpp
 )
 
 target_compile_options(

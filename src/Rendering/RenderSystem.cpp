@@ -65,7 +65,7 @@ void RenderSystem::EndFrame() noexcept
     const SpriteComponent &sprite = sprites_.get<SpriteComponent>(entity);
     sprite.GetTexture().Bind();
     sprite.GetShader().Use();
-    sprite.GetShader().SetUniformMatrix4("model", 1, false, TransformTo4x4TransformationMatrix(sprites_.get<TransformComponent>(entity)).data());
+    sprite.GetShader().SetUniformMatrix4("model", 1, false, TransformComponent::To4x4TransformationMatrix(sprites_.get<TransformComponent>(entity)).data());
     GL_CALL(glDrawElements(GL_TRIANGLES, game_.GetResourceManager().GetSpriteIndexCount(), GL_UNSIGNED_INT, 0));
   }
 

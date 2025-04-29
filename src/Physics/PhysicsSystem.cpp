@@ -21,12 +21,31 @@ void PhysicsSystem::Update() noexcept
 {
   ZoneScopedC(0xfc940a);
 
-  for(entt::entity entity : square_colliders_)
+  for(auto container_a = square_colliders_.begin(); container_a != square_colliders_.end(); ++container_a)
   {
-    ZoneScopedNC("Check square collider", 0xfc940a);
+    ZoneScopedNC("Check square collider: " + std::to_string(*container_a), 0xfc940a);
+    
+    for(auto container_b = container_a + 1; container_b != square_colliders_.end(); ++container_b)
+    {
+      Vector4 rect_a = square_colliders_.get<SquareColliderComponent>(*container_a).GetRect();
+      TransformComponent &transform_a = square_colliders_.get<TransformComponent>(*container_a);
+      rect_a.z() *= transform_a.linear().diagonal().x();
+      rect_a.w() *= transform_a.linear().diagonal().y();
+      rect_a.block<2, 1>(0, 0) += transform_a.translation();
 
-    const SquareColliderComponent &square_collider = square_colliders_.get<SquareColliderComponent>(entity);
-    TransformComponent &transform = square_colliders_.get<TransformComponent>(entity);
+      Vector4 rect_b = square_colliders_.get<SquareColliderComponent>(*container_b).GetRect();
+      TransformComponent &transform_b = square_colliders_.get<TransformComponent>(*container_b);
+      rect_b.z() *= transform_b.linear().diagonal().x();
+      rect_b.w() *= transform_b.linear().diagonal().y();
+      rect_b.block<2, 1>(0, 0) += transform_b.translation();
+
+      GAME_DLOG(LogType::kInfo) << rect_a.transpose() << "    " << rect_b.transpose();
+      GAME_DLOG_IF(rect_a.x() + rect_a.z() > rect_b.x() &&
+                   rect_b.x() + rect_b.z() > rect_a.x() &&
+                   rect_a.y() + rect_a.w() > rect_b.y() &&
+                   rect_b.y() + rect_b.w() > rect_a.y(), LogType::kInfo) << "Hit!";
+    }
+
 
     //GAME_DLOG(LogType::kInfo) << ToWorldRect(square_collider.GetRect(), transform).transpose();
   }

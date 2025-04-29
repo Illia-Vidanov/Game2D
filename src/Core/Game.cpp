@@ -32,7 +32,7 @@ Game::Game(const int argc, const char * const *argv) noexcept
 
   GAME_VLOG(1, LogType::kInfo) << "Running!!!";
 
-  event_system_.AddListener(event_cleaner_, EventType::kQuit, this, [](const Event &event, void *game){ return reinterpret_cast<Game*>(game)->QuitEvent(); });
+  event_system_.AddListener(event_cleaner_, EventType::kQuit, this, []([[maybe_unused]] const Event &event, void *game){ return reinterpret_cast<Game*>(game)->QuitEvent(); });
   event_system_.AddListener(event_cleaner_, EventType::kKeyDown, this, [](const Event &event, void *game){ if(event.GetKeycode() == static_cast<int>(SDLK_ESCAPE)) { reinterpret_cast<Game*>(game)->QuitEvent(); } return false; });
 
   window_.InitEvents();
@@ -45,6 +45,15 @@ Game::Game(const int argc, const char * const *argv) noexcept
   player_sprite.SetTexture(resource_manager_.GetTexture(TextureType::kNoImage64));
   registry_.emplace<SquareColliderComponent>(player_);
   registry_.emplace<PlayerComponent>(player_).Initialize(player_, *this);
+
+  box_ = registry_.create();
+  TransformComponent &box_transform = registry_.emplace<TransformComponent>(box_);
+  box_transform.translation() = Vector2{20, 20};
+  box_transform.linear().diagonal() = Vector2{10, 10};
+  SpriteComponent &box_sprite = registry_.emplace<SpriteComponent>(box_);
+  box_sprite.SetShader(resource_manager_.GetShader(ShaderType::kDefault));
+  box_sprite.SetTexture(resource_manager_.GetTexture(TextureType::kWhite));
+  registry_.emplace<SquareColliderComponent>(box_);
 }
 
 void Game::Run() noexcept

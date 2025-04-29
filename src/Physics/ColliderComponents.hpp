@@ -17,7 +17,7 @@ public:
   [[nodiscard]] constexpr inline auto GetRect() const noexcept -> const Vector4 & { return rect_; }
 
 private:
-  Vector4 rect_ = Vector4::Ones();
+  Vector4 rect_ = Vector4{0, 0, 1, 1};
 };
 } // game
 
