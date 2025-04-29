@@ -2,15 +2,6 @@
 
 #include "Setup.hpp"
 
-#include <fstream>
-#include <iostream>
-#include <optional>
-#include <string>
-#include <filesystem>
-#include <cassert>
-
-#include <tracy/Tracy.hpp>
-
 
 namespace game
 {

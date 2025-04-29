@@ -2,12 +2,6 @@
 
 #include "Setup.hpp"
 
-#include <type_traits>
-#include <cmath>
-
-#include <gcem/gcem.hpp>
-#include <Eigen/Dense>
-
 #include "Utils/MathConstants.hpp"
 #include "Utils/Logger.hpp"
 #include "Physics/TransformComponent.hpp"
@@ -15,17 +9,19 @@
 
 namespace game
 {
-auto OrthographicProjection(float left, float right, float bottom, float top, float near, float far) noexcept -> Matrix4
+// near_ and far_ are written with underline because some windows library defines near and far
+
+auto OrthographicProjection(float left, float right, float bottom, float top, float near_, float far_) noexcept -> Matrix4
 {
   Matrix4 projection = Matrix4::Identity();
   
   projection(0, 0) = 2.0f / (right - left);
   projection(1, 1) = 2.0f / (top - bottom);
-  projection(2, 2) = -2.0f / (far - near);
+  projection(2, 2) = -2.0f / (far_ - near_);
   
   projection(0, 3) = -(right + left) / (right - left);
   projection(1, 3) = -(top + bottom) / (top - bottom);
-  projection(2, 3) = -(far + near) / (far - near);
+  projection(2, 3) = -(far_ + near_) / (far_ - near_);
 
   return projection;
 }

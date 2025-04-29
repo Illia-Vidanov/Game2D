@@ -2,9 +2,6 @@
 
 #include "Setup.hpp"
 
-#include <SDL2/SDL.h>
-#include <glad/glad.h>
-
 #include "Core/Game.hpp"
 #include "Utils/Logger.hpp"
 #include "Core/EventSystem.hpp"

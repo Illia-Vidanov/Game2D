@@ -1,11 +1,6 @@
 #include "ResourceManager.hpp"
 
-#include <string>
-#include <unordered_map>
-
-#include <Eigen/Dense>
-#include <Eigen/Geometry>
-#include <glad/glad.h>
+#include "Setup.hpp"
 
 #include "Rendering/VAO.hpp"
 #include "Rendering/Shader.hpp"

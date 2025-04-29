@@ -2,13 +2,6 @@
 
 #include "Setup.hpp"
 
-#include <glad/glad.h>
-#include <SDL2/SDL.h>
-#include <tracy/Tracy.hpp>
-#include <Eigen/Dense>
-#include <Eigen/Geometry>
-#include <entt.hpp>
-
 #include "Core/Game.hpp"
 #include "Core/Window.hpp"
 #include "Utils/Logger.hpp"
@@ -16,7 +9,6 @@
 #include "Rendering/Utils.hpp"
 #include "Rendering/SpriteComponent.hpp"
 #include "Physics/TransformComponent.hpp"
-
 
 
 namespace game

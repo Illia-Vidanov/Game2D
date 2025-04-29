@@ -2,18 +2,16 @@
 Todo:
 
 */
-
 #include "Setup.hpp"
-
-#include <tracy/Tracy.hpp>
 
 #include "Core/Game.hpp"
 
-int main(int argc, char **argv)
+
+int WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmdshow)
 {
   ZoneScopedC(0xd10834);
 
-  game::Game game(argc, argv);
+  game::Game game(0, nullptr);
   game.Run();
 
   return 0;

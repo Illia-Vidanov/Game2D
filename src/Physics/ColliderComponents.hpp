@@ -3,8 +3,6 @@
 
 #include "Setup.hpp"
 
-#include <Eigen/Dense>
-
 #include "Utils/MathConstants.hpp"
 
 

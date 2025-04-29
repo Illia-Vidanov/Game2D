@@ -2,12 +2,6 @@
 
 #include "Setup.hpp"
 
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <windows.h>
-
-#include <tracy/Tracy.hpp>
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 

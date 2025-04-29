@@ -3,13 +3,6 @@
 
 #include "Setup.hpp"
 
-#include <vector>
-#include <algorithm>
-
-#include <entt.hpp>
-#include <Eigen/Dense>
-#include <Eigen/Geometry>
-
 #include "Physics/ColliderComponents.hpp"
 #include "Physics/TransformComponent.hpp"
 #include "Utils/MathConstants.hpp"

@@ -3,15 +3,9 @@
 
 #include "Setup.hpp"
 
-#include <type_traits>
-#include <cmath>
-
-#include <gcem/gcem.hpp>
-#include <Eigen/Dense>
-#include <Eigen/Geometry>
-
 #include "Utils/MathConstants.hpp"
 #include "Physics/TransformComponent.hpp"
+
 
 namespace game
 {
@@ -428,6 +422,5 @@ auto OrthographicProjection(float left, float right, float bottom, float top, fl
 auto OrthographicProjection2D(float left, float right, float bottom, float top) noexcept -> Matrix3;
 auto TransformTo4x4TransformationMatrix(const TransformComponent &transform) noexcept -> Matrix4;
 } // game
-
 
 #endif // GAME_MATH_HPP

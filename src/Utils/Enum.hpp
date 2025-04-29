@@ -1,10 +1,8 @@
 #ifndef GAME_ENUM_HPP
 #define GAME_ENUM_HPP
 
-#include <type_traits>
-#include <iostream>
-
 #include "Setup.hpp"
+
 
 namespace game
 {

@@ -3,9 +3,6 @@
 
 #include "Setup.hpp"
 
-#include <Eigen/Dense>
-#include <Eigen/Geometry>
-
 #include "Utils/MathConstants.hpp"
 
 namespace game

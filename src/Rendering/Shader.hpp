@@ -3,12 +3,6 @@
 
 #include "Setup.hpp"
 
-#include <string>
-#include <functional>
-#include <initializer_list>
-
-#include <glad/glad.h>
-
 #include "Rendering/Utils.hpp"
 #include "Utils/Logger.hpp"
 

@@ -2,14 +2,6 @@
 
 #include "Setup.hpp"
 
-#include <vector>
-#include <utility>
-
-#include <entt.hpp>
-#include <Eigen/Dense>
-#include <Eigen/Geometry>
-#include <tracy/Tracy.hpp>
-
 #include "Physics/ColliderComponents.hpp"
 #include "Physics/TransformComponent.hpp"
 #include "Utils/Logger.hpp"

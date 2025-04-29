@@ -1,8 +1,6 @@
 #ifndef GAME_WINDOW_HPP
 #define GAME_WINDOW_HPP
 
-#include <string>
-
 #include "Setup.hpp"
 
 #include "Core/EventSystem.hpp"

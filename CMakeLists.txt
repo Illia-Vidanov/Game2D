@@ -75,9 +75,9 @@ target_include_directories(
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/libs/entt
 )
 
-target_link_libraries(
+target_precompile_headers(
   ${GAME_OBJ_LIB_NAME}
-  PUBLIC TracyClient
+  PUBLIC [["c:\\Programming\\c++\\Game2D\\src\\Setup.hpp"]]
 )
 
 
@@ -99,6 +99,7 @@ target_link_libraries(
   PRIVATE glad
   PRIVATE SDL2
   PRIVATE SDL2main
+  PRIVATE TracyClient
 )
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES OUTPUT_NAME ${CMAKE_PROJECT_NAME})

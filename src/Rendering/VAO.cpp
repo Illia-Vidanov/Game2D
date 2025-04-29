@@ -2,10 +2,6 @@
 
 #include "Setup.hpp"
 
-#include <vector>
-
-#include <glad/glad.h>
-
 #include "Rendering/Buffers.hpp"
 #include "Rendering/Utils.hpp"
 

@@ -3,13 +3,6 @@
 
 #include "Setup.hpp"
 
-#include <string>
-#include <tuple>
-#include <utility>
-#include <algorithm>
-
-#include <glad/glad.h>
-
 #include "Rendering/Utils.hpp"
 #include "Utils/Math.hpp"
 

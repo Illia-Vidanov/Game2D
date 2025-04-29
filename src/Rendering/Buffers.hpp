@@ -3,12 +3,9 @@
 
 #include "Setup.hpp"
 
-#include <vector>
-
-#include <glad/glad.h>
-
 #include "Rendering/Utils.hpp"
 #include "Rendering/DataStructures.hpp"
+
 
 namespace game
 {

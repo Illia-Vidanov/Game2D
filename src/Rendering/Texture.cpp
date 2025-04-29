@@ -2,12 +2,6 @@
 
 #include "Setup.hpp"
 
-#include <string>
-#include <tuple>
-#include <utility>
-
-#include <glad/glad.h>
-
 #include "Rendering/Utils.hpp"
 #include "Utils/FileReader.hpp"
 #include "Texture.hpp"

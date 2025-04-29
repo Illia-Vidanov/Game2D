@@ -3,8 +3,6 @@
 
 #include "Setup.hpp"
 
-#include <glad/glad.h>
-
 #include "Utils/Logger.hpp"
 
 

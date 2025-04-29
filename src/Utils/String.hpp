@@ -1,15 +1,7 @@
-#ifndef STRING_UTILS_HPP
-#define STRING_UTILS_HPP
+#ifndef GAME_STRING_UTILS_HPP
+#define GAME_STRING_UTILS_HPP
 
 #include "Setup.hpp"
-
-#include <string>
-#include <vector>
-#include <utility>
-#include <algorithm>
-#include <filesystem>
-
-#include <tracy/Tracy.hpp>
 
 
 namespace game
@@ -156,4 +148,4 @@ inline auto ConcatStringArray(detail::ConstRawStrArray<CharT> first, const detai
 }
 } // game
 
-#endif // STRING_UTILS_HPP
+#endif // GAME_STRING_UTILS_HPP

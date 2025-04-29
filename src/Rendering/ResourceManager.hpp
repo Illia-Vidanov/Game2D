@@ -3,9 +3,6 @@
 
 #include "Setup.hpp"
 
-#include <string>
-#include <unordered_map>
-
 #include "Rendering/VAO.hpp"
 #include "Rendering/Shader.hpp"
 #include "Rendering/Texture.hpp"

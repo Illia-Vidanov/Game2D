@@ -3,9 +3,6 @@
 
 #include "Setup.hpp"
 
-#include <type_traits>
-#include <array>
-#include <tuple>
 
 namespace game
 {

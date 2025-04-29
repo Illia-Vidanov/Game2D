@@ -2,9 +2,6 @@
 
 #include "Setup.hpp"
 
-#include <array>
-#include <tracy/Tracy.hpp>
-
 #include "Core/Game.hpp"
 #include "Core/EventSystem.hpp"
 

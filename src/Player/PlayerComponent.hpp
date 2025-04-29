@@ -3,8 +3,6 @@
 
 #include "Setup.hpp"
 
-#include <entt.hpp>
-
 
 namespace game
 {

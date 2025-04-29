@@ -2,10 +2,6 @@
 
 #include "Setup.hpp"
 
-#include <SDL2/SDL_keycode.h>
-#include <SDL2/SDL.h>
-#include <tracy/Tracy.hpp>
-
 #include "Utils/Logger.hpp"
 #include "Utils/FlagParser.hpp"
 #include "Core/Window.hpp"

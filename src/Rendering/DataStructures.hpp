@@ -1,7 +1,10 @@
 #ifndef GAME_DATA_STRUCTURES_HPP
 #define GAME_DATA_STRUCTURES_HPP
 
+#include "Setup.hpp"
+
 #include "Utils/MathConstants.hpp"
+
 
 namespace game
 {
@@ -16,4 +19,4 @@ struct Vertex
 using Index = uint32_t;
 } // game
 
-#endif
+#endif // GAME_DATA_STRUCTURES_HPP

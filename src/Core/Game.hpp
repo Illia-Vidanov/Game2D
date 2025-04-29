@@ -3,8 +3,6 @@
 
 #include "Setup.hpp"
 
-#include "entt.hpp"
-
 #include "Utils/FlagParser.hpp"
 #include "Core/Window.hpp"
 #include "Core/EventSystem.hpp"
@@ -14,17 +12,15 @@
 #include "Physics/PhysicsSystem.hpp"
 
 
-class SDL_Window;
-
-int main(int argc, char **argv);
-
 namespace game
 {
 // Main class of a game
 class Game
 {
-  friend int ::main(int argc, char **argv);
 public:
+  Game(const int argc, const char * const *argv) noexcept;
+  void Run() noexcept;
+
   [[nodiscard]] constexpr inline auto GetFlags() noexcept -> Flags& { return flags_; }
   [[nodiscard]] constexpr inline auto GetFlags() const noexcept -> const Flags& { return flags_; }
   [[nodiscard]] constexpr inline auto GetWindow() noexcept -> Window& { return window_; }
@@ -41,15 +37,8 @@ public:
   [[nodiscard]] constexpr inline auto GetResourceManager() const noexcept -> const ResourceManager& { return resource_manager_; }
 
 private:
-  // Initializes game
-  Game(const int argc, const char * const *argv) noexcept;
-
-  // Main game loop
-  void Run() noexcept;
-  // Close application
   void Exit() noexcept;
-
-  // Function to executre on Quit event
+  
   auto QuitEvent() noexcept -> bool;
 
   bool running_ = false;

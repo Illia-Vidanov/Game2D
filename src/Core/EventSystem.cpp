@@ -2,11 +2,6 @@
 
 #include "Setup.hpp"
 
-#include <utility>
-
-#include <SDL2/SDL.h>
-#include <tracy/Tracy.hpp>
-
 #include "Utils/Enum.hpp"
 
 

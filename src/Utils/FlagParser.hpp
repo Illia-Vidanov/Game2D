@@ -1,13 +1,8 @@
-#ifndef FLAG_PARSER_HPP
-#define FLAG_PARSER_HPP
-
-#include <string>
-#include <unordered_map>
-#include <unordered_set>
-#include <utility>
-#include <cassert>
+#ifndef GAME_FLAG_PARSER_HPP
+#define GAME_FLAG_PARSER_HPP
 
 #include "Setup.hpp"
+
 #include "Utils/String.hpp"
 #include "Utils/Logger.hpp"
 
@@ -90,4 +85,4 @@ private:
 };
 } // game
 
-#endif // FLAG_PARSER_HPP
+#endif // GAME_FLAG_PARSER_HPP

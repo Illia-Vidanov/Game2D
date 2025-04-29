@@ -3,10 +3,6 @@
 
 #include "Setup.hpp"
 
-#include <entt.hpp>
-#include <Eigen/Dense>
-#include <Eigen/Geometry>
-
 #include "Rendering/SpriteComponent.hpp"
 #include "Physics/TransformComponent.hpp"
 #include "Utils/MathConstants.hpp"

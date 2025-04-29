@@ -2,11 +2,6 @@
 
 #include "Setup.hpp"
 
-#include <string>
-#include <filesystem>
-
-#include <glad/glad.h>
-
 #include "Utils/Logger.hpp"
 #include "Utils/FileReader.hpp"
 

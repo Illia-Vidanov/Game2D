@@ -2,18 +2,10 @@
 
 #include "Setup.hpp"
 
-#include <Eigen/Dense>
-#include <Eigen/Geometry>
-#include <SDL2/SDL.h>
-#include <tracy/Tracy.hpp>
-
-#include "Utils/Math.hpp"
-#include "Utils/MathConstants.hpp"
 #include "Utils/Logger.hpp"
 #include "Rendering/SpriteComponent.hpp"
 #include "Rendering/ResourceManager.hpp"
 #include "Core/Game.hpp"
-#include "Core/EventSystem.hpp"
 #include "Physics/ColliderComponents.hpp"
 #include "Player/InputSystem.hpp"
 #include "Physics/TransformComponent.hpp"
