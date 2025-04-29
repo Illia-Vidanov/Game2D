@@ -1,5 +1,5 @@
-#ifndef GAME_INPUT_HPP
-#define GAME_INPUT_HPP
+#ifndef GAME_INPUT_SYSTEM_HPP
+#define GAME_INPUT_SYSTEM_HPP
 
 #include "Setup.hpp"
 
@@ -9,17 +9,17 @@
 #include <SDL2/SDL_keycode.h>
 #include <SDL2/SDL_keyboard.h>
 
-#include "Core/EventHandler.hpp"
+#include "Core/EventSystem.hpp"
 
 
 namespace game
 {
 class Game;
 
-class Input
+class InputSystem
 {
 public:
-  Input(Game &game) noexcept;
+  InputSystem(Game &game) noexcept;
   void InitEvents() noexcept;
 
   void Update() noexcept;
@@ -45,6 +45,6 @@ private:
   Game &game_;
   EventCleaner event_cleaner_;
 };
-}
+} // game
 
-#endif
+#endif // GAME_INPUT_SYSTEM_HPP

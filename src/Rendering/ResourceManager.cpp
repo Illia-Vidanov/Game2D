@@ -13,7 +13,7 @@
 #include "Rendering/Texture.hpp"
 #include "Rendering/DataStructures.hpp"
 #include "Core/Game.hpp"
-#include "Core/EventHandler.hpp"
+#include "Core/EventSystem.hpp"
 #include "Utils/Math.hpp"
 
 
@@ -21,7 +21,7 @@ namespace game
 {
 ResourceManager::ResourceManager(Game &game) noexcept
   : game_{game}
-  , event_cleaner_{game_.GetEventHandler()}
+  , event_cleaner_{game_.GetEventSystem()}
 {
   ZoneScopedC(0xC4DD00);
 

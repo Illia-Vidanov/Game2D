@@ -5,7 +5,7 @@
 
 #include "Setup.hpp"
 
-#include "Core/EventHandler.hpp"
+#include "Core/EventSystem.hpp"
 #include "Utils/MathConstants.hpp"
 
 

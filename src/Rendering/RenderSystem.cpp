@@ -1,24 +1,29 @@
-#include "Renderer.hpp"
+#include "RenderSystem.hpp"
 
 #include "Setup.hpp"
 
 #include <glad/glad.h>
 #include <SDL2/SDL.h>
 #include <tracy/Tracy.hpp>
+#include <Eigen/Dense>
+#include <Eigen/Geometry>
+#include <entt.hpp>
 
 #include "Core/Game.hpp"
 #include "Core/Window.hpp"
 #include "Utils/Logger.hpp"
 #include "Utils/Math.hpp"
 #include "Rendering/Utils.hpp"
-#include "Rendering/Sprite.hpp"
+#include "Rendering/SpriteComponent.hpp"
+#include "Physics/TransformComponent.hpp"
 
 
 
 namespace game
 {
-Renderer::Renderer(Game &game) noexcept
-  : game_(game)
+RenderSystem::RenderSystem(Game &game) noexcept
+  : game_{game}
+  , sprites_{game_.GetRegistry().group<const SpriteComponent>(entt::get<TransformComponent>)}
 {
   ZoneScopedC(0x07dbd4);
 
@@ -40,51 +45,42 @@ Renderer::Renderer(Game &game) noexcept
   GL_CALL(glClearColor(0.224f, 0.298f, 0.302f, 1.0f));
 }
 
-void Renderer::PrintDebugInfo() const noexcept
+void RenderSystem::PrintDebugInfo() const noexcept
 {
   GAME_VLOG(1, LogType::kInfo) << "GL Vendor:           " << glGetString(GL_VENDOR)                   << '\n'
-                               << "GL Renderer:         " << glGetString(GL_RENDERER)                 << '\n'
+                               << "GL RenderSystem:         " << glGetString(GL_RENDERER)                 << '\n'
                                << "GL Version:          " << glGetString(GL_VERSION)                  << '\n'
                                << "GL Shading Lnaguage: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << '\n';
 }
 
-
-void Renderer::Render(const Sprite &sprite) noexcept
-{
-  ZoneScopedC(0x07dbd4);
-
-  GL_CALL(glActiveTexture(GL_TEXTURE0));
-  sprite.GetTexture().Bind();
-  sprite.GetShader().Use();
-  sprite.GetShader().SetUniformMatrix4("model", 1, false, TransformTo4x4TransformationMatrix(sprite.GetTransform()).data());
-  GL_CALL(glDrawElements(GL_TRIANGLES, game_.GetResourceManager().GetSpriteIndexCount(), GL_UNSIGNED_INT, 0));
-}
-
-void Renderer::StartFrame() noexcept
+void RenderSystem::StartFrame() noexcept
 {
   ZoneScopedC(0x07dbd4);
 
   GL_CALL(glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT));
 }
 
-void Renderer::EndFrame() noexcept
+void RenderSystem::EndFrame() noexcept
 {
   ZoneScopedC(0x07dbd4);
 
   game_.GetResourceManager().BindSpriteVAO();
-
-  while(sprite_queue.size())
+  for(entt::entity entity : sprites_)
   {
     ZoneScopedNC("Render sprite", 0x07dbd4);
 
-    Render(*sprite_queue.front());
-    sprite_queue.pop();
+    GL_CALL(glActiveTexture(GL_TEXTURE0));
+    const SpriteComponent &sprite = sprites_.get<SpriteComponent>(entity);
+    sprite.GetTexture().Bind();
+    sprite.GetShader().Use();
+    sprite.GetShader().SetUniformMatrix4("model", 1, false, TransformTo4x4TransformationMatrix(sprites_.get<TransformComponent>(entity)).data());
+    GL_CALL(glDrawElements(GL_TRIANGLES, game_.GetResourceManager().GetSpriteIndexCount(), GL_UNSIGNED_INT, 0));
   }
 
   SDL_GL_SwapWindow(game_.GetWindow().GetSDLWindow());
 }
 
-void Renderer::Exit() noexcept
+void RenderSystem::Exit() noexcept
 {
   ZoneScopedC(0x07dbd4);
 

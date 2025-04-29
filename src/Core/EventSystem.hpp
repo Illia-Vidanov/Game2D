@@ -238,7 +238,7 @@ class Game;
 
 // Add listener to an event and dispatch events with specific type
 // If callback returns true then event is handeled and doesn't spread further
-class EventHandler
+class EventSystem
 {
   friend EventCleaner;
 public:
@@ -280,34 +280,34 @@ private:
 
 
 // Class that manages lifetime of event listeners
-// It removes listeners that were created using it from EventHandler on destruction
+// It removes listeners that were created using it from EventSystem on destruction
 class EventCleaner
 {
-  friend EventHandler;
+  friend EventSystem;
 public:
-  inline EventCleaner(EventHandler &event_handler) noexcept : event_handler_{event_handler} {}
+  inline EventCleaner(EventSystem &event_handler) noexcept : event_handler_{event_handler} {}
   inline ~EventCleaner() noexcept { ZoneScopedC(0xe8bb25); for(auto uid : uids_) event_handler_.RemoveListener(uid); }
 
-  // Add position (you can get it when adding listener in EventHandler) to EventClener that will be removed from EventHandler on the destruction
+  // Add position (you can get it when adding listener in EventSystem) to EventClener that will be removed from EventSystem on the destruction
   inline void AddUid(std::size_t uid) noexcept { uids_.push_back(uid); }
-  // Remove position (you can get it when adding listener in EventHandler) from EventCleaner to not remove it on the destruction of a cleaner
+  // Remove position (you can get it when adding listener in EventSystem) from EventCleaner to not remove it on the destruction of a cleaner
   inline void RemoveUid(std::size_t uid) noexcept { std::swap(uids_.back(), *std::find(uids_.begin(), uids_.end(), uid)); uids_.pop_back(); }
   // Remove all positions from cleaner so they won't be removed on destruction of EventCleaner
   inline void ClearUids() noexcept { uids_.clear(); }
 
 private:
-  EventHandler &event_handler_;
+  EventSystem &event_handler_;
   std::vector<std::size_t> uids_;
 };
 
 
-inline void EventHandler::RemoveListener(EventCleaner &cleaner, std::size_t uid) noexcept
+inline void EventSystem::RemoveListener(EventCleaner &cleaner, std::size_t uid) noexcept
 {
   listeners_.erase(uid);
   cleaner.RemoveUid(uid);
 }
 
-inline void EventHandler::DispatchEvent(const Event &event) noexcept
+inline void EventSystem::DispatchEvent(const Event &event) noexcept
 {
   ZoneScopedC(0xe8bb25);
 
@@ -331,7 +331,7 @@ inline void EventHandler::DispatchEvent(const Event &event) noexcept
   }
 }
 
-inline void EventHandler::ClearListeners(EventType type) noexcept
+inline void EventSystem::ClearListeners(EventType type) noexcept
 {
   ZoneScopedC(0xe8bb25);
 
@@ -340,11 +340,11 @@ inline void EventHandler::ClearListeners(EventType type) noexcept
     listeners_.erase(listeners_.find(range.first->second));
 }
 
-inline auto EventHandler::AddListener(EventCleaner &cleaner, EventType type, void *data, CallbackType callback) noexcept -> std::size_t
+inline auto EventSystem::AddListener(EventCleaner &cleaner, EventType type, void *data, CallbackType callback) noexcept -> std::size_t
 {
   ZoneScopedC(0xe8bb25);
 
-  GAME_ASSERT(this == &cleaner.event_handler_) << "Same cleaner used for multiple EventHandlers:\n"
+  GAME_ASSERT(this == &cleaner.event_handler_) << "Same cleaner used for multiple EventSystems:\n"
                                                   "This handler: " << this
                                                << "\nHandler which EventCleaner is bound to: " << &cleaner.event_handler_;
   ++last_uid;

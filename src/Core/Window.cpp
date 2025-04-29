@@ -7,7 +7,7 @@
 
 #include "Core/Game.hpp"
 #include "Utils/Logger.hpp"
-#include "Core/EventHandler.hpp"
+#include "Core/EventSystem.hpp"
 #include "Rendering/Utils.hpp"
 #include "Utils/MathConstants.hpp"
 
@@ -16,7 +16,7 @@ namespace game
 {
 Window::Window(Game &game) noexcept
   : game_(game)
-  , event_cleaner_(game_.GetEventHandler())
+  , event_cleaner_(game_.GetEventSystem())
 {
   ZoneScopedC(0x00FFF2);
 
@@ -36,7 +36,7 @@ Window::Window(Game &game) noexcept
   
   GAME_ASSERT(sdl_window_ != nullptr) << "Couldn't create sdl window: " << SDL_GetError();
 
-  game_.GetEventHandler().AddListener(event_cleaner_, EventType::kWindowResize, this, [](const Event &event, void *window) -> bool { return reinterpret_cast<Window*>(window)->WindowResizedEvent(event); });
+  game_.GetEventSystem().AddListener(event_cleaner_, EventType::kWindowResize, this, [](const Event &event, void *window) -> bool { return reinterpret_cast<Window*>(window)->WindowResizedEvent(event); });
 }
 
 void Window::Exit() noexcept
@@ -49,7 +49,7 @@ void Window::Exit() noexcept
 
 void Window::InitEvents() noexcept
 {
-  game_.GetEventHandler().DispatchEvent(Event{Event::WindowResize{0, 0, static_cast<int>(width_), static_cast<int>(height_)}});
+  game_.GetEventSystem().DispatchEvent(Event{Event::WindowResize{0, 0, static_cast<int>(width_), static_cast<int>(height_)}});
 }
 
 void Window::DispatchSDLEvents() noexcept
@@ -74,17 +74,17 @@ void Window::DispatchSDLEvents() noexcept
     switch(event.type)
     {
     case SDL_QUIT:
-      game_.GetEventHandler().DispatchEvent(Event{Event::Quit{}});
+      game_.GetEventSystem().DispatchEvent(Event{Event::Quit{}});
       break;
     case SDL_KEYDOWN:
-      game_.GetEventHandler().DispatchEvent(Event{Event::KeyDown{
+      game_.GetEventSystem().DispatchEvent(Event{Event::KeyDown{
         event.key.keysym.sym,
         event.key.keysym.scancode,
         event.key.keysym.mod
       }});
       break;
     case SDL_KEYUP:
-      game_.GetEventHandler().DispatchEvent(Event{Event::KeyUp{
+      game_.GetEventSystem().DispatchEvent(Event{Event::KeyUp{
         event.key.keysym.sym,
         event.key.keysym.scancode,
         event.key.keysym.mod
@@ -95,7 +95,7 @@ void Window::DispatchSDLEvents() noexcept
       {
       case SDL_WINDOWEVENT_SIZE_CHANGED:
         if(width_ != event.window.data1 || height_ != event.window.data2)
-          game_.GetEventHandler().DispatchEvent(Event{Event::WindowResize{width_, height_, event.window.data1, event.window.data2}});
+          game_.GetEventSystem().DispatchEvent(Event{Event::WindowResize{width_, height_, event.window.data1, event.window.data2}});
         break;
       default:
         break;
@@ -145,7 +145,7 @@ void Window::SetRenderResolution(const int render_width, const int render_height
   if(render_width_ == render_width && render_height_ == render_height)
     return;
     
-  game_.GetEventHandler().DispatchEvent(Event::RenderAreaResize{render_width_, render_height_, render_width, render_height});
+  game_.GetEventSystem().DispatchEvent(Event::RenderAreaResize{render_width_, render_height_, render_width, render_height});
   
   render_width_ = render_width;
   render_height_ = render_height;

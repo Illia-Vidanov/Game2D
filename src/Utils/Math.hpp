@@ -8,8 +8,10 @@
 
 #include <gcem/gcem.hpp>
 #include <Eigen/Dense>
+#include <Eigen/Geometry>
 
 #include "Utils/MathConstants.hpp"
+#include "Physics/TransformComponent.hpp"
 
 namespace game
 {
@@ -424,7 +426,7 @@ constexpr inline T Bitmask(U bit) noexcept { GAME_ASSERT(bit < (sizeof(T) * CHAR
 
 auto OrthographicProjection(float left, float right, float bottom, float top, float near, float far) noexcept -> Matrix4;
 auto OrthographicProjection2D(float left, float right, float bottom, float top) noexcept -> Matrix3;
-auto TransformTo4x4TransformationMatrix(const Transform &transform) noexcept -> Matrix4;
+auto TransformTo4x4TransformationMatrix(const TransformComponent &transform) noexcept -> Matrix4;
 } // game
 
 

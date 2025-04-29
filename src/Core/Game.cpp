@@ -11,8 +11,9 @@
 #include "Core/Window.hpp"
 #include "Utils/Logger.hpp"
 #include "Utils/Type.hpp"
-
-#include "Rendering/Sprite.hpp"
+#include "Player/PlayerComponent.hpp"
+#include "Rendering/SpriteComponent.hpp"
+#include "Physics/TransformComponent.hpp"
 
 
 namespace game
@@ -23,23 +24,31 @@ Game::Game(const int argc, const char * const *argv) noexcept
       Logger::Get().SetVerboseLevel(10);
     }(), false)) // pre initialization functions
   , flags_(argc, argv) // args are UTF8 encoded because we use SDL2main
-  , event_cleaner_(event_handler_)
-  , window_(*this)
-  , renderer_(*this)
-  , resource_manager_(*this)
-  , input_(*this)
-  , player_(*this)
+  , player_{registry_.create()}
+  , event_cleaner_{event_system_}
+  , window_{*this}
+  , render_system_{*this}
+  , resource_manager_{*this}
+  , input_system_{*this}
+  , physics_system_{*this}
 {
   ZoneScopedC(0xb3041b);
 
   GAME_VLOG(1, LogType::kInfo) << "Running!!!";
 
-  event_handler_.AddListener(event_cleaner_, EventType::kQuit, this, [](const Event &event, void *game){ return reinterpret_cast<Game*>(game)->QuitEvent(); });
-  event_handler_.AddListener(event_cleaner_, EventType::kKeyDown, this, [](const Event &event, void *game){ if(event.GetKeycode() == static_cast<int>(SDLK_ESCAPE)) { reinterpret_cast<Game*>(game)->QuitEvent(); } return false; });
+  event_system_.AddListener(event_cleaner_, EventType::kQuit, this, [](const Event &event, void *game){ return reinterpret_cast<Game*>(game)->QuitEvent(); });
+  event_system_.AddListener(event_cleaner_, EventType::kKeyDown, this, [](const Event &event, void *game){ if(event.GetKeycode() == static_cast<int>(SDLK_ESCAPE)) { reinterpret_cast<Game*>(game)->QuitEvent(); } return false; });
 
   window_.InitEvents();
   resource_manager_.InitEvents();
-  input_.InitEvents();
+  input_system_.InitEvents();
+
+  registry_.emplace<TransformComponent>(player_);
+  SpriteComponent &player_sprite = registry_.emplace<SpriteComponent>(player_);
+  player_sprite.SetShader(resource_manager_.GetShader(ShaderType::kDefault));
+  player_sprite.SetTexture(resource_manager_.GetTexture(TextureType::kNoImage64));
+  registry_.emplace<SquareColliderComponent>(player_);
+  registry_.emplace<PlayerComponent>(player_).Initialize(player_, *this);
 }
 
 void Game::Run() noexcept
@@ -50,15 +59,15 @@ void Game::Run() noexcept
   while(running_)
   {
     window_.DispatchSDLEvents();
-    event_handler_.DispatchEnquedEvents();
+    event_system_.DispatchEnquedEvents();
     
-    renderer_.StartFrame();
+    render_system_.StartFrame();
 
-    input_.Update();
-    physics_.Update();
-    player_.Update();
+    input_system_.Update();
+    physics_system_.Update();
+    registry_.get<PlayerComponent>(player_).Update();
 
-    renderer_.EndFrame();
+    render_system_.EndFrame();
 
     FrameMark;
   }
@@ -70,8 +79,9 @@ void Game::Exit() noexcept
 {
   ZoneScopedC(0xb3041b);
 
+  //registry_.clear();
   resource_manager_.Exit();
-  renderer_.Exit();
+  render_system_.Exit();
   window_.Exit();
 }
 

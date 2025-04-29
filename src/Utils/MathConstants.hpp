@@ -9,7 +9,6 @@
 namespace game
 {
 using DefFloatType = float;
-using Transform = Eigen::Transform<DefFloatType, 2, 2>;
 using Vector2 = Eigen::Vector2<DefFloatType>;
 using Vector3 = Eigen::Vector3<DefFloatType>;
 using Vector4 = Eigen::Vector4<DefFloatType>;

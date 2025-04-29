@@ -9,6 +9,8 @@
 #include <Eigen/Dense>
 
 #include "Utils/MathConstants.hpp"
+#include "Utils/Logger.hpp"
+#include "Physics/TransformComponent.hpp"
 
 
 namespace game
@@ -41,12 +43,12 @@ auto OrthographicProjection2D(float left, float right, float bottom, float top) 
   return projection;
 }
 
-auto TransformTo4x4TransformationMatrix(const Transform &transform) noexcept -> Matrix4
+auto TransformTo4x4TransformationMatrix(const TransformComponent &transform) noexcept -> Matrix4
 {
   Matrix4 result = Matrix4::Identity();
   result.block<2, 2>(0, 0) = transform.linear();
   result.block<2, 1>(0, 3) = transform.translation();
-
+  GAME_DLOG(LogType::kInfo) << result.transpose();
   return result;
 }
 } // game

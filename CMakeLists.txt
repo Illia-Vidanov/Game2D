@@ -39,21 +39,21 @@ set(GAME_OBJ_LIB_NAME "${PROJECT_NAME}objlib")
 add_library(${GAME_OBJ_LIB_NAME} STATIC
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/Game.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/Window.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/EventHandler.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/EventSystem.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/FlagParser.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/Logger.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/FileReader.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/Math.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Rendering/Renderer.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Rendering/Sprite.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Rendering/RenderSystem.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Rendering/SpriteComponent.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Rendering/Shader.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Rendering/VAO.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Rendering/ResourceManager.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Rendering/Texture.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Game/Player.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Game/Input.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Physics/Physics.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Physics/Collider.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Player/PlayerComponent.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Player/InputSystem.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Physics/PhysicsSystem.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Physics/ColliderComponents.cpp
 )
 
 target_compile_options(
@@ -72,6 +72,7 @@ target_include_directories(
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/libs/glad/include
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/libs/tracy/public
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/libs/stb_image
+  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/libs/entt
 )
 
 target_link_libraries(

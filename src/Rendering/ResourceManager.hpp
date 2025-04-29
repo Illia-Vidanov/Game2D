@@ -11,7 +11,7 @@
 #include "Rendering/Texture.hpp"
 #include "Rendering/Buffers.hpp"
 #include "Rendering/DataStructures.hpp"
-#include "Core/EventHandler.hpp"
+#include "Core/EventSystem.hpp"
 
 
 namespace game

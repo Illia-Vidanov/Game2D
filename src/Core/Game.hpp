@@ -3,14 +3,15 @@
 
 #include "Setup.hpp"
 
+#include "entt.hpp"
+
 #include "Utils/FlagParser.hpp"
 #include "Core/Window.hpp"
-#include "Core/EventHandler.hpp"
-#include "Rendering/Renderer.hpp"
+#include "Core/EventSystem.hpp"
+#include "Rendering/RenderSystem.hpp"
 #include "Rendering/ResourceManager.hpp"
-#include "Game/Player.hpp"
-#include "Game/Input.hpp"
-#include "Physics/Physics.hpp"
+#include "Player/InputSystem.hpp"
+#include "Physics/PhysicsSystem.hpp"
 
 
 class SDL_Window;
@@ -26,16 +27,16 @@ class Game
 public:
   [[nodiscard]] constexpr inline auto GetFlags() noexcept -> Flags& { return flags_; }
   [[nodiscard]] constexpr inline auto GetFlags() const noexcept -> const Flags& { return flags_; }
-  [[nodiscard]] constexpr inline auto GetInput() noexcept -> Input& { return input_; }
-  [[nodiscard]] constexpr inline auto GetInput() const noexcept -> const Input& { return input_; }
   [[nodiscard]] constexpr inline auto GetWindow() noexcept -> Window& { return window_; }
   [[nodiscard]] constexpr inline auto GetWindow() const noexcept -> const Window& { return window_; }
-  [[nodiscard]] constexpr inline auto GetPhysics() noexcept -> Physics& { return physics_; }
-  [[nodiscard]] constexpr inline auto GetPhysics() const noexcept -> const Physics& { return physics_; }
-  [[nodiscard]] constexpr inline auto GetRenderer() noexcept -> Renderer& { return renderer_; }
-  [[nodiscard]] constexpr inline auto GetRenderer() const noexcept -> const Renderer& { return renderer_; }
-  [[nodiscard]] constexpr inline auto GetEventHandler() noexcept -> EventHandler& { return event_handler_; }
-  [[nodiscard]] constexpr inline auto GetEventHandler() const noexcept -> const EventHandler& { return event_handler_; }
+  [[nodiscard]] constexpr inline auto GetRenderSystem() noexcept -> RenderSystem& { return render_system_; }
+  [[nodiscard]] constexpr inline auto GetRenderSystem() const noexcept -> const RenderSystem& { return render_system_; }
+  [[nodiscard]] constexpr inline auto GetRegistry() noexcept -> entt::registry& { return registry_; }
+  [[nodiscard]] constexpr inline auto GetRegistry() const noexcept -> const entt::registry& { return registry_; }
+  [[nodiscard]] constexpr inline auto GetInputSystem() noexcept -> InputSystem& { return input_system_; }
+  [[nodiscard]] constexpr inline auto GetInputSystem() const noexcept -> const InputSystem& { return input_system_; }
+  [[nodiscard]] constexpr inline auto GetEventSystem() noexcept -> EventSystem& { return event_system_; }
+  [[nodiscard]] constexpr inline auto GetEventSystem() const noexcept -> const EventSystem& { return event_system_; }
   [[nodiscard]] constexpr inline auto GetResourceManager() noexcept -> ResourceManager& { return resource_manager_; }
   [[nodiscard]] constexpr inline auto GetResourceManager() const noexcept -> const ResourceManager& { return resource_manager_; }
 
@@ -53,17 +54,19 @@ private:
 
   bool running_ = false;
   Flags flags_;
-  EventHandler event_handler_;
+  
+  entt::registry registry_;
+  entt::entity player_;
+
+  EventSystem event_system_;
   EventCleaner event_cleaner_;
   Window window_;
-  Renderer renderer_;
+  RenderSystem render_system_;
   ResourceManager resource_manager_;
 
-  Input input_;
-  Physics physics_;
-  Player player_;
-  
-  
+  InputSystem input_system_;
+  PhysicsSystem physics_system_;
+
 };
 } // game
 
