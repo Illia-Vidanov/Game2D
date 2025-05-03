@@ -50,13 +50,13 @@ Game::Game(const int argc, const char * const *argv) noexcept
   registry_.emplace<PlayerComponent>(player_, player_, *this);
 
   box_ = registry_.create();
-  TransformComponent &box_transform = registry_.emplace<TransformComponent>(box_, player_, *this);
+  TransformComponent &box_transform = registry_.emplace<TransformComponent>(box_, box_, *this);
   box_transform.SetPosition(Vector2{20, 20});
   box_transform.SetScale(Vector2{10, 10});
-  SpriteComponent &box_sprite = registry_.emplace<SpriteComponent>(box_, player_, *this);
+  SpriteComponent &box_sprite = registry_.emplace<SpriteComponent>(box_, box_, *this);
   box_sprite.SetShader(resource_manager_.GetShader(ShaderType::kDefault));
   box_sprite.SetTexture(resource_manager_.GetTexture(TextureType::kWhite));
-  registry_.emplace<RectangleColliderComponent>(box_, player_, *this);
+  registry_.emplace<RectangleColliderComponent>(box_, box_, *this);
 }
 
 void Game::Run() noexcept

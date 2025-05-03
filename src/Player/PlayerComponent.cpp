@@ -22,18 +22,18 @@ PlayerComponent::PlayerComponent(entt::entity self, Game &game) noexcept
 
   //sprite_.GetShader().SetUniform("spriteColor", 1.0f, 1.0f, 1.0f);
   TransformComponent &transform = game_.GetRegistry().get<TransformComponent>(self_);
-  transform.SetScale(transform.GetScale() * 10);
+  transform.SetScale(Vector2{10, 10});
 }
 
 void PlayerComponent::Update() noexcept
 {
   ZoneScopedC(0x31ff98);
 
-  //game_->GetRegistry().get<RigidbodyComponent>(self_).SetVelocity(Vector2{
-  //  (static_cast<float>(game_->GetInputSystem().GetKey(SDL_SCANCODE_D)) - static_cast<float>(game_->GetInputSystem().GetKey(SDL_SCANCODE_A))) * 0.01f,
-  //  (static_cast<float>(game_->GetInputSystem().GetKey(SDL_SCANCODE_W)) - static_cast<float>(game_->GetInputSystem().GetKey(SDL_SCANCODE_S))) * 0.01f
-  //});
+  game_.GetRegistry().get<RigidbodyComponent>(self_).SetVelocity(Vector2{
+    (static_cast<float>(game_.GetInputSystem().GetKey(SDL_SCANCODE_D)) - static_cast<float>(game_.GetInputSystem().GetKey(SDL_SCANCODE_A))),
+    (static_cast<float>(game_.GetInputSystem().GetKey(SDL_SCANCODE_W)) - static_cast<float>(game_.GetInputSystem().GetKey(SDL_SCANCODE_S)))
+  });
 
-  //GAME_DLOG(LogType::kInfo) << transform_.translation().transpose();
+  //GAME_DLOG(LogType::kInfo) << game_.GetRegistry().get<RigidbodyComponent>(self_).GetVelocity().transpose();
 }
 } // game

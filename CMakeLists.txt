@@ -78,6 +78,11 @@ target_include_directories(
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/libs/box2d/include
 )
 
+target_link_libraries(
+  ${GAME_OBJ_LIB_NAME}
+  PRIVATE TracyClient
+)
+
 target_precompile_headers(
   ${GAME_OBJ_LIB_NAME}
   PUBLIC [["c:\\Programming\\c++\\Game2D\\src\\Setup.hpp"]]

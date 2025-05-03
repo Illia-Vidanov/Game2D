@@ -25,12 +25,15 @@ void PhysicsSystem::Update() noexcept
 {
   ZoneScopedC(0xfc940a);
 
-  entt::view<entt::get_t<RigidbodyComponent>> rigidbodies;
+  b2World_Step(world_id_, 1.0f / 60.0f, 4);
+
+  entt::view<entt::get_t<RigidbodyComponent>> rigidbodies = game_.GetRegistry().view<RigidbodyComponent>();
   for(entt::entity entity : rigidbodies)
   {
     TransformComponent &transform = game_.GetRegistry().get<TransformComponent>(entity);
-    transform.SetPositionWithoutRigidbodyUpdate(transform.GetPosition() + ToNormalVector2(b2Body_GetLinearVelocity(Getb2BodyId(entity))));
-    transform.SetRotationAngleWithoutRigidbodyUpdate(transform.GetRotationAngle() + b2Body_GetAngularVelocity(Getb2BodyId(entity)));
+    transform.SetPositionWithoutRigidbodyUpdate(ToNormalVector2(b2Body_GetPosition(body_ids_[entity])));
+    b2Rot rotation = b2Body_GetRotation(body_ids_[entity]);
+    transform.SetRotationAngleWithoutRigidbodyUpdate(std::atan2(rotation.s, rotation.c));
   }
 }
 } // game
