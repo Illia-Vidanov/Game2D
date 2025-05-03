@@ -3,8 +3,6 @@
 
 #include "Setup.hpp"
 
-#include "Physics/ColliderComponents.hpp"
-#include "Physics/TransformComponent.hpp"
 #include "Utils/MathConstants.hpp"
 
 
@@ -14,15 +12,23 @@ class Game;
 
 class PhysicsSystem
 {
+  using MapType = std::unordered_map<entt::entity, b2BodyId>;
 public:
   PhysicsSystem(Game &game);
 
   void Update() noexcept;
 
-private:
-  decltype(std::declval<entt::registry>().group<const SquareColliderComponent>(entt::get<TransformComponent>)) square_colliders_;
+  [[nodiscard]] constexpr inline auto GetWorldId() const noexcept -> b2WorldId { return world_id_; }
+  [[nodiscard]] inline auto Getb2BodyId(entt::entity entity) const noexcept -> b2BodyId { MapType::const_iterator it = body_ids_.find(entity); return it == body_ids_.end() ? b2_nullBodyId : it->second; }
+  inline void Addb2BodyId(entt::entity entity, b2BodyId body_id) noexcept { body_ids_[entity] = body_id; }
 
-  [[nodiscard]] inline auto ToWorldRect(const Vector4 &rect, const TransformComponent &transform) noexcept { return Vector4{rect(0) + transform.translation()(0), rect(1) + transform.translation()(1), rect(2) * transform.linear().diagonal()(0), rect(2) * transform.linear().diagonal()(1)}; }
+  [[nodiscard]] static auto Isb2BodyIdNull(b2BodyId body_id) noexcept -> bool { return body_id.index1 != b2_nullBodyId.index1; } // The only way I found to check for validity. It might be also advisable to check for generation, but I am not sure...
+
+private:
+  Game &game_;
+
+  b2WorldId world_id_;
+  MapType body_ids_;
 };
 } // game
 

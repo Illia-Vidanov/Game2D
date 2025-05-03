@@ -13,6 +13,7 @@ using Vector4 = Eigen::Vector4<DefFloatType>;
 using Vector2i = Eigen::Vector2<int>;
 using Vector3i = Eigen::Vector3<int>;
 using Vector4i = Eigen::Vector4<int>;
+using Matrix2 = Eigen::Matrix2<DefFloatType>;
 using Matrix3 = Eigen::Matrix3<DefFloatType>;
 using Matrix4 = Eigen::Matrix4<DefFloatType>;
 

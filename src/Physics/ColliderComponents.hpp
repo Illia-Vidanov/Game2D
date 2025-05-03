@@ -10,14 +10,30 @@ namespace game
 {
 class Game;
 
-class SquareColliderComponent
+class RectangleColliderComponent
 {
 public:
-  [[nodiscard]] constexpr inline auto GetRect() noexcept -> Vector4 & { return rect_; }
-  [[nodiscard]] constexpr inline auto GetRect() const noexcept -> const Vector4 & { return rect_; }
+  RectangleColliderComponent(entt::entity self, Game &game) noexcept;
 
+  [[nodiscard]] constexpr inline auto GetHalfSize() const noexcept -> const Vector2 & { return half_size_; }
+  inline void SetHalfSize(const Vector2 &half_size) noexcept { half_size_ = half_size; Updateb2(); }
+  [[nodiscard]] constexpr inline auto GetOffset() const noexcept -> const Vector2 & { return offset_; }
+  inline void SetOffset(const Vector2 &offset) noexcept { offset_ = offset; Updateb2(); }
+  [[nodiscard]] constexpr inline auto GetAngle() const noexcept -> DefFloatType { return angle_; }
+  inline void SetAngle(DefFloatType angle) noexcept { angle_ = angle; Updateb2(); }
+  
+  void Updateb2() const noexcept;
+  
 private:
-  Vector4 rect_ = Vector4{0, 0, 1, 1};
+  entt::entity self_;
+  Game &game_;
+
+  b2ShapeId shape_id_;
+  Vector2 half_size_ = Vector2{0.5f, 0.5f};
+  Vector2 offset_ = Vector2::Zero();
+  DefFloatType angle_ = 0;
+
+  [[nodiscard]] auto Getb2Polygon() const noexcept -> b2Polygon;
 };
 } // game
 

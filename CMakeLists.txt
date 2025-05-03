@@ -55,6 +55,7 @@ add_library(${GAME_OBJ_LIB_NAME} STATIC
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Physics/PhysicsSystem.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Physics/ColliderComponents.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Physics/TransformComponent.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Physics/RigidbodyComponent.cpp
 )
 
 target_compile_options(
@@ -74,6 +75,7 @@ target_include_directories(
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/libs/tracy/public
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/libs/stb_image
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/libs/entt
+  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/libs/box2d/include
 )
 
 target_precompile_headers(
@@ -94,6 +96,11 @@ target_compile_options(
   PRIVATE -fmax-errors=3
 )
 
+target_link_directories(
+  ${CMAKE_PROJECT_NAME}
+  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/box2d/lib
+)
+
 target_link_libraries(
   ${CMAKE_PROJECT_NAME}
   PRIVATE ${GAME_OBJ_LIB_NAME}
@@ -101,6 +108,7 @@ target_link_libraries(
   PRIVATE SDL2
   PRIVATE SDL2main
   PRIVATE TracyClient
+  PRIVATE box2d
 )
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES OUTPUT_NAME ${CMAKE_PROJECT_NAME})

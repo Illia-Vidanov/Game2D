@@ -15,7 +15,6 @@ namespace game
 {
 RenderSystem::RenderSystem(Game &game) noexcept
   : game_{game}
-  , sprites_{game_.GetRegistry().group<const SpriteComponent>(entt::get<TransformComponent>)}
 {
   ZoneScopedC(0x07dbd4);
 
@@ -57,15 +56,16 @@ void RenderSystem::EndFrame() noexcept
   ZoneScopedC(0x07dbd4);
 
   game_.GetResourceManager().BindSpriteVAO();
-  for(entt::entity entity : sprites_)
+  entt::view<entt::get_t<SpriteComponent>> sprites = game_.GetRegistry().view<SpriteComponent>();
+  for(entt::entity entity : sprites)
   {
     ZoneScopedNC("Render sprite", 0x07dbd4);
 
     GL_CALL(glActiveTexture(GL_TEXTURE0));
-    const SpriteComponent &sprite = sprites_.get<SpriteComponent>(entity);
+    const SpriteComponent &sprite = sprites.get<SpriteComponent>(entity);
     sprite.GetTexture().Bind();
     sprite.GetShader().Use();
-    sprite.GetShader().SetUniformMatrix4("model", 1, false, TransformComponent::To4x4TransformationMatrix(sprites_.get<TransformComponent>(entity)).data());
+    sprite.GetShader().SetUniformMatrix4("model", 1, false, TransformComponent::To4x4TransformationMatrix(game_.GetRegistry().get<TransformComponent>(entity)).data());
     GL_CALL(glDrawElements(GL_TRIANGLES, game_.GetResourceManager().GetSpriteIndexCount(), GL_UNSIGNED_INT, 0));
   }
 

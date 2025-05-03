@@ -11,12 +11,12 @@ class Game;
 class PlayerComponent
 {
 public:
-  void Initialize(entt::entity self, Game &game);
+  PlayerComponent(entt::entity self, Game &game) noexcept;
   void Update() noexcept;
 
 private:
   entt::entity self_;
-  Game *game_;
+  Game &game_;
 };
 } // game
 

@@ -10,6 +10,8 @@
 #include "Player/PlayerComponent.hpp"
 #include "Rendering/SpriteComponent.hpp"
 #include "Physics/TransformComponent.hpp"
+#include "Physics/ColliderComponents.hpp"
+#include "Physics/RigidbodyComponent.hpp"
 
 
 namespace game
@@ -39,21 +41,22 @@ Game::Game(const int argc, const char * const *argv) noexcept
   resource_manager_.InitEvents();
   input_system_.InitEvents();
 
-  registry_.emplace<TransformComponent>(player_);
-  SpriteComponent &player_sprite = registry_.emplace<SpriteComponent>(player_);
+  registry_.emplace<TransformComponent>(player_, player_, *this);
+  SpriteComponent &player_sprite = registry_.emplace<SpriteComponent>(player_, player_, *this);
   player_sprite.SetShader(resource_manager_.GetShader(ShaderType::kDefault));
   player_sprite.SetTexture(resource_manager_.GetTexture(TextureType::kNoImage64));
-  registry_.emplace<SquareColliderComponent>(player_);
-  registry_.emplace<PlayerComponent>(player_).Initialize(player_, *this);
+  registry_.emplace<RectangleColliderComponent>(player_, player_, *this);
+  registry_.emplace<RigidbodyComponent>(player_, player_, *this);
+  registry_.emplace<PlayerComponent>(player_, player_, *this);
 
   box_ = registry_.create();
-  TransformComponent &box_transform = registry_.emplace<TransformComponent>(box_);
-  box_transform.translation() = Vector2{20, 20};
-  box_transform.linear().diagonal() = Vector2{10, 10};
-  SpriteComponent &box_sprite = registry_.emplace<SpriteComponent>(box_);
+  TransformComponent &box_transform = registry_.emplace<TransformComponent>(box_, player_, *this);
+  box_transform.SetPosition(Vector2{20, 20});
+  box_transform.SetScale(Vector2{10, 10});
+  SpriteComponent &box_sprite = registry_.emplace<SpriteComponent>(box_, player_, *this);
   box_sprite.SetShader(resource_manager_.GetShader(ShaderType::kDefault));
   box_sprite.SetTexture(resource_manager_.GetTexture(TextureType::kWhite));
-  registry_.emplace<SquareColliderComponent>(box_);
+  registry_.emplace<RectangleColliderComponent>(box_, player_, *this);
 }
 
 void Game::Run() noexcept

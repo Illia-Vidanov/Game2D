@@ -3,10 +3,6 @@
 
 #include "Setup.hpp"
 
-#include "Rendering/SpriteComponent.hpp"
-#include "Physics/TransformComponent.hpp"
-#include "Utils/MathConstants.hpp"
-
 
 namespace game
 {
@@ -26,7 +22,6 @@ private:
 
   Game &game_;
   Owner<void*> context_; // even in implementation SDL_GLContext is just typedef to void*
-  decltype(std::declval<entt::registry>().group<const SpriteComponent>(entt::get<TransformComponent>)) sprites_;
 };
 } // game
 

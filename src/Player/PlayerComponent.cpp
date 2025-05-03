@@ -9,29 +9,30 @@
 #include "Physics/ColliderComponents.hpp"
 #include "Player/InputSystem.hpp"
 #include "Physics/TransformComponent.hpp"
+#include "Physics/RigidbodyComponent.hpp"
 
 
 namespace game
 {
-void PlayerComponent::Initialize(entt::entity self, Game &game)
+PlayerComponent::PlayerComponent(entt::entity self, Game &game) noexcept
+  : self_{self}
+  , game_{game}
 {
   ZoneScopedC(0x31ff98);
 
-  self_ = self;
-  game_ = &game;
-
   //sprite_.GetShader().SetUniform("spriteColor", 1.0f, 1.0f, 1.0f);
-  game_->GetRegistry().get<TransformComponent>(self_).linear().diagonal() *= 10;
+  TransformComponent &transform = game_.GetRegistry().get<TransformComponent>(self_);
+  transform.SetScale(transform.GetScale() * 10);
 }
 
 void PlayerComponent::Update() noexcept
 {
   ZoneScopedC(0x31ff98);
 
-  game_->GetRegistry().get<TransformComponent>(self_).translation() += Vector2{
-    (static_cast<float>(game_->GetInputSystem().GetKey(SDL_SCANCODE_D)) - static_cast<float>(game_->GetInputSystem().GetKey(SDL_SCANCODE_A))) * 0.01f,
-    (static_cast<float>(game_->GetInputSystem().GetKey(SDL_SCANCODE_W)) - static_cast<float>(game_->GetInputSystem().GetKey(SDL_SCANCODE_S))) * 0.01f
-  };
+  //game_->GetRegistry().get<RigidbodyComponent>(self_).SetVelocity(Vector2{
+  //  (static_cast<float>(game_->GetInputSystem().GetKey(SDL_SCANCODE_D)) - static_cast<float>(game_->GetInputSystem().GetKey(SDL_SCANCODE_A))) * 0.01f,
+  //  (static_cast<float>(game_->GetInputSystem().GetKey(SDL_SCANCODE_W)) - static_cast<float>(game_->GetInputSystem().GetKey(SDL_SCANCODE_S))) * 0.01f
+  //});
 
   //GAME_DLOG(LogType::kInfo) << transform_.translation().transpose();
 }

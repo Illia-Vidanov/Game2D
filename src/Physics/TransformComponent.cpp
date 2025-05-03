@@ -3,12 +3,51 @@
 #include "Setup.hpp"
 
 #include "Utils/MathConstants.hpp"
+#include "Core/Game.hpp"
+#include "Physics/RigidbodyComponent.hpp"
+#include "Physics/ColliderComponents.hpp"
 
 
 namespace game
 {
-// near_ and far_ are written with underline because some windows library defines near and far
+TransformComponent &TransformComponent::operator=(const TransformComponent &other) noexcept
+{
+  angle_ = other.angle_;
+  sin_ = other.sin_;
+  cos_ = other.cos_;
+  scale_ = other.scale_;
+  
+  UpdateDependentColliders();
+  if(RigidbodyComponent *rigidbody = game_.GetRegistry().try_get<RigidbodyComponent>(self_))
+    rigidbody->Updateb2Transform();
 
+  return *this;
+}
+
+TransformComponent &TransformComponent::operator=(const Transform &other) noexcept
+{
+  Transform::operator=(other);
+  const Vector2 &sin_and_cos = linear().col(0).normalized();
+  sin_ = sin_and_cos(1);
+  cos_ = sin_and_cos(0);
+  scale_ = Vector2{linear()(1, 1) / sin_, linear()(0, 0) / cos_};
+  angle_ = std::atan2(sin_, cos_);
+
+  UpdateDependentColliders();
+  if(RigidbodyComponent *rigidbody = game_.GetRegistry().try_get<RigidbodyComponent>(self_))
+    rigidbody->Updateb2Transform();
+
+  return *this;
+}
+
+void TransformComponent::SetPosition(const Vector2 &position) noexcept
+{
+  translation() = position;
+  if(RigidbodyComponent *rigidbody = game_.GetRegistry().try_get<RigidbodyComponent>(self_))
+    rigidbody->Updateb2Transform();
+}
+
+// near_ and far_ are written with underline because some windows library defines near and far
 auto TransformComponent::OrthographicProjection(float left, float right, float bottom, float top, float near_, float far_) noexcept -> Matrix4
 {
   Matrix4 projection = Matrix4::Identity();
@@ -37,12 +76,18 @@ auto TransformComponent::OrthographicProjection2D(float left, float right, float
   return projection;
 }
 
-auto TransformComponent::To4x4TransformationMatrix(const TransformComponent &transform) noexcept -> Matrix4
+auto TransformComponent::To4x4TransformationMatrix(const Transform &transform) noexcept -> Matrix4
 {
   Matrix4 result = Matrix4::Identity();
   result.block<2, 2>(0, 0) = transform.linear();
   result.block<2, 1>(0, 3) = transform.translation();
 
   return result;
+}
+
+void TransformComponent::UpdateDependentColliders() noexcept
+{
+  if(RectangleColliderComponent *rectangle_collider = game_.GetRegistry().try_get<RectangleColliderComponent>(self_))
+    rectangle_collider->Updateb2();
 }
 }

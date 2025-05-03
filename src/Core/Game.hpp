@@ -25,14 +25,16 @@ public:
   [[nodiscard]] constexpr inline auto GetFlags() const noexcept -> const Flags& { return flags_; }
   [[nodiscard]] constexpr inline auto GetWindow() noexcept -> Window& { return window_; }
   [[nodiscard]] constexpr inline auto GetWindow() const noexcept -> const Window& { return window_; }
-  [[nodiscard]] constexpr inline auto GetRenderSystem() noexcept -> RenderSystem& { return render_system_; }
-  [[nodiscard]] constexpr inline auto GetRenderSystem() const noexcept -> const RenderSystem& { return render_system_; }
   [[nodiscard]] constexpr inline auto GetRegistry() noexcept -> entt::registry& { return registry_; }
   [[nodiscard]] constexpr inline auto GetRegistry() const noexcept -> const entt::registry& { return registry_; }
   [[nodiscard]] constexpr inline auto GetInputSystem() noexcept -> InputSystem& { return input_system_; }
   [[nodiscard]] constexpr inline auto GetInputSystem() const noexcept -> const InputSystem& { return input_system_; }
   [[nodiscard]] constexpr inline auto GetEventSystem() noexcept -> EventSystem& { return event_system_; }
   [[nodiscard]] constexpr inline auto GetEventSystem() const noexcept -> const EventSystem& { return event_system_; }
+  [[nodiscard]] constexpr inline auto GetRenderSystem() noexcept -> RenderSystem& { return render_system_; }
+  [[nodiscard]] constexpr inline auto GetRenderSystem() const noexcept -> const RenderSystem& { return render_system_; }
+  [[nodiscard]] constexpr inline auto GetPhysicsSystem() noexcept -> PhysicsSystem& { return physics_system_; }
+  [[nodiscard]] constexpr inline auto GetPhysicsSystem() const noexcept -> const PhysicsSystem& { return physics_system_; }
   [[nodiscard]] constexpr inline auto GetResourceManager() noexcept -> ResourceManager& { return resource_manager_; }
   [[nodiscard]] constexpr inline auto GetResourceManager() const noexcept -> const ResourceManager& { return resource_manager_; }
 

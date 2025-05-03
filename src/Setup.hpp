@@ -57,6 +57,8 @@
 // STB Image - image reading
 #include <stb_image.h>
 
+// Box2D - 2d physics library
+#include <box2d/box2d.h>
 
 // Used to show who owns the memory
 template<typename T>
