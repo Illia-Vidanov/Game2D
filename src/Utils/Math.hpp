@@ -3,7 +3,6 @@
 
 #include "Setup.hpp"
 
-#include "Utils/MathConstants.hpp"
 #include "Physics/TransformComponent.hpp"
 
 
@@ -14,17 +13,17 @@ template<typename T>
 using ReturnFloatType = std::conditional_t<std::is_integral_v<T>, DefFloatType, T>;
 
 template<typename T>
-constexpr inline T NotNull(T t) { return t == 0 ? T{1} : t; }
+[[nodiscard]] constexpr inline T NotNull(T t) noexcept { return t == 0 ? T{1} : t; }
 
 template<typename T>
-constexpr inline ReturnFloatType<T> DegreesToRadians(T degrees) { return degrees * (kPI / 180); }
+[[nodiscard]] constexpr inline ReturnFloatType<T> DegreesToRadians(T degrees) noexcept { return degrees * (kPI / 180); }
 
 template<typename T>
-constexpr inline ReturnFloatType<T> RadiansToDegrees(T radians) { return radians * (180 / kPI); }
+[[nodiscard]] constexpr inline ReturnFloatType<T> RadiansToDegrees(T radians) noexcept { return radians * (180 / kPI); }
 
 
 template<typename T, typename U>
-constexpr inline bool AreSame(T t, U u) { return gcem::abs(t - u) < kElipson; }
+[[nodiscard]] constexpr inline bool AreSame(T t, U u) noexcept { return gcem::abs(t - u) < kElipson; }
 
 // Shorthand of writing (std::numeric_limits<T>::digits10 + 1)
 template<typename T>
@@ -58,7 +57,7 @@ constexpr inline DefFloatType kFastPower10NegativeLookup[20] =
 // Example: FastPower10<float>(2.3);
 // If exp > 19 or exp < -19, 1 is returned
 template<typename T = uint32_t, typename U>
-constexpr inline T FastPower10(const U exp)
+[[nodiscard]] constexpr inline T FastPower10(const U exp) noexcept
 {
     if constexpr(!std::is_integral_v<U>)
         return gcem::pow(T(10), exp);
@@ -85,7 +84,7 @@ constexpr inline T FastPower10(const U exp)
 // If value is floating point, fraction part is ignored, by casting value to long long
 // Indexing starts at 0 and equals the same as (x / 10^index) % 10
 template<typename T = uint8_t, typename U, typename V, std::enable_if_t<!std::is_floating_point_v<U>, bool> = true>
-constexpr inline T GetDigit(const U u, const V index)
+[[nodiscard]] constexpr inline T GetDigit(const U u, const V index) noexcept
 {
     // We might get division by 0 if we skip this line
     if(index < 0)
@@ -94,7 +93,7 @@ constexpr inline T GetDigit(const U u, const V index)
 }
 
 template<typename T = uint8_t, typename U, typename V, std::enable_if_t<std::is_floating_point_v<U>, bool> = true>
-constexpr inline T GetDigit(const U u, const V index)
+[[nodiscard]] constexpr inline T GetDigit(const U u, const V index) noexcept
 {
     return GetDigit(static_cast<long long>(u), index);
 }
@@ -108,7 +107,7 @@ constexpr inline T GetDigit(const U u, const V index)
 //          first = -10, last = 5, number = -6543210 => 43210;
 // If number is floating point, fraction part is ignored by casting value to long long
 template<typename T, typename U, std::enable_if_t<!std::is_floating_point_v<T>, bool> = true>
-constexpr inline T GetDigitSubstring(const T number, U first, const U last)
+[[nodiscard]] constexpr inline T GetDigitSubstring(const T number, U first, const U last) noexcept
 {
     // I am not sure about this line.
     // It might be better to throw an error, but it means we need to check for it anyway, so I would prefer doing it this way
@@ -124,7 +123,7 @@ constexpr inline T GetDigitSubstring(const T number, U first, const U last)
 }
 
 template<typename T, typename U, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-constexpr inline T GetDigitSubstring(const T number, const U first, const U last)
+[[nodiscard]] constexpr inline T GetDigitSubstring(const T number, const U first, const U last) noexcept
 {
     return GetDigitSubstring(static_cast<long long>(number), first, last);
 }
@@ -133,7 +132,7 @@ constexpr inline T GetDigitSubstring(const T number, const U first, const U last
 namespace detail
 {
 template <typename T>
-constexpr inline uint32_t DigitCountImpl(T t)
+[[nodiscard]] constexpr inline uint32_t DigitCountImpl(T t) noexcept
 {
     if(t < T(0))
         return DigitCountImpl(-t);
@@ -147,7 +146,7 @@ constexpr inline uint32_t DigitCountImpl(T t)
 }
 
 template<>
-inline uint32_t DigitCountImpl<char>(char t)
+[[nodiscard]] inline uint32_t DigitCountImpl<char>(char t) noexcept
 {
     if(t < 0)
         return DigitCountImpl<char>(-t);
@@ -156,14 +155,14 @@ inline uint32_t DigitCountImpl<char>(char t)
     return x[static_cast<unsigned char>(t)];
 }
 template<>
-inline uint32_t DigitCountImpl<unsigned char>(unsigned char t)
+[[nodiscard]] inline uint32_t DigitCountImpl<unsigned char>(unsigned char t) noexcept
 {
     static const unsigned char x[256] = { 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 };
     return x[t];
 }
 
 template<>
-constexpr inline uint32_t DigitCountImpl<short>(short t)
+[[nodiscard]] constexpr inline uint32_t DigitCountImpl<short>(short t) noexcept
 {
     if(t < 0)
         return DigitCountImpl<short>(-t);
@@ -186,7 +185,7 @@ constexpr inline uint32_t DigitCountImpl<short>(short t)
     }
 }
 template<>
-constexpr inline uint32_t DigitCountImpl<unsigned short>(unsigned short t)
+[[nodiscard]] constexpr inline uint32_t DigitCountImpl<unsigned short>(unsigned short t) noexcept
 {
     if(t >= 100)
     {
@@ -207,7 +206,7 @@ constexpr inline uint32_t DigitCountImpl<unsigned short>(unsigned short t)
 }
 
 template<>
-constexpr inline uint32_t DigitCountImpl<int>(int t)
+[[nodiscard]] constexpr inline uint32_t DigitCountImpl<int>(int t) noexcept
 {
     if(t < 0) return DigitCountImpl<int>(-t);
 
@@ -243,7 +242,7 @@ constexpr inline uint32_t DigitCountImpl<int>(int t)
 }
 
 template<>
-constexpr inline uint32_t DigitCountImpl<unsigned int>(unsigned int t)
+[[nodiscard]] constexpr inline uint32_t DigitCountImpl<unsigned int>(unsigned int t) noexcept
 {
     if(t >= 100000)
     {
@@ -277,7 +276,7 @@ constexpr inline uint32_t DigitCountImpl<unsigned int>(unsigned int t)
 }
 
 template<>
-constexpr inline uint32_t DigitCountImpl<long long>(long long t)
+[[nodiscard]] constexpr inline uint32_t DigitCountImpl<long long>(long long t) noexcept
 {
     if(t < 0)
         return DigitCountImpl<long long>(-t);
@@ -341,7 +340,7 @@ constexpr inline uint32_t DigitCountImpl<long long>(long long t)
     return 1;
 }
 template<>
-constexpr inline uint32_t DigitCountImpl<unsigned long long>(unsigned long long t)
+[[nodiscard]] constexpr inline uint32_t DigitCountImpl<unsigned long long>(unsigned long long t) noexcept
 {
     if(t >= 10000000000)
     {
@@ -410,13 +409,16 @@ constexpr inline uint32_t DigitCountImpl<unsigned long long>(unsigned long long 
 // Get number of whole digits in any type
 // 0 = 0 digits
 template<typename T = uint32_t, typename U>
-constexpr inline T DigitCount(U number)
+[[nodiscard]] constexpr inline T DigitCount(U number) noexcept
 {
     return number == 0 ? 0 : static_cast<T>(detail::DigitCountImpl(number));
 }
 
 template<typename T = int, typename U>
-constexpr inline T Bitmask(U bit) noexcept { GAME_ASSERT(bit < (sizeof(T) * CHAR_BIT)) << "Too large bit: " << bit; return static_cast<T>(1) << bit; }
+[[nodiscard]] constexpr inline T Bitmask(U bit) noexcept { GAME_ASSERT(bit < (sizeof(T) * CHAR_BIT)) << "Too large bit: " << bit; return static_cast<T>(1) << bit; }
+
+template<typename T = int, typename U>
+[[nodiscard]] constexpr inline T Sign(U value) noexcept { return value < U{0} ? static_cast<T>(-1) : static_cast<T>(1); } // return static_cast<T>(static_cast<int>(value < 0) * -2 + 1)    branchless approach
 
 [[nodiscard]] inline auto Tob2Vec2(const Vector2 &vector) noexcept -> b2Vec2 { return b2Vec2{vector.x(), vector.y()}; }
 [[nodiscard]] inline auto Tob2Rot(DefFloatType angle) noexcept -> b2Rot { return b2Rot{std::cos(angle), std::sin(angle)}; }
