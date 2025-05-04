@@ -46,9 +46,10 @@ public:
   
   [[nodiscard]] inline auto GetSpriteIndexCount() -> Index { return sprite_ebo_.GetCount(); }
   inline void BindSpriteVAO() { sprite_vao_.Bind(); }
-
+  [[nodiscard]] inline auto GetOrthographicProjection() const noexcept -> Matrix3 { return orthographic_projection_; }
   
-private:
+  
+  private:
   using ShaderContainerType = std::unordered_map<ShaderType, Shader>;
   using TextureContainerType = std::unordered_map<TextureType, Texture>;
   
@@ -57,7 +58,8 @@ private:
   VBO sprite_vbo_;
   EBO sprite_ebo_;
   VAO sprite_vao_;
-
+  Matrix3 orthographic_projection_;
+  
   Game &game_;
   EventCleaner event_cleaner_;
 };

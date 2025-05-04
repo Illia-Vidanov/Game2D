@@ -4,7 +4,6 @@
 #include "Setup.hpp"
 
 #include "Core/EventSystem.hpp"
-#include "Utils/MathConstants.hpp"
 
 
 class SDL_Window;

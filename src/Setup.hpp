@@ -76,4 +76,9 @@ using NotNull = T;
 // Converts expression in prentecies to string
 #define GAME_TO_STRING(x) #x
 
+
+// Own
+#include "Utils/Logger.hpp"
+#include "Utils/MathConstants.hpp"
+
 #endif // GAME_SETUP_HPP

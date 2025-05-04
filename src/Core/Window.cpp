@@ -3,10 +3,9 @@
 #include "Setup.hpp"
 
 #include "Core/Game.hpp"
-#include "Utils/Logger.hpp"
+
 #include "Core/EventSystem.hpp"
 #include "Rendering/Utils.hpp"
-#include "Utils/MathConstants.hpp"
 
 
 namespace game

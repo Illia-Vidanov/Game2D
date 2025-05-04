@@ -21,8 +21,9 @@ RectangleColliderComponent::RectangleColliderComponent(entt::entity self, Game &
   if(PhysicsSystem::Isb2BodyIdNull(body_id))
   {
     b2BodyDef body_definition = b2DefaultBodyDef();
-    body_definition.position = game_.GetRegistry().get<TransformComponent>(self_).Getb2Position();
-    body_definition.rotation = game_.GetRegistry().get<TransformComponent>(self_).Getb2Rotation();
+    const TransformComponent &transform = game_.GetRegistry().get<TransformComponent>(self_);
+    body_definition.position = transform.Getb2Position();
+    body_definition.rotation = transform.Getb2Rotation();
     game_.GetPhysicsSystem().Addb2BodyId(self_, body_id = b2CreateBody(game_.GetPhysicsSystem().GetWorldId(), &body_definition));
   }
 

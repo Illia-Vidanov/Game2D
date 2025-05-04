@@ -3,8 +3,12 @@ Todo:
 - Hide warnings with unused parametrs
 - Finish logger
 - Input
-- Collisiions
 - Flags
+- Background
+- Moving Scene
+- Sprite
+- Animation
+- Simplest character controller
 */
 #include "Setup.hpp"
 

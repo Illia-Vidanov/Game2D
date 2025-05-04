@@ -4,7 +4,7 @@
 
 #include "Core/Game.hpp"
 #include "Core/Window.hpp"
-#include "Utils/Logger.hpp"
+
 #include "Utils/Math.hpp"
 #include "Rendering/Utils.hpp"
 #include "Rendering/SpriteComponent.hpp"
@@ -59,13 +59,14 @@ void RenderSystem::EndFrame() noexcept
   entt::view<entt::get_t<SpriteComponent>> sprites = game_.GetRegistry().view<SpriteComponent>();
   for(entt::entity entity : sprites)
   {
-    ZoneScopedNC("Render sprite", 0x07dbd4);
+  ZoneScopedNC("Render sprite", 0x07dbd4);
 
     GL_CALL(glActiveTexture(GL_TEXTURE0));
     const SpriteComponent &sprite = sprites.get<SpriteComponent>(entity);
     sprite.GetTexture().Bind();
     sprite.GetShader().Use();
-    sprite.GetShader().SetUniformMatrix4("model", 1, false, TransformComponent::To4x4TransformationMatrix(game_.GetRegistry().get<TransformComponent>(entity)).data());
+    Matrix3 transformation_matrix = game_.GetResourceManager().GetOrthographicProjection() * game_.GetCamera().GetViewMatrix().inverse() * game_.GetRegistry().get<TransformComponent>(entity).matrix();
+    sprite.GetShader().SetUniformMatrix3("mvp", 1, false, transformation_matrix.data());
     GL_CALL(glDrawElements(GL_TRIANGLES, game_.GetResourceManager().GetSpriteIndexCount(), GL_UNSIGNED_INT, 0));
   }
 

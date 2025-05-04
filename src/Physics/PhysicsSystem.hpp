@@ -3,8 +3,6 @@
 
 #include "Setup.hpp"
 
-#include "Utils/MathConstants.hpp"
-
 
 namespace game
 {

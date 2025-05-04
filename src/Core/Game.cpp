@@ -2,10 +2,10 @@
 
 #include "Setup.hpp"
 
-#include "Utils/Logger.hpp"
+
 #include "Utils/FlagParser.hpp"
 #include "Core/Window.hpp"
-#include "Utils/Logger.hpp"
+
 #include "Utils/Type.hpp"
 #include "Player/PlayerComponent.hpp"
 #include "Rendering/SpriteComponent.hpp"
@@ -29,6 +29,7 @@ Game::Game(const int argc, const char * const *argv) noexcept
   , resource_manager_{*this}
   , input_system_{*this}
   , physics_system_{*this}
+  , camera_{*this}
 {
   ZoneScopedC(0xb3041b);
 
@@ -41,7 +42,7 @@ Game::Game(const int argc, const char * const *argv) noexcept
   resource_manager_.InitEvents();
   input_system_.InitEvents();
 
-  registry_.emplace<TransformComponent>(player_, player_, *this);
+  registry_.emplace<TransformComponent>(player_, player_, *this).SetScale(Vector2{10, 10});
   SpriteComponent &player_sprite = registry_.emplace<SpriteComponent>(player_, player_, *this);
   player_sprite.SetShader(resource_manager_.GetShader(ShaderType::kDefault));
   player_sprite.SetTexture(resource_manager_.GetTexture(TextureType::kNoImage64));

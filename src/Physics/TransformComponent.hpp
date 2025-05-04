@@ -3,7 +3,6 @@
 
 #include "Setup.hpp"
 
-#include "Utils/MathConstants.hpp"
 
 namespace game
 {
@@ -17,15 +16,14 @@ public:
   TransformComponent &operator=(const Transform &other) noexcept;
 
   [[nodiscard]] inline auto GetPosition() noexcept -> Vector2 { return translation(); }
-  void SetPosition(const Vector2 &position) noexcept;
-  inline void SetPositionWithoutRigidbodyUpdate(const Vector2 &position) noexcept { translation() = position; }
+  inline void SetPosition(const Vector2 &position) noexcept { translation() = position; }
   [[nodiscard]] constexpr inline auto GetRotationAngle() const noexcept -> DefFloatType { return angle_; }
-  inline void SetRotationAngle(DefFloatType angle) noexcept { angle_ = angle; sin_ = std::sin(angle_); cos_ = std::cos(angle_); linear() = Eigen::Scaling(scale_) * Matrix2{ {cos_, -sin_}, {sin_, cos_} }; UpdateDependentColliders(); }
-  inline void SetRotationAngleWithoutRigidbodyUpdate(DefFloatType angle) noexcept { angle_ = angle; sin_ = std::sin(angle_); cos_ = std::cos(angle_); linear() = Eigen::Scaling(scale_) * Matrix2{ {cos_, -sin_}, {sin_, cos_} }; }
+  inline void SetRotationAngle(DefFloatType angle) noexcept { angle_ = angle; sin_ = std::sin(angle_); cos_ = std::cos(angle_); linear() = Eigen::Scaling(scale_) * Matrix2{ {cos_, -sin_}, {sin_, cos_} }; }
+
   [[nodiscard]] inline auto GetSinAndCos() const noexcept -> Vector2 { return Vector2{sin_, cos_}; }
-  inline void SetSinAndCos(const Vector2 &sin_and_cos) noexcept { sin_ = sin_and_cos.x(); cos_ = sin_and_cos.y(); angle_ = std::atan2(sin_, cos_); linear() = Eigen::Scaling(scale_) * Matrix2{ {cos_, -sin_}, {sin_, cos_} }; UpdateDependentColliders(); }
+  inline void SetSinAndCos(const Vector2 &sin_and_cos) noexcept { sin_ = sin_and_cos.x(); cos_ = sin_and_cos.y(); angle_ = std::atan2(sin_, cos_); linear() = Eigen::Scaling(scale_) * Matrix2{ {cos_, -sin_}, {sin_, cos_} }; }
   [[nodiscard]] inline auto GetScale() const noexcept -> Vector2 { return scale_; }
-  inline void SetScale(const Vector2 &scale) noexcept { scale_ = scale; linear() = Eigen::Scaling(scale_) * Matrix2{ {cos_, -sin_}, {sin_, cos_} }; UpdateDependentColliders(); }
+  inline void SetScale(const Vector2 &scale) noexcept { scale_ = scale; linear() = Eigen::Scaling(scale_) * Matrix2{ {cos_, -sin_}, {sin_, cos_} }; }
 
   [[nodiscard]] static auto OrthographicProjection(float left, float right, float bottom, float top, float near, float far) noexcept -> Matrix4;
   [[nodiscard]] static auto OrthographicProjection2D(float left, float right, float bottom, float top) noexcept -> Matrix3;
@@ -35,8 +33,6 @@ public:
   [[nodiscard]] inline auto Getb2Rotation() const noexcept -> b2Rot { return b2Rot{cos_, sin_}; }
 
 private:
-  void UpdateDependentColliders() noexcept;
-
   entt::entity self_;
   Game &game_;
 

@@ -4,7 +4,6 @@
 #include "Setup.hpp"
 
 #include "Rendering/DataStructures.hpp"
-#include "Utils/MathConstants.hpp"
 
 
 namespace game

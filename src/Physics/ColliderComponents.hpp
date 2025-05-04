@@ -3,12 +3,13 @@
 
 #include "Setup.hpp"
 
-#include "Utils/MathConstants.hpp"
-
 
 namespace game
 {
 class Game;
+
+// Position is updated with tranform
+// Size and rotation are not!
 
 class RectangleColliderComponent
 {

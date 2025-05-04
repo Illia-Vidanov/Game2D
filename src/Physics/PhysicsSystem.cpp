@@ -5,8 +5,6 @@
 #include "Physics/ColliderComponents.hpp"
 #include "Physics/TransformComponent.hpp"
 #include "Physics/RigidbodyComponent.hpp"
-#include "Utils/Logger.hpp"
-#include "Utils/MathConstants.hpp"
 #include "Core/Game.hpp"
 
 
@@ -31,9 +29,15 @@ void PhysicsSystem::Update() noexcept
   for(entt::entity entity : rigidbodies)
   {
     TransformComponent &transform = game_.GetRegistry().get<TransformComponent>(entity);
-    transform.SetPositionWithoutRigidbodyUpdate(ToNormalVector2(b2Body_GetPosition(body_ids_[entity])));
+    transform.SetPosition(ToNormalVector2(b2Body_GetPosition(body_ids_[entity])));
     b2Rot rotation = b2Body_GetRotation(body_ids_[entity]);
-    transform.SetRotationAngleWithoutRigidbodyUpdate(std::atan2(rotation.s, rotation.c));
+    transform.SetSinAndCos(Vector2{rotation.s, rotation.c});
   }
+  
+  //for(auto it : body_ids_)
+  //{
+  //  GAME_DLOG(LogType::kInfo) << ToNormalVector2(b2Body_GetPosition(it.second)).transpose();
+  //}
+  //GAME_DLOG(LogType::kInfo) << ' ';
 }
 } // game

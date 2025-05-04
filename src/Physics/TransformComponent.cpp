@@ -2,7 +2,6 @@
 
 #include "Setup.hpp"
 
-#include "Utils/MathConstants.hpp"
 #include "Core/Game.hpp"
 #include "Physics/RigidbodyComponent.hpp"
 #include "Physics/ColliderComponents.hpp"
@@ -14,15 +13,10 @@ TransformComponent &TransformComponent::operator=(const TransformComponent &othe
 {
   ZoneScopedC(0xff65a8);
 
-
   angle_ = other.angle_;
   sin_ = other.sin_;
   cos_ = other.cos_;
   scale_ = other.scale_;
-  
-  UpdateDependentColliders();
-  if(RigidbodyComponent *rigidbody = game_.GetRegistry().try_get<RigidbodyComponent>(self_))
-    rigidbody->Updateb2Transform();
 
   return *this;
 }
@@ -38,20 +32,7 @@ TransformComponent &TransformComponent::operator=(const Transform &other) noexce
   scale_ = Vector2{linear()(1, 1) / sin_, linear()(0, 0) / cos_};
   angle_ = std::atan2(sin_, cos_);
 
-  UpdateDependentColliders();
-  if(RigidbodyComponent *rigidbody = game_.GetRegistry().try_get<RigidbodyComponent>(self_))
-    rigidbody->Updateb2Transform();
-
   return *this;
-}
-
-void TransformComponent::SetPosition(const Vector2 &position) noexcept
-{
-  ZoneScopedC(0xff65a8);
-
-  translation() = position;
-  if(RigidbodyComponent *rigidbody = game_.GetRegistry().try_get<RigidbodyComponent>(self_))
-    rigidbody->Updateb2Transform();
 }
 
 // near_ and far_ are written with underline because some windows library defines near and far
@@ -96,13 +77,5 @@ auto TransformComponent::To4x4TransformationMatrix(const Transform &transform) n
   result.block<2, 1>(0, 3) = transform.translation();
 
   return result;
-}
-
-void TransformComponent::UpdateDependentColliders() noexcept
-{
-  ZoneScopedC(0xff65a8);
-
-  if(RectangleColliderComponent *rectangle_collider = game_.GetRegistry().try_get<RectangleColliderComponent>(self_))
-    rectangle_collider->Updateb2();
 }
 }

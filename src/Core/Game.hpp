@@ -9,6 +9,7 @@
 #include "Rendering/RenderSystem.hpp"
 #include "Rendering/ResourceManager.hpp"
 #include "Player/InputSystem.hpp"
+#include "Player/Camera.hpp"
 #include "Physics/PhysicsSystem.hpp"
 
 
@@ -23,6 +24,8 @@ public:
 
   [[nodiscard]] constexpr inline auto GetFlags() noexcept -> Flags& { return flags_; }
   [[nodiscard]] constexpr inline auto GetFlags() const noexcept -> const Flags& { return flags_; }
+  [[nodiscard]] constexpr inline auto GetCamera() noexcept -> Camera& { return camera_; }
+  [[nodiscard]] constexpr inline auto GetCamera() const noexcept -> const Camera& { return camera_; }
   [[nodiscard]] constexpr inline auto GetWindow() noexcept -> Window& { return window_; }
   [[nodiscard]] constexpr inline auto GetWindow() const noexcept -> const Window& { return window_; }
   [[nodiscard]] constexpr inline auto GetRegistry() noexcept -> entt::registry& { return registry_; }
@@ -49,16 +52,16 @@ private:
   entt::registry registry_;
   entt::entity player_;
   entt::entity box_;
-
+  
   EventSystem event_system_;
   EventCleaner event_cleaner_;
   Window window_;
   RenderSystem render_system_;
   ResourceManager resource_manager_;
-
+  
   InputSystem input_system_;
   PhysicsSystem physics_system_;
-
+  Camera camera_;
 };
 } // game
 
