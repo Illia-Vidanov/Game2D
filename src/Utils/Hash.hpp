@@ -67,7 +67,7 @@ constexpr uint32_t Crc32<std::size_t(-1)>(__attribute__((unused)) const char *st
 #define HASH_STRING(x) (detail::Crc32<sizeof(x) - 1>(x))
 
 // Hash given type
-template<typename T> constexpr inline std::size_t HeshType()
+template<typename T> constexpr std::size_t HeshType()
 { return HASH_STRING(__PRETTY_FUNCTION__); }
 
 

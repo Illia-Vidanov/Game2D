@@ -5,67 +5,39 @@
 
 #include "Rendering/Utils.hpp"
 #include "Utils/Math.hpp"
+#include "Utils/Logger.hpp"
+#include "Utils/MathConstants.hpp"
 
 
 namespace game
 {
-enum class TextureFlags : int
+struct TextureDefinition
 {
-  kNone = 0,
+public:
+  TextureDefinition(const std::string &new_source_path) noexcept : source_path{new_source_path} {}
 
-  //kGenerateMipmap = Bitmask(0),
-  //kIsTransparent  = Bitmask(1),
+  bool is_empty = false;
+  uint32_t type = GL_TEXTURE_2D;
+  const std::string &source_path;
+  uint32_t internal_format = GL_RGBA8;
+  uint32_t format = GL_RGBA;
+  uint32_t mipmap_count = static_cast<uint32_t>(-1);
 };
 
 class Texture
 {
 public:
-  Texture(uint32_t type);
+  Texture(TextureDefinition texture_definition) noexcept;
 
-  inline void Delete() { GL_CALL(glDeleteTextures(1, &id_)); }
+  void Delete() noexcept { GL_CALL(glDeleteTextures(1, &id_)); }
 
-  inline void Bind() const noexcept { GL_CALL(glBindTexture(type_, id_)); }
-  inline void Unbind() const noexcept { GL_CALL(glBindTexture(type_, 0)); }
-
-  void BufferData(const std::string &path);
-  void UpdateTexture() noexcept;
-  
-  [[nodiscard]] constexpr inline auto GetType() const noexcept -> uint32_t { return type_; }
-  [[nodiscard]] constexpr inline auto GetFlags() const noexcept -> TextureFlags { return flags_; }
-  inline void SetFlags(TextureFlags flags) { flags_ = flags; UpdateTexture(); }
-  template<std::size_t Index = 0, typename... Args>
-  void SetParametrs(const std::tuple<std::pair<int, Args>...> &data) const;
-  template<typename T>
-  inline void SetParametr(int name, T data) const { GAME_LOG(LogType::kError) << "No function to set glTexParametr with parametr of type \'" << typeid(T).name() << '\''; }
+  void Bind() const noexcept { GL_CALL(glBindTexture(type_, id_)); }
+  void Unbind() const noexcept { GL_CALL(glBindTexture(type_, 0)); }
 
 private:
+  const uint32_t type_;
   uint32_t id_ = 0;
-  const uint32_t type_ = 0;
-  TextureFlags flags_ = TextureFlags::kNone;
 };
-
-template<std::size_t Index, typename... Args>
-void Texture::SetParametrs(const std::tuple<std::pair<int, Args>...> &data) const
-{
-  Bind();
-  // Clamp is important because compiler looks ahead and gives errors
-  if constexpr(Index != sizeof...(Args) - 1)
-		SetParametrs<std::clamp(Index + 1, static_cast<std::size_t>(0), static_cast<std::size_t>(sizeof...(Args) - 1))>(data);
-
-  SetParametr(std::get<0>(std::get<Index>(data)), std::get<1>(std::get<Index>(data)));
-}
-
-template<>
-inline void Texture::SetParametr<int>(int name, int data) const
-{
-  GL_CALL(glTexParameteri(type_, name, data));
-}
-
-template<>
-inline void Texture::SetParametr<float>(int name, float data) const
-{
-  GL_CALL(glTexParameterf(type_, name, data));
-}
 } // game
 
 #endif // GAME_TEXTURE_HPP

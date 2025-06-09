@@ -2,6 +2,8 @@
 
 #include "Setup.hpp"
 
+#include "Utils/Logger.hpp"
+#include "Utils/MathConstants.hpp"
 #include "Physics/ColliderComponents.hpp"
 #include "Physics/TransformComponent.hpp"
 #include "Physics/RigidbodyComponent.hpp"
@@ -33,11 +35,5 @@ void PhysicsSystem::Update() noexcept
     b2Rot rotation = b2Body_GetRotation(body_ids_[entity]);
     transform.SetSinAndCos(Vector2{rotation.s, rotation.c});
   }
-  
-  //for(auto it : body_ids_)
-  //{
-  //  GAME_DLOG(LogType::kInfo) << ToNormalVector2(b2Body_GetPosition(it.second)).transpose();
-  //}
-  //GAME_DLOG(LogType::kInfo) << ' ';
 }
 } // game

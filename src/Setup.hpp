@@ -55,6 +55,7 @@
 #include <entt.hpp>
 
 // STB Image - image reading
+// Implementation is defined in Utils/FileReader.cpp
 #include <stb_image.h>
 
 // Box2D - 2d physics library
@@ -76,9 +77,21 @@ using NotNull = T;
 // Converts expression in prentecies to string
 #define GAME_TO_STRING(x) #x
 
+#if defined(NDEBUG) && !defined(TRACY_ENABLE)
+  #define GAME_ASSERT_STD_MESSAGE(condition, message)
+  #define GAME_ASSERT_STD_NO_MESSAGE(condition)
+  #define GAME_ASSERT_STD_CHOOSER(x, A, B, FUNC, ...)
+  #define GAME_ASSERT_STD(condition, message)
+  #define GAME_DEBUG_LINE(command)
+#else
+  #define GAME_ASSERT_STD_MESSAGE(condition, message) assert(((void)(message), static_cast<bool>(condition)))
+  #define GAME_ASSERT_STD_NO_MESSAGE(condition) assert(static_cast<bool>(condition))
+  #define GAME_ASSERT_STD_CHOOSER(x, A, B, FUNC, ...) FUNC
+  // Assert based on std::assert
+  #define GAME_ASSERT_STD(...) GAME_ASSERT_STD_CHOOSER(, ##__VA_ARGS__, GAME_ASSERT_STD_MESSAGE, GAME_ASSERT_STD_NO_MESSAGE, sstatic_assert(false, "Wrong number of arguments"))(__VA_ARGS__)
+  // Remove line on build
+  #define GAME_DEBUG_LINE(command) do { command; } while(0)
+#endif
 
-// Own
-#include "Utils/Logger.hpp"
-#include "Utils/MathConstants.hpp"
 
 #endif // GAME_SETUP_HPP

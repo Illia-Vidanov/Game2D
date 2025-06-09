@@ -3,15 +3,16 @@
 
 #include "Setup.hpp"
 
+#include "Utils/Logger.hpp"
+#include "Utils/MathConstants.hpp"
+
 
 namespace game
 {
 struct Vertex
 {
-  DefFloatType position_x = 0;
-  DefFloatType position_y = 0;
-  DefFloatType texture_position_x = 0;
-  DefFloatType texture_position_y = 0;
+  DefaultFloatType position_x = 0;
+  DefaultFloatType position_y = 0;
 };
 
 using Index = uint32_t;

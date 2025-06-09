@@ -3,20 +3,22 @@
 
 #include "Setup.hpp"
 
+#include "Utils/Logger.hpp"
+#include "Utils/MathConstants.hpp"
+
 
 namespace game
 {
-class Game;
+class Entity;
 
 class PlayerComponent
 {
 public:
-  PlayerComponent(entt::entity self, Game &game) noexcept;
+  PlayerComponent(Entity &entity) noexcept;
   void Update() noexcept;
 
 private:
-  entt::entity self_;
-  Game &game_;
+  Entity &entity_;
 };
 } // game
 

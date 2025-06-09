@@ -3,11 +3,17 @@
 
 #include "Setup.hpp"
 
+#include "Utils/Logger.hpp"
+#include "Utils/MathConstants.hpp"
+
 
 namespace game
 {
 struct ImageData
 {
+public:
+  using DataType = uint8_t;
+
   uint8_t *data = nullptr;
   int width = 0;
   int height = 0;

@@ -2,13 +2,20 @@
 
 #include "Setup.hpp"
 
-
+#include "Utils/Logger.hpp"
+#include "Utils/MathConstants.hpp"
 #include "Utils/FlagParser.hpp"
 #include "Core/Window.hpp"
-
-#include "Utils/Type.hpp"
+#include "Core/EventSystem.hpp"
+#include "Core/Entity.hpp"
+#include "Rendering/RenderSystem.hpp"
+#include "Rendering/ResourceManager.hpp"
+#include "Player/InputSystem.hpp"
+#include "Player/Camera.hpp"
 #include "Player/PlayerComponent.hpp"
-#include "Rendering/SpriteComponent.hpp"
+#include "Utils/Type.hpp"
+#include "Physics/PhysicsSystem.hpp"
+#include "Rendering/SpriteComponents.hpp"
 #include "Physics/TransformComponent.hpp"
 #include "Physics/ColliderComponents.hpp"
 #include "Physics/RigidbodyComponent.hpp"
@@ -22,7 +29,6 @@ Game::Game(const int argc, const char * const *argv) noexcept
       Logger::Get().SetVerboseLevel(10);
     }(), false)) // pre initialization functions
   , flags_(argc, argv) // args are UTF8 encoded because we use SDL2main
-  , player_{registry_.create()}
   , event_cleaner_{event_system_}
   , window_{*this}
   , render_system_{*this}
@@ -39,30 +45,39 @@ Game::Game(const int argc, const char * const *argv) noexcept
   event_system_.AddListener(event_cleaner_, EventType::kKeyDown, this, [](const Event &event, void *game){ if(event.GetKeycode() == static_cast<int>(SDLK_ESCAPE)) { reinterpret_cast<Game*>(game)->QuitEvent(); } return false; });
 
   window_.InitEvents();
-  resource_manager_.InitEvents();
   input_system_.InitEvents();
+}
 
-  registry_.emplace<TransformComponent>(player_, player_, *this).SetScale(Vector2{10, 10});
-  SpriteComponent &player_sprite = registry_.emplace<SpriteComponent>(player_, player_, *this);
-  player_sprite.SetShader(resource_manager_.GetShader(ShaderType::kDefault));
-  player_sprite.SetTexture(resource_manager_.GetTexture(TextureType::kNoImage64));
-  registry_.emplace<RectangleColliderComponent>(player_, player_, *this);
-  registry_.emplace<RigidbodyComponent>(player_, player_, *this);
-  registry_.emplace<PlayerComponent>(player_, player_, *this);
+Game::~Game() noexcept
+{
+  ZoneScopedC(0xb3041b);
 
-  box_ = registry_.create();
-  TransformComponent &box_transform = registry_.emplace<TransformComponent>(box_, box_, *this);
-  box_transform.SetPosition(Vector2{20, 20});
-  box_transform.SetScale(Vector2{10, 10});
-  SpriteComponent &box_sprite = registry_.emplace<SpriteComponent>(box_, box_, *this);
-  box_sprite.SetShader(resource_manager_.GetShader(ShaderType::kDefault));
-  box_sprite.SetTexture(resource_manager_.GetTexture(TextureType::kWhite));
-  registry_.emplace<RectangleColliderComponent>(box_, box_, *this);
+  registry_.clear();
 }
 
 void Game::Run() noexcept
 {
   ZoneScopedC(0xb3041b);
+
+  Entity player = Entity(*this);
+  TransformComponent &player_transform = player.AddComponent<TransformComponent>();
+  player_transform.SetScale(Vector2{10, 10});
+  AnimatedSpriteComponent &player_sprite = player.AddComponent<AnimatedSpriteComponent>();
+  player_sprite.SetShader(&resource_manager_.GetShader(ShaderType::kAnimatedSprite));
+  player_sprite.SetTexture(&resource_manager_.GetTexture(TextureType::kPlayer));
+  player_sprite.SetAtlasStep(0.5f);
+  player.AddComponent<RectangleColliderComponent>();
+  player.AddComponent<RigidbodyComponent>();
+  PlayerComponent &player_component = player.AddComponent<PlayerComponent>();
+
+  Entity box = Entity(*this);
+  TransformComponent &box_transform = box.AddComponent<TransformComponent>();
+  box_transform.SetPosition(Vector2{20, 20});
+  box_transform.SetScale(Vector2{10, 10});
+  TexturedSpriteComponent &box_sprite = box.AddComponent<TexturedSpriteComponent>();
+  box_sprite.SetShader(&resource_manager_.GetShader(ShaderType::kTexturedSprite));
+  box_sprite.SetTexture(&resource_manager_.GetTexture(TextureType::kNoTexture64));
+  box.AddComponent<RectangleColliderComponent>();
 
   running_ = true;
   while(running_)
@@ -74,24 +89,12 @@ void Game::Run() noexcept
 
     input_system_.Update();
     physics_system_.Update();
-    registry_.get<PlayerComponent>(player_).Update();
+    player_component.Update();
 
     render_system_.EndFrame();
 
     FrameMark;
   }
-
-  Exit();
-}
-
-void Game::Exit() noexcept
-{
-  ZoneScopedC(0xb3041b);
-
-  //registry_.clear();
-  resource_manager_.Exit();
-  render_system_.Exit();
-  window_.Exit();
 }
 
 auto Game::QuitEvent() noexcept -> bool

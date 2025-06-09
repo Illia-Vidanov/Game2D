@@ -4,42 +4,38 @@
 #include "Setup.hpp"
 
 #include "Utils/Enum.hpp"
+#include "Utils/String.hpp"
+#include "Utils/MathConstants.hpp"
 
 /* Todo:
-*  Show line, file, condition, time, error type
 *  Color
-*  Formatter
-*  Setters
 */
 
 #if defined(NDEBUG) && !defined(TRACY_ENABLE)
-  #define GAME_DLOG(type) if constexpr (false) game::LogStream(LogData{__LINE__, __FILE__, LogType::kNone})
-  #define GAME_VDLOG(level, type) if constexpr (false) game::LogStream(LogData{__LINE__, __FILE__, LogType::kNone})
-  #define GAME_ASSERT(condition) if constexpr (false) game::LogStream(LogData{__LINE__, __FILE__, LogType::kNone})
-  #define GAME_ASSERT_STD(condition, message)
-  #define GAME_DEBUG_LINE(command)
-  #define GAME_DLOG_IF(condition, type)
-  #define GAME_VDLOG_IF(condition, level, type)
+  #define GAME_DLOG(type) if constexpr (false) game::LogStream{LogData{__LINE__, __FILE__, LogType::kNone, std::chrono::system_clock::now(), #condition, static_cast<Logger::VerboseLevelType>{-1}}}
+  #define GAME_VDLOG(level, type) GAME_DLOG(void)
+  #define GAME_ASSERT(condition) GAME_DLOG(void)
+  #define GAME_DLOG_IF(condition, type) GAME_DLOG(void)
+  #define GAME_VDLOG_IF(condition, level, type) GAME_DLOG(void)
 #else
   // Log message only in when NDEBUG is 0
   #define GAME_DLOG(type) GAME_LOG(type)
-  // Log message only in when NDEBUG is 0 and verbose level is smaller than current Logger's verbose level
+  // DLOG if verbose level is smaller than current Logger's verbose level
   #define GAME_VDLOG(level, type) GAME_VLOG(level, type)
-  // Assert if condition is false
-  #define GAME_ASSERT(condition) if(GAME_IS_UNLIKELY(!(static_cast<bool>(condition)))) GAME_DLOG(LogType::kFatal)
-  // Assert using deafult assert function
-  #define GAME_ASSERT_STD(condition, message) assert(((void)(message), static_cast<bool>(condition)))
-  // Remove line on build
-  #define GAME_DEBUG_LINE(command) do { command; } while(0)
-  // Debug log if condition is true
-  #define GAME_DLOG_IF(condition, type) if(static_cast<bool>(condition)) GAME_DLOG(type)
-  #define GAME_VDLOG_IF(condition, level, type) if(static_cast<bool>(condition)) GAME_VDLOG(level, type)
+  #define GAME_ASSERT(condition) if(GAME_IS_UNLIKELY(!(static_cast<bool>(condition)))) game::LogStream{game::LogData{__LINE__, __FILE__, game::LogType::kFatal, std::chrono::system_clock::now(), #condition, static_cast<game::Logger::VerboseLevelType>(-1)}}
+  // DLOG if condition is true
+  #define GAME_DLOG_IF(condition, type) GAME_LOG_IF(condition, type)
+  // DLOG if verbose level is smaller than current Logger's verbose level and condition is true
+  #define GAME_VDLOG_IF(condition, level, type) GAME_VLOG_IF(condition, level, type)
 #endif
 
-#define GAME_LOG(type) game::LogStream(LogData{__LINE__, __FILE__, type})
-#define GAME_VLOG(level, type) if(level < game::Logger::Get().GetVerboseLevel()) GAME_LOG(type)
-#define GAME_LOG_IF(condition, type) if(static_cast<bool>(condition)) GAME_LOG(type)
-#define GAME_VLOG_IF(condition, level, type) if(static_cast<bool>(condition)) GAME_VLOG(level, type)
+#define GAME_LOG(type) game::LogStream{game::LogData{__LINE__, __FILE__, type, std::chrono::system_clock::now(), "", static_cast<game::Logger::VerboseLevelType>(-1)}}
+// LOG if verbose level is smaller than current Logger's verbose level
+#define GAME_VLOG(level, type) if(level < game::Logger::Get().GetVerboseLevel()) game::LogStream{game::LogData{__LINE__, __FILE__, type, std::chrono::system_clock::now(), "", static_cast<game::Logger::VerboseLevelType>(level)}}
+// LOG if condition is true
+#define GAME_LOG_IF(condition, type) if(static_cast<bool>(condition)) game::LogStream{game::LogData{__LINE__, __FILE__, type, std::chrono::system_clock::now(), #condition, static_cast<game::Logger::VerboseLevelType>(-1)}}
+// LOG if verbose level is smaller than current Logger's verbose level and condition is true
+#define GAME_VLOG_IF(condition, level, type) if(static_cast<bool>(condition)) game::LogStream{game::LogData{__LINE__, __FILE__, type, std::chrono::system_clock::now(), #condition, static_cast<game::Logger::VerboseLevelType>(level)}}
 
 namespace game
 {
@@ -48,96 +44,86 @@ enum class LogType : uint8_t
   kNone, kFatal, kError, kWarning, kInfo
 };
 
-
-class Logger
+const std::string kLogTypeNameMap[] =
 {
-  friend class LogStream;
-public:
-	using StreamCharT = char;
-  using VerboseLevelT = int;
-
-  // Global instance of logger
-  [[nodiscard]] static inline auto Get() -> Logger& { static Logger instance; return instance; }
-
-  [[nodiscard]] constexpr inline auto GetStream() noexcept -> std::basic_ostream<StreamCharT>& { return stream_; }
-  [[nodiscard]] constexpr inline auto GetFile() noexcept -> std::basic_ofstream<StreamCharT>& { return file_; }
-  [[nodiscard]] constexpr inline auto IsOutputToFile() const noexcept -> bool { return output_to_file_; }
-  [[nodiscard]] constexpr inline auto GetVerboseLevel() const noexcept -> int { return verbose_level_; }
-
-  // Sets verbose levels such that values with heigher level won't be printed
-  constexpr inline void SetVerboseLevel(VerboseLevelT verbose_level) noexcept { verbose_level_ = verbose_level; }
-  // If true output is also writen to file
-  // Default value is true 
-  constexpr inline void SetOutputToFile(bool output_to_file) noexcept { output_to_file_ = output_to_file; }
-  // Set buffer of underlying stream
-  // Set to:
-  // std::cerr.rdbuf() to use std::cerr
-  // std::cout.rdbuf() to use std::cout
-  // etc.
-  inline void SetOutStreamBuffer(std::basic_ostream<StreamCharT> &stream) noexcept { stream_.rdbuf(stream.rdbuf()); }
-
-  // Get string with name of LogType
-  [[nodiscard]] static inline auto GetLogTypeName(LogType type) noexcept -> std::string { static const std::string kLogTypeNameMap[] = { "Fatal", "Error", "Warning", "Info" }; return kLogTypeNameMap[ToUnderlying(type)]; }
-
-  static inline const std::filesystem::path kDefLogPath = "./logs/";
-  static inline const std::string kDefLogFileName = "last_log.txt";
-  static inline const std::basic_ostream<StreamCharT> kDefStream = std::basic_ostream<StreamCharT>{std::cout.rdbuf()};
-  static constexpr inline VerboseLevelT kDefVerboseLevel = 0;
-
-private:
-  Logger() noexcept;
-  ~Logger() noexcept;
-
-  std::basic_ostream<StreamCharT> stream_{kDefStream.rdbuf()};
-  bool output_to_file_ = true;
-  VerboseLevelT verbose_level_ = 0;
-  std::string file_path_{kDefLogPath.generic_u8string() + kDefLogFileName};
-	std::basic_ofstream<StreamCharT> file_;
+  "None", "Fatal", "Error", "Warning", "Info"
 };
 
 
 struct LogData
 {
+  using VerboseLevelType = int;
+
   int line;
   const char *file;
   LogType type;
+  std::chrono::time_point<std::chrono::system_clock> time;
+  const char *condition;
+  VerboseLevelType verbose_level;
 };
 
 
-// Stream that uses global information from Logger to log
+class Logger
+{
+public:
+  Logger() noexcept;
+  ~Logger() noexcept;
+
+	using StreamCharT = char;
+  using VerboseLevelType = LogData::VerboseLevelType;
+  using FormatterType = std::function<std::string(const LogData &)>; // Wanted to use plain function pointer, but in getter "function can't return function"
+
+  // Global instance of logger
+  [[nodiscard]] static auto Get() -> Logger& { static Logger instance; return instance; }
+
+  [[nodiscard]] constexpr auto GetFile() noexcept -> std::basic_ofstream<StreamCharT>& { return file_; }
+  [[nodiscard]] constexpr auto GetFilePath() const noexcept -> const std::string& { return file_path_; }
+  void SetFilePath(std::string file_path) noexcept { file_path_ = file_path; file_.close(); OpenFile(); }
+  
+  [[nodiscard]] constexpr auto GetVerboseLevel() const noexcept -> int { return verbose_level_; }
+  constexpr void SetVerboseLevel(VerboseLevelType verbose_level) noexcept { verbose_level_ = verbose_level; }
+  [[nodiscard]] constexpr auto GetStream() noexcept -> std::basic_ostream<StreamCharT>& { return stream_; }
+  // Set buffer of underlying stream
+  // Set to:
+  // std::cerr.rdbuf() to use std::cerr
+  // std::cout.rdbuf() to use std::cout
+  // etc.
+  void SetStream(std::basic_ostream<StreamCharT> &stream) noexcept { stream_.rdbuf(stream.rdbuf()); }
+
+  auto GetFormatter() const noexcept -> const FormatterType& { return formatter_; }
+  void SetFormatter(const FormatterType &formatter) { formatter_ = formatter; }
+  
+
+  [[nodiscard]] static auto GetLogTypeName(LogType type) noexcept -> std::string { return kLogTypeNameMap[ToUnderlying(type)]; }
+
+private:
+  void OpenFile() noexcept;  
+
+  std::basic_ostream<StreamCharT> stream_{std::cout.rdbuf()};
+  VerboseLevelType verbose_level_ = 0;
+  std::string file_path_{"./logs/last_log.txt"};
+	std::basic_ofstream<StreamCharT> file_;
+  FormatterType formatter_ = [](const LogData &log_data) -> std::string { return (StringBuilder{} << GetLogTypeName(log_data.type) << "] ").GetString(); };
+
+  static inline constexpr std::ios_base::openmode kOpenMode = std::ios_base::out | std::ios_base::trunc;
+};
+
+
 class LogStream
 {
 public:
-  LogStream(const LogData &log_data) noexcept : fatal_(log_data.type == LogType::kFatal) { GAME_ASSERT_STD(log_data.type != LogType::kNone, "LogType::kNone"); }
+  LogStream(const LogData &log_data) noexcept;
   ~LogStream() noexcept;
-	
-  // Input value to be printed
+
   template<typename T>
-	inline LogStream &operator<<(T &&t) noexcept;
+  auto operator<<(T &&t) noexcept -> LogStream& { string_builder_ << t; return *this; }
 
 private:
-  bool fatal_ = false;
-	
-  static inline std::basic_stringstream<Logger::StreamCharT> string_stream;
-};
+  void Output(const std::string &string) noexcept;
 
-template<typename T>
-inline LogStream &LogStream::operator<<(T &&t) noexcept
-{
-  ZoneScopedNC("Log vaue", 0xbaed00);
-  
-  string_stream << std::forward<T>(t);
-	return *this;
-}
-
-namespace detail
-{
-class Vodify
-{
-public:
-  constexpr inline void operator&(__attribute__((unused)) const LogStream &) const noexcept {}
+  const bool fatal_ = false;
+  StringBuilder<Logger::StreamCharT> string_builder_;
 };
-} // detail
 } // game
 
 #endif // GAME_LOGGER_HPP

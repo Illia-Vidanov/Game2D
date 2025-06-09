@@ -3,6 +3,8 @@
 #include "Setup.hpp"
 
 #include "Utils/String.hpp"
+#include "Utils/Logger.hpp"
+#include "Utils/MathConstants.hpp"
 
 
 namespace game

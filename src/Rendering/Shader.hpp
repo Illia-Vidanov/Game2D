@@ -4,7 +4,8 @@
 #include "Setup.hpp"
 
 #include "Rendering/Utils.hpp"
-
+#include "Utils/Logger.hpp"
+#include "Utils/MathConstants.hpp"
 
 
 namespace game
@@ -12,36 +13,37 @@ namespace game
 class Shader
 {
 public:
-  inline Shader() noexcept { GL_CALL(id_ = glCreateProgram()); }
-  inline void Delete() const noexcept { GL_CALL(glDeleteProgram(id_)); }
+  Shader() noexcept { GL_CALL(id_ = glCreateProgram()); }
+  void Delete() const noexcept { GL_CALL(glDeleteProgram(id_)); }
   
   // Temp. Not sure if needed
   uint32_t GetID() const noexcept { return id_; }
 
-  inline void Use() const noexcept { GL_CALL(glUseProgram(id_)); }
+  void Use() const noexcept { GL_CALL(glUseProgram(id_)); }
   
-  template<typename T> constexpr inline void SetUniform(const std::string &name, T t0) const noexcept { GAME_ASSERT_STD(false, "No overload with such parametrs exists"); }
-  template<typename T> constexpr inline void SetUniform(const std::string &name, T t0, T t1) const noexcept { GAME_ASSERT_STD(false, "No overload with such parametrs exists"); }
-  template<typename T> constexpr inline void SetUniform(const std::string &name, T t0, T t1, T t2) const noexcept { GAME_ASSERT_STD(false, "No overload with such parametrs exists"); }
-  template<typename T> constexpr inline void SetUniform(const std::string &name, T t0, T t1, T t2, T t3) const noexcept { GAME_ASSERT_STD(false, "No overload with such parametrs exists"); }
-  template<typename T> constexpr inline void SetUniform1v(const std::string &name, int count, const T *t) const noexcept { GAME_ASSERT_STD(false, "No overload with such parametrs exists"); }
-  template<typename T> constexpr inline void SetUniform2v(const std::string &name, int count, const T *t) const noexcept { GAME_ASSERT_STD(false, "No overload with such parametrs exists"); }
-  template<typename T> constexpr inline void SetUniform3v(const std::string &name, int count, const T *t) const noexcept { GAME_ASSERT_STD(false, "No overload with such parametrs exists"); }
-  template<typename T> constexpr inline void SetUniform4v(const std::string &name, int count, const T *t) const noexcept { GAME_ASSERT_STD(false, "No overload with such parametrs exists"); }
-  inline void SetUniformMatrix2(const std::string &name, int count, bool transpose, const float *t) const noexcept { Use(); GL_CALL(glUniformMatrix2fv(GetLocation(name), count, transpose, t)); }
-  inline void SetUniformMatrix3(const std::string &name, int count, bool transpose, const float *t) const noexcept { Use(); GL_CALL(glUniformMatrix3fv(GetLocation(name), count, transpose, t)); }
-  inline void SetUniformMatrix4(const std::string &name, int count, bool transpose, const float *t) const noexcept { Use(); GL_CALL(glUniformMatrix4fv(GetLocation(name), count, transpose, t)); }
-  inline void SetUniformMatrix2x3(const std::string &name, int count, bool transpose, const float *t) const noexcept { Use(); GL_CALL(glUniformMatrix2x3fv(GetLocation(name), count, transpose, t)); }
-  inline void SetUniformMatrix3x2(const std::string &name, int count, bool transpose, const float *t) const noexcept { Use(); GL_CALL(glUniformMatrix3x2fv(GetLocation(name), count, transpose, t)); }
-  inline void SetUniformMatrix2x4(const std::string &name, int count, bool transpose, const float *t) const noexcept { Use(); GL_CALL(glUniformMatrix2x4fv(GetLocation(name), count, transpose, t)); }
-  inline void SetUniformMatrix4x2(const std::string &name, int count, bool transpose, const float *t) const noexcept { Use(); GL_CALL(glUniformMatrix4x2fv(GetLocation(name), count, transpose, t)); }
-  inline void SetUniformMatrix3x4(const std::string &name, int count, bool transpose, const float *t) const noexcept { Use(); GL_CALL(glUniformMatrix3x4fv(GetLocation(name), count, transpose, t)); }
-  inline void SetUniformMatrix4x3(const std::string &name, int count, bool transpose, const float *t) const noexcept { Use(); GL_CALL(glUniformMatrix4x3fv(GetLocation(name), count, transpose, t)); }
+  [[nodiscard]] auto HasUniform(const std::string &name) const noexcept -> bool { int result; GL_CALL(result = glGetUniformLocation(id_, name.c_str())); return result != -1; }
+  template<typename T> constexpr void SetUniform(const std::string &name, T t0) const noexcept { GAME_ASSERT_STD(false, "No overload with such parametrs exists"); }
+  template<typename T> constexpr void SetUniform(const std::string &name, T t0, T t1) const noexcept { GAME_ASSERT_STD(false, "No overload with such parametrs exists"); }
+  template<typename T> constexpr void SetUniform(const std::string &name, T t0, T t1, T t2) const noexcept { GAME_ASSERT_STD(false, "No overload with such parametrs exists"); }
+  template<typename T> constexpr void SetUniform(const std::string &name, T t0, T t1, T t2, T t3) const noexcept { GAME_ASSERT_STD(false, "No overload with such parametrs exists"); }
+  template<typename T> constexpr void SetUniform1v(const std::string &name, int count, const T *t) const noexcept { GAME_ASSERT_STD(false, "No overload with such parametrs exists"); }
+  template<typename T> constexpr void SetUniform2v(const std::string &name, int count, const T *t) const noexcept { GAME_ASSERT_STD(false, "No overload with such parametrs exists"); }
+  template<typename T> constexpr void SetUniform3v(const std::string &name, int count, const T *t) const noexcept { GAME_ASSERT_STD(false, "No overload with such parametrs exists"); }
+  template<typename T> constexpr void SetUniform4v(const std::string &name, int count, const T *t) const noexcept { GAME_ASSERT_STD(false, "No overload with such parametrs exists"); }
+  void SetUniformMatrix2(const std::string &name, int count, bool transpose, const float *t) const noexcept { Use(); GL_CALL(glUniformMatrix2fv(GetLocation(name), count, transpose, t)); }
+  void SetUniformMatrix3(const std::string &name, int count, bool transpose, const float *t) const noexcept { Use(); GL_CALL(glUniformMatrix3fv(GetLocation(name), count, transpose, t)); }
+  void SetUniformMatrix4(const std::string &name, int count, bool transpose, const float *t) const noexcept { Use(); GL_CALL(glUniformMatrix4fv(GetLocation(name), count, transpose, t)); }
+  void SetUniformMatrix2x3(const std::string &name, int count, bool transpose, const float *t) const noexcept { Use(); GL_CALL(glUniformMatrix2x3fv(GetLocation(name), count, transpose, t)); }
+  void SetUniformMatrix3x2(const std::string &name, int count, bool transpose, const float *t) const noexcept { Use(); GL_CALL(glUniformMatrix3x2fv(GetLocation(name), count, transpose, t)); }
+  void SetUniformMatrix2x4(const std::string &name, int count, bool transpose, const float *t) const noexcept { Use(); GL_CALL(glUniformMatrix2x4fv(GetLocation(name), count, transpose, t)); }
+  void SetUniformMatrix4x2(const std::string &name, int count, bool transpose, const float *t) const noexcept { Use(); GL_CALL(glUniformMatrix4x2fv(GetLocation(name), count, transpose, t)); }
+  void SetUniformMatrix3x4(const std::string &name, int count, bool transpose, const float *t) const noexcept { Use(); GL_CALL(glUniformMatrix3x4fv(GetLocation(name), count, transpose, t)); }
+  void SetUniformMatrix4x3(const std::string &name, int count, bool transpose, const float *t) const noexcept { Use(); GL_CALL(glUniformMatrix4x3fv(GetLocation(name), count, transpose, t)); }
 
-  inline bool operator==(const Shader &other) noexcept { return id_ == other.id_; }
-  inline bool operator!=(const Shader &other) noexcept { return id_ != other.id_; }
+  bool operator==(const Shader &other) noexcept { return id_ == other.id_; }
+  bool operator!=(const Shader &other) noexcept { return id_ != other.id_; }
 
-  inline void CompileShaders(const std::string *begin, const std::string *end) noexcept { GAME_ASSERT(begin <= end) << "Invalid range"; for(; begin != end; begin++) CompileShader(*begin); }
+  void CompileShaders(const std::string *begin, const std::string *end) noexcept { GAME_ASSERT(begin <= end) << "Invalid range"; for(; begin != end; begin++) CompileShader(*begin); }
   void CompileShader(const std::string &path) noexcept;
   void LinkProgram() noexcept;
 
@@ -59,7 +61,7 @@ private:
   uint32_t id_;
   std::vector<uint32_t> compiled_shaders_;
 
-  inline auto GetLocation(const std::string &name) const noexcept -> int;
+  auto GetLocation(const std::string &name) const noexcept -> int;
   static auto ExtensionToShaderType(const std::string &extension) noexcept -> uint32_t;
 };
 

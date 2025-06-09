@@ -2,6 +2,8 @@
 
 #include "Setup.hpp"
 
+#include "Utils/Logger.hpp"
+#include "Utils/MathConstants.hpp"
 #include "Core/Game.hpp"
 #include "Physics/RigidbodyComponent.hpp"
 #include "Physics/ColliderComponents.hpp"
@@ -9,22 +11,25 @@
 
 namespace game
 {
-TransformComponent &TransformComponent::operator=(const TransformComponent &other) noexcept
-{
-  ZoneScopedC(0xff65a8);
-
-  angle_ = other.angle_;
-  sin_ = other.sin_;
-  cos_ = other.cos_;
-  scale_ = other.scale_;
-
-  return *this;
-}
-
 TransformComponent &TransformComponent::operator=(const Transform &other) noexcept
 {
   ZoneScopedC(0xff65a8);
 
+  Transform::operator=(other);
+  const Vector2 &sin_and_cos = linear().col(0).normalized();
+  sin_ = sin_and_cos(1);
+  cos_ = sin_and_cos(0);
+  scale_ = Vector2{linear()(1, 1) / sin_, linear()(0, 0) / cos_};
+  angle_ = std::atan2(sin_, cos_);
+
+  return *this;
+}
+
+// Separate declaration of copy and move are preffered, because Transform::operator= might also have move semantics
+TransformComponent &TransformComponent::operator=(Transform &&other) noexcept
+{
+  ZoneScopedC(0xff65a8);
+  
   Transform::operator=(other);
   const Vector2 &sin_and_cos = linear().col(0).normalized();
   sin_ = sin_and_cos(1);

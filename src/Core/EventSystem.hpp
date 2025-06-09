@@ -3,7 +3,8 @@
 
 #include "Setup.hpp"
 
-
+#include "Utils/Logger.hpp"
+#include "Utils/MathConstants.hpp"
 #include "Utils/Enum.hpp"
 
 
@@ -26,7 +27,7 @@ public:
   {
     friend Event;
   public:
-    explicit constexpr inline Common(EventType new_type) noexcept
+    explicit constexpr Common(EventType new_type) noexcept
     : type{new_type}
     {}
 
@@ -39,7 +40,7 @@ public:
 private:
   struct Keyboard
   {
-    explicit constexpr inline Keyboard(int new_keycode, int new_scancode, uint16_t new_mod_keys) noexcept
+    explicit constexpr Keyboard(int new_keycode, int new_scancode, uint16_t new_mod_keys) noexcept
     : keycode{new_keycode}
     , scancode{new_scancode}
     , mod_keys{new_mod_keys}
@@ -55,35 +56,35 @@ private:
 public:
   struct KeyDown : Common, Keyboard
   {
-    explicit constexpr inline KeyDown(int new_keycode, int new_scancode, uint16_t new_mod_keys) noexcept
+    explicit constexpr KeyDown(int new_keycode, int new_scancode, uint16_t new_mod_keys) noexcept
     : Common{EventType::kKeyDown}
     , Keyboard{new_keycode, new_scancode, new_mod_keys}
     {}
   };
-  constexpr inline Event(const KeyDown &key_down) noexcept
+  constexpr Event(const KeyDown &key_down) noexcept
   : key_down_{key_down}
   {}
 
 
   struct KeyUp : Common, Keyboard
   {
-    explicit constexpr inline KeyUp(int new_keycode, int new_scancode, uint16_t new_mod_keys) noexcept
+    explicit constexpr KeyUp(int new_keycode, int new_scancode, uint16_t new_mod_keys) noexcept
     : Common{EventType::kKeyUp}
     , Keyboard{new_keycode, new_scancode, new_mod_keys}
     {}
   };
-  constexpr inline Event(const KeyUp &key_up) noexcept
+  constexpr Event(const KeyUp &key_up) noexcept
   : key_up_{key_up}
   {}
 
 
   struct Quit : Common
   {
-    explicit constexpr inline Quit() noexcept
+    explicit constexpr Quit() noexcept
       : Common{EventType::kQuit}
     {}
   };
-  inline Event(const Quit &quit) noexcept
+  Event(const Quit &quit) noexcept
     : quit_{quit}
   {}
 
@@ -91,7 +92,7 @@ public:
 private:
   struct AreaResize
   {
-  explicit constexpr inline AreaResize(int new_old_resolution_x, int new_old_resolution_y, int new_new_resolution_x, int new_new_resolution_y) noexcept
+  explicit constexpr AreaResize(int new_old_resolution_x, int new_old_resolution_y, int new_new_resolution_x, int new_new_resolution_y) noexcept
     : old_resolution_x{new_old_resolution_x}
     , old_resolution_y{new_old_resolution_y}
     , new_resolution_x{new_new_resolution_x}
@@ -110,24 +111,24 @@ private:
 public:
   struct WindowResize : Common, AreaResize
   {
-    explicit constexpr inline WindowResize(int new_old_resolution_x, int new_old_resolution_y, int new_new_resolution_x, int new_new_resolution_y) noexcept
+    explicit constexpr WindowResize(int new_old_resolution_x, int new_old_resolution_y, int new_new_resolution_x, int new_new_resolution_y) noexcept
       : Common{EventType::kWindowResize}
       , AreaResize{new_old_resolution_x, new_old_resolution_y, new_new_resolution_x, new_new_resolution_y}
     {}
   };
-  inline Event(const WindowResize &window_resize) noexcept
+  Event(const WindowResize &window_resize) noexcept
     : window_resize_{window_resize}
   {}
 
 
   struct RenderAreaResize : Common, AreaResize
   {
-    explicit constexpr inline RenderAreaResize(int new_old_resolution_x, int new_old_resolution_y, int new_new_resolution_x, int new_new_resolution_y) noexcept
+    explicit constexpr RenderAreaResize(int new_old_resolution_x, int new_old_resolution_y, int new_new_resolution_x, int new_new_resolution_y) noexcept
       : Common{EventType::kRenderAreaResize}
       , AreaResize{new_old_resolution_x, new_old_resolution_y, new_new_resolution_x, new_new_resolution_y}
     {}
   };
-  inline Event(const RenderAreaResize &render_area_resize) noexcept
+  Event(const RenderAreaResize &render_area_resize) noexcept
     : render_area_resize_{render_area_resize}
   {}
 
@@ -135,76 +136,73 @@ public:
   // Custom type should specify it's type for listeners and it's last bit should be 1 or contain just use kCustomTypeBitMask
   struct Custom : Common
   {
-    explicit constexpr inline Custom(EventType custom_type, void *new_data) noexcept
+    explicit constexpr Custom(EventType custom_type, void *new_data) noexcept
     : Common{custom_type}
     , data{new_data}
     {
-      GAME_ASSERT_STD(custom_type & kCustomTypeBitMask, "Custom type's should contain kCustomTypeBitMask");
+      GAME_ASSERT_STD(custom_type & kCustomTypeBitMask);
     }
     void *data;
   };
-  inline Event(const Custom &custom) noexcept
+  Event(const Custom &custom) noexcept
   : custom_{custom}
   {}
 
 public:
-  static constexpr inline std::underlying_type_t<EventType> kCustomTypeBitMask = std::underlying_type_t<EventType>{1} << (sizeof(EventType) * CHAR_BIT - 1);
+  static constexpr std::underlying_type_t<EventType> kCustomTypeBitMask = std::underlying_type_t<EventType>{1} << (sizeof(EventType) * CHAR_BIT - 1);
 
   
-  [[nodiscard]] constexpr inline auto GetType() const noexcept -> EventType { return common_.type; }
+  [[nodiscard]] constexpr auto GetType() const noexcept -> EventType { return common_.type; }
   // Get name of event according to type
   // If type is custom "Other: (type value)" is returned
   // Mainly debuging feature
   [[nodiscard]] auto GetName() const noexcept -> std::string;
 	
-	[[nodiscard]] inline auto GetKeycode() const noexcept -> int
+	[[nodiscard]] auto GetKeycode() const noexcept -> int
   {
     GAME_ASSERT_STD(common_.type == EventType::kKeyDown
-                 || common_.type == EventType::kKeyUp
-                 , "Acces data from wrong event type. Expected: kKeyDown/kKeyUp/kKeyPressed");
+                 || common_.type == EventType::kKeyUp);
     return keyboard_.keycode;
   }
-	[[nodiscard]] inline auto GetScancode() const noexcept -> int
+	[[nodiscard]] auto GetScancode() const noexcept -> int
   {
     GAME_ASSERT_STD(common_.type == EventType::kKeyDown
-                 || common_.type == EventType::kKeyUp
-                 , "Acces data from wrong event type. Expected: kKeyDown/kKeyUp/kKeyPressed");
+                 || common_.type == EventType::kKeyUp);
     return keyboard_.scancode;
   }
-	[[nodiscard]] inline auto GetModKeys() const noexcept -> uint16_t
+	[[nodiscard]] auto GetModKeys() const noexcept -> uint16_t
   {
     GAME_ASSERT_STD(common_.type == EventType::kKeyDown
-                 || common_.type == EventType::kKeyUp
-                 , "Acces data from wrong event type. Expected: kKeyDown/kKeyUp/kKeyPressed");
+                 || common_.type == EventType::kKeyUp);
     return keyboard_.mod_keys;
   }
-	[[nodiscard]] inline auto GetCustomData() const noexcept -> void*
+	[[nodiscard]] auto GetCustomData() const noexcept -> void*
   {
-    GAME_ASSERT_STD(GetType() & kCustomTypeBitMask, "Acces data from wrong event type. Expected: to contain kCustomTypeBitMask");
+    GAME_ASSERT_STD(GetType() & kCustomTypeBitMask);
     return custom_.data;
   }
-  [[nodiscard]] inline auto GetOldResolutionX() const noexcept -> int
+  [[nodiscard]] auto GetOldResolutionX() const noexcept -> int
   {
     GAME_ASSERT_STD(common_.type == EventType::kWindowResize
-                 || common_.type == EventType::kRenderAreaResize, "Acces data from wrong event type. Expected: kWindowResize or kRenderAreaResize");
+                 || common_.type == EventType::kRenderAreaResize);
     return area_resize_.old_resolution_x;
   }
-  [[nodiscard]] inline auto GetOldResolutionY() const noexcept -> int
+  [[nodiscard]] auto GetOldResolutionY() const noexcept -> int
   {
     GAME_ASSERT_STD(common_.type == EventType::kWindowResize
-                 || common_.type == EventType::kRenderAreaResize, "Acces data from wrong event type. Expected: kWindowResize or kRenderAreaResize");
+                 || common_.type == EventType::kRenderAreaResize);
     return area_resize_.old_resolution_y;
   }
-  [[nodiscard]] inline auto GetNewResolutionX() const noexcept -> int
+  [[nodiscard]] auto GetNewResolutionX() const noexcept -> int
   {
     GAME_ASSERT_STD(common_.type == EventType::kWindowResize
-                 || common_.type == EventType::kRenderAreaResize, "Acces data from wrong event type. Expected: kWindowResize or kRenderAreaResize");
+                 || common_.type == EventType::kRenderAreaResize);
     return area_resize_.new_resolution_x;
   }
-  [[nodiscard]] inline auto GetNewResolutionY() const noexcept -> int
+  [[nodiscard]] auto GetNewResolutionY() const noexcept -> int
   {
     GAME_ASSERT_STD(common_.type == EventType::kWindowResize
-                 || common_.type == EventType::kRenderAreaResize, "Acces data from wrong event type. Expected: kWindowResize or kRenderAreaResize");
+                 || common_.type == EventType::kRenderAreaResize);
     return area_resize_.new_resolution_y;
   }
 
@@ -243,22 +241,20 @@ public:
   // Add to type event listener that will be trigered when event fires
   // First in is first to be called when event happens
   // UID is returned that can be used to remvoe listener
-  inline auto AddListener(EventCleaner &cleaner, EventType type, void *data, CallbackType callback) noexcept -> std::size_t;
-  inline void RemoveListener(EventCleaner &cleaner, std::size_t uid) noexcept;
-  // Remove all listeners of specified type
-  inline void ClearListeners(EventType type) noexcept;
-  // Clear all listeners
-  inline void ClearListeners() noexcept { listeners_.clear(); events_.clear(); }
+  auto AddListener(EventCleaner &cleaner, EventType type, void *data, CallbackType callback) noexcept -> std::size_t;
+  void RemoveListener(EventCleaner &cleaner, std::size_t uid) noexcept;
+  void ClearListeners(EventType type) noexcept;
+  void ClearListeners() noexcept { listeners_.clear(); events_.clear(); }
  
   // Instantly dispatch event
-  inline void DispatchEvent(const Event &event) noexcept;
-  inline void EnqueEvent(const Event &event) noexcept { queue_.push(event); }
-  inline void DispatchEnquedEvents() noexcept { ZoneScopedC(0xe8bb25); while(queue_.size()) { DispatchEvent(queue_.front()); queue_.pop(); } }
+  void DispatchEvent(const Event &event) noexcept;
+  void EnqueEvent(const Event &event) noexcept { queue_.push(event); }
+  void DispatchEnquedEvents() noexcept { ZoneScopedC(0xe8bb25); while(queue_.size()) { DispatchEvent(queue_.front()); queue_.pop(); } }
 
 
 private:
   // Used in event cleaner to directly remove listener when EventCleaner is destroyed
-  inline void RemoveListener(std::size_t uid) noexcept { listeners_.erase(uid); }
+  void RemoveListener(std::size_t uid) noexcept { listeners_.erase(uid); }
 
   QueueType queue_;
   ListenerMapType listeners_;
@@ -276,15 +272,16 @@ class EventCleaner
 {
   friend EventSystem;
 public:
-  inline EventCleaner(EventSystem &event_handler) noexcept : event_handler_{event_handler} {}
-  inline ~EventCleaner() noexcept { ZoneScopedC(0xe8bb25); for(auto uid : uids_) event_handler_.RemoveListener(uid); }
+  EventCleaner(EventSystem &event_handler) noexcept : event_handler_{event_handler} {}
+  
+  ~EventCleaner() noexcept { ZoneScopedC(0xe8bb25); for(auto uid : uids_) event_handler_.RemoveListener(uid); }
 
   // Add position (you can get it when adding listener in EventSystem) to EventClener that will be removed from EventSystem on the destruction
-  inline void AddUid(std::size_t uid) noexcept { uids_.push_back(uid); }
+  void AddUid(std::size_t uid) noexcept { uids_.push_back(uid); }
   // Remove position (you can get it when adding listener in EventSystem) from EventCleaner to not remove it on the destruction of a cleaner
-  inline void RemoveUid(std::size_t uid) noexcept { std::swap(uids_.back(), *std::find(uids_.begin(), uids_.end(), uid)); uids_.pop_back(); }
+  void RemoveUid(std::size_t uid) noexcept { std::swap(uids_.back(), *std::find(uids_.begin(), uids_.end(), uid)); uids_.pop_back(); }
   // Remove all positions from cleaner so they won't be removed on destruction of EventCleaner
-  inline void ClearUids() noexcept { uids_.clear(); }
+  void ClearUids() noexcept { uids_.clear(); }
 
 private:
   EventSystem &event_handler_;

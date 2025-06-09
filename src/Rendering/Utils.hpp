@@ -2,8 +2,8 @@
 #define GAME_UTILS_GL_HPP
 
 #include "Setup.hpp"
-
-
+#include "Utils/Logger.hpp"
+#include "Utils/MathConstants.hpp"
 
 
 #ifndef NDEBUG
@@ -18,7 +18,17 @@
 
 namespace game
 {
-constexpr inline std::size_t GetSizeFromGLType(uint32_t type) noexcept
+template<typename Type>
+constexpr uint32_t GetGLTypeFromType() { static_assert(false, "Unsupported type"); return 0; }
+
+template<> constexpr uint32_t GetGLTypeFromType<int32_t>()  { return GL_INT; }
+template<> constexpr uint32_t GetGLTypeFromType<uint32_t>() { return GL_UNSIGNED_INT; }
+template<> constexpr uint32_t GetGLTypeFromType<int16_t>()  { return GL_SHORT; }
+template<> constexpr uint32_t GetGLTypeFromType<uint16_t>() { return GL_UNSIGNED_SHORT; }
+template<> constexpr uint32_t GetGLTypeFromType<int8_t>()   { return GL_BYTE; }
+template<> constexpr uint32_t GetGLTypeFromType<uint8_t>()  { return GL_UNSIGNED_BYTE; }
+
+constexpr std::size_t GetSizeFromGLType(uint32_t type) noexcept
 {
   switch(type)
   {
@@ -41,13 +51,13 @@ constexpr inline std::size_t GetSizeFromGLType(uint32_t type) noexcept
 }
 
 template<typename Type>
-constexpr inline uint32_t GetGLTypeFromType() noexcept { GAME_ASSERT(false) << "No GLType fot type " << typeid(Type).name(); return 0; }
-template<> constexpr inline uint32_t GetGLTypeFromType<int32_t>() noexcept  { return GL_INT; }
-template<> constexpr inline uint32_t GetGLTypeFromType<uint32_t>() noexcept { return GL_UNSIGNED_INT; }
-template<> constexpr inline uint32_t GetGLTypeFromType<int16_t>() noexcept  { return GL_SHORT; }
-template<> constexpr inline uint32_t GetGLTypeFromType<uint16_t>() noexcept { return GL_UNSIGNED_SHORT; }
-template<> constexpr inline uint32_t GetGLTypeFromType<int8_t>() noexcept   { return GL_BYTE; }
-template<> constexpr inline uint32_t GetGLTypeFromType<uint8_t>() noexcept  { return GL_UNSIGNED_BYTE; }
+constexpr uint32_t TypeToGLType() noexcept { GAME_ASSERT(false) << "No GLType fot type " << typeid(Type).name(); return 0; }
+template<> constexpr uint32_t TypeToGLType<int32_t>() noexcept { return GL_INT; }
+template<> constexpr uint32_t TypeToGLType<uint32_t>() noexcept { return GL_UNSIGNED_INT; }
+template<> constexpr uint32_t TypeToGLType<int16_t>() noexcept { return GL_SHORT; }
+template<> constexpr uint32_t TypeToGLType<uint16_t>() noexcept { return GL_UNSIGNED_SHORT; }
+template<> constexpr uint32_t TypeToGLType<int8_t>() noexcept { return GL_BYTE; }
+template<> constexpr uint32_t TypeToGLType<uint8_t>() noexcept { return GL_UNSIGNED_BYTE; }
 } // game
 
 #endif // GAME_UTILS_GL_HPP

@@ -3,6 +3,8 @@
 
 #include "Setup.hpp"
 
+#include "Utils/Logger.hpp"
+#include "Utils/MathConstants.hpp"
 #include "Rendering/VAO.hpp"
 #include "Rendering/Shader.hpp"
 #include "Rendering/Texture.hpp"
@@ -17,36 +19,42 @@ class Game;
 
 enum class ShaderType : uint32_t
 {
-  kDefault = 0
+  kDefaultSprite = 0,
+  kTexturedSprite,
+  kAnimatedSprite,
 };
 
 enum class TextureType : uint32_t
 {
   kDefault = 0,
-  kNoImage64 = kDefault,
+  kNoTexture64 = kDefault,
   kWhite,
+  kPlayer,
 };
 
 class ResourceManager
 {
 public:
   ResourceManager(Game &game) noexcept;
-  void Exit() noexcept;
-  void InitEvents() noexcept;
+  ~ResourceManager() noexcept;
+  ResourceManager(const ResourceManager &other) = delete;
+  ResourceManager(ResourceManager &&other) = delete;
+  ResourceManager &operator=(const ResourceManager &other) = delete;
+  ResourceManager &operator=(ResourceManager &&other) = delete;
 
-  auto LoadTexture(TextureType type, uint32_t texture_type, const std::string &path) noexcept -> Texture &;
-  [[nodiscard]] inline auto GetTexture(TextureType type) const noexcept -> const Texture & { GAME_ASSERT(textures_.find(type) != textures_.end()) << "No texture with type \'" << type << "\'"; return textures_.at(type); }
-  [[nodiscard]] inline auto GetTexture(TextureType type) noexcept -> Texture & { GAME_ASSERT(textures_.find(type) != textures_.end()) << "No texture with type \'" << type << "\'"; return textures_.at(type); }
+  auto LoadTexture(TextureType type, const TextureDefinition &texture_definition) noexcept -> Texture &;
+  [[nodiscard]] auto GetTexture(TextureType type) const noexcept -> const Texture & { GAME_ASSERT(textures_.find(type) != textures_.end()) << "No texture with type \'" << type << "\'"; return textures_.at(type); }
+  [[nodiscard]] auto GetTexture(TextureType type) noexcept -> Texture & { GAME_ASSERT(textures_.find(type) != textures_.end()) << "No texture with type \'" << type << "\'"; return textures_.at(type); }
 
-  inline auto LoadShader(ShaderType type) noexcept -> Shader & { return LoadShader(type, nullptr, nullptr); }
-  inline auto LoadShader(ShaderType type, std::initializer_list<std::string> paths) noexcept -> Shader & { return LoadShader(type, paths.begin(), paths.end()); }
+  auto LoadShader(ShaderType type) noexcept -> Shader & { return LoadShader(type, nullptr, nullptr); }
+  auto LoadShader(ShaderType type, std::initializer_list<std::string> paths) noexcept -> Shader & { return LoadShader(type, paths.begin(), paths.end()); }
   auto LoadShader(ShaderType type, const std::string *begin, const std::string *end) noexcept -> Shader &;
-  [[nodiscard]] inline auto GetShader(ShaderType type) const noexcept -> const Shader & { GAME_ASSERT(shaders_.find(type) != shaders_.end()) << "No shader with type \'" << type << "\'"; return shaders_.at(type); }
-  [[nodiscard]] inline auto GetShader(ShaderType type) noexcept -> Shader & { GAME_ASSERT(shaders_.find(type) != shaders_.end()) << "No shader with type \'" << type << "\'"; return shaders_.at(type); }
+  [[nodiscard]] auto GetShader(ShaderType type) const noexcept -> const Shader & { GAME_ASSERT(shaders_.find(type) != shaders_.end()) << "No shader with type \'" << type << "\'"; return shaders_.at(type); }
+  [[nodiscard]] auto GetShader(ShaderType type) noexcept -> Shader & { GAME_ASSERT(shaders_.find(type) != shaders_.end()) << "No shader with type \'" << type << "\'"; return shaders_.at(type); }
   
-  [[nodiscard]] inline auto GetSpriteIndexCount() -> Index { return sprite_ebo_.GetCount(); }
-  inline void BindSpriteVAO() { sprite_vao_.Bind(); }
-  [[nodiscard]] inline auto GetOrthographicProjection() const noexcept -> Matrix3 { return orthographic_projection_; }
+  [[nodiscard]] auto GetSpriteIndexCount() -> Index { return sprite_ebo_.GetCount(); }
+  void BindSpriteVAO() { sprite_vao_.Bind(); }
+  [[nodiscard]] auto GetOrthographicProjection() const noexcept -> Matrix3 { return orthographic_projection_; }
   
   
   private:
@@ -61,7 +69,6 @@ public:
   Matrix3 orthographic_projection_;
   
   Game &game_;
-  EventCleaner event_cleaner_;
 };
 } // game
 

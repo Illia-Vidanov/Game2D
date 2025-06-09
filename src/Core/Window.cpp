@@ -3,7 +3,8 @@
 #include "Setup.hpp"
 
 #include "Core/Game.hpp"
-
+#include "Utils/Logger.hpp"
+#include "Utils/MathConstants.hpp"
 #include "Core/EventSystem.hpp"
 #include "Rendering/Utils.hpp"
 
@@ -35,7 +36,7 @@ Window::Window(Game &game) noexcept
   game_.GetEventSystem().AddListener(event_cleaner_, EventType::kWindowResize, this, [](const Event &event, void *window) -> bool { return reinterpret_cast<Window*>(window)->WindowResizedEvent(event); });
 }
 
-void Window::Exit() noexcept
+Window::~Window() noexcept
 {
   ZoneScopedC(0x00FFF2);
 
@@ -146,8 +147,8 @@ void Window::SetRenderResolution(const int render_width, const int render_height
   render_width_ = render_width;
   render_height_ = render_height;
 
-  pixels_per_unit_x_ = static_cast<DefFloatType>(render_width_) / static_cast<DefFloatType>(kUnitsPerScreenX);
-  pixels_per_unit_y_ = static_cast<DefFloatType>(render_height_) / static_cast<DefFloatType>(kUnitsPerScreenY);
+  pixels_per_unit_x_ = static_cast<DefaultFloatType>(render_width_) / static_cast<DefaultFloatType>(kUnitsPerScreenX);
+  pixels_per_unit_y_ = static_cast<DefaultFloatType>(render_height_) / static_cast<DefaultFloatType>(kUnitsPerScreenY);
 }
 
 void Window::SetTitle(const std::string &title) noexcept

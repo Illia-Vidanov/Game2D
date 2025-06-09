@@ -3,6 +3,9 @@
 
 #include "Setup.hpp"
 
+#include "Utils/Logger.hpp"
+#include "Utils/MathConstants.hpp"
+
 
 namespace game
 {
@@ -12,14 +15,12 @@ class RenderSystem
 {
 public:
   RenderSystem(Game &game) noexcept;
-  void Exit() noexcept;
+  ~RenderSystem() noexcept;
   
   void StartFrame() noexcept;
   void EndFrame() noexcept;
   
 private:
-  void PrintDebugInfo() const noexcept;
-
   Game &game_;
   Owner<void*> context_; // even in implementation SDL_GLContext is just typedef to void*
 };

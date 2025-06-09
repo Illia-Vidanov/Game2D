@@ -3,6 +3,8 @@
 
 #include "Setup.hpp"
 
+#include "Utils/Logger.hpp"
+#include "Utils/MathConstants.hpp"
 #include "Core/EventSystem.hpp"
 
 

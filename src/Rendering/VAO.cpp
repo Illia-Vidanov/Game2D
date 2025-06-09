@@ -4,6 +4,9 @@
 
 #include "Rendering/Buffers.hpp"
 #include "Rendering/Utils.hpp"
+#include "Utils/Logger.hpp"
+#include "Utils/MathConstants.hpp"
+
 
 namespace game
 {

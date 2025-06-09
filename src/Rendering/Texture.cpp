@@ -5,33 +5,41 @@
 #include "Rendering/Utils.hpp"
 #include "Utils/FileReader.hpp"
 #include "Texture.hpp"
+#include "Utils/Logger.hpp"
+#include "Utils/MathConstants.hpp"
 
 
 namespace game
 {
-Texture::Texture(uint32_t type)
-  : type_(type)
+Texture::Texture(TextureDefinition texture_definition) noexcept
+  : type_{texture_definition.type}
 {
   ZoneScopedC(0x57005A);
+
+  if(texture_definition.is_empty)
+    return;
+
   GL_CALL(glGenTextures(1, &id_));
-}
-
-void Texture::BufferData(const std::string &path)
-{
-  ZoneScopedC(0x57005A);
-
-  
-  ImageData image_data = FileReader::Image(path);
-  
   Bind();
-  GL_CALL(glTexStorage2D(type_, 1, GL_RGBA8, image_data.width, image_data.height));
-  GL_CALL(glTexSubImage2D(type_, 0, 0, 0, image_data.width, image_data.height, GL_BGRA, GL_UNSIGNED_BYTE, image_data.data));
-  GL_CALL(glGenerateMipmap(GL_TEXTURE_2D));
 
+  ImageData image_data = FileReader::Image(texture_definition.source_path);
+  GL_CALL(glTexStorage2D(type_, 1, texture_definition.internal_format, image_data.width, image_data.height));
+  GL_CALL(glTexSubImage2D(type_, 0, 0, 0, image_data.width, image_data.height, texture_definition.format, TypeToGLType<ImageData::DataType>(), image_data.data));
   image_data.Free();
-}
+  
+  switch(texture_definition.mipmap_count)
+  {
+  default:
+    GL_CALL(glTexParameteri(texture_definition.type, GL_TEXTURE_MAX_LEVEL, texture_definition.mipmap_count));
+    GL_CALL(glGenerateMipmap(type_));
+    break;
+    
+  case static_cast<uint32_t>(-1):
+    GL_CALL(glGenerateMipmap(type_));
+    break;
 
-void Texture::UpdateTexture() noexcept
-{
+  case static_cast<uint32_t>(0):
+    break;
+  }
 }
 } // game

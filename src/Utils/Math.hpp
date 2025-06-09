@@ -3,27 +3,28 @@
 
 #include "Setup.hpp"
 
-#include "Physics/TransformComponent.hpp"
+#include "Utils/Logger.hpp"
+#include "Utils/MathConstants.hpp"
 
 
 namespace game
 {
 // If type is custom it's better to leave it as is
 template<typename T>
-using ReturnFloatType = std::conditional_t<std::is_integral_v<T>, DefFloatType, T>;
+using ReturnFloatType = std::conditional_t<std::is_integral_v<T>, DefaultFloatType, T>;
 
 template<typename T>
-[[nodiscard]] constexpr inline T NotNull(T t) noexcept { return t == 0 ? T{1} : t; }
+[[nodiscard]] constexpr T NotNull(T t) noexcept { return t == 0 ? T{1} : t; }
 
 template<typename T>
-[[nodiscard]] constexpr inline ReturnFloatType<T> DegreesToRadians(T degrees) noexcept { return degrees * (kPI / 180); }
+[[nodiscard]] constexpr ReturnFloatType<T> DegreesToRadians(T degrees) noexcept { return degrees * (kPI / 180); }
 
 template<typename T>
-[[nodiscard]] constexpr inline ReturnFloatType<T> RadiansToDegrees(T radians) noexcept { return radians * (180 / kPI); }
+[[nodiscard]] constexpr ReturnFloatType<T> RadiansToDegrees(T radians) noexcept { return radians * (180 / kPI); }
 
 
 template<typename T, typename U>
-[[nodiscard]] constexpr inline bool AreSame(T t, U u) noexcept { return gcem::abs(t - u) < kElipson; }
+[[nodiscard]] constexpr bool AreSame(T t, U u) noexcept { return gcem::abs(t - u) < kElipson; }
 
 // Shorthand of writing (std::numeric_limits<T>::digits10 + 1)
 template<typename T>
@@ -42,13 +43,13 @@ constexpr inline T kFastPower10PositiveLookup[20] =
     kMaxDigits<T> > 16 ? gcem::pow<T, T>(10, 16) : 0, kMaxDigits<T> > 17 ? gcem::pow<T, T>(10, 17) : 0, kMaxDigits<T> > 18 ? gcem::pow<T, T>(10, 18) : 0, kMaxDigits<T> > 19 ? gcem::pow<T, T>(10, 19) : 0
 };
 
-constexpr inline DefFloatType kFastPower10NegativeLookup[20] =
+constexpr inline DefaultFloatType kFastPower10NegativeLookup[20] =
 {
-    static_cast<DefFloatType>(1), static_cast<DefFloatType>(1) / 10, static_cast<DefFloatType>(1) / 100, static_cast<DefFloatType>(1) / 1000,
-    static_cast<DefFloatType>(1) / gcem::pow<uint64_t, uint64_t>(10, 4),  static_cast<DefFloatType>(1) / gcem::pow<uint64_t, uint64_t>(10, 5),  static_cast<DefFloatType>(1) / gcem::pow<uint64_t, uint64_t>(10, 6),  static_cast<DefFloatType>(1) / gcem::pow<uint64_t, uint64_t>(10, 7),
-    static_cast<DefFloatType>(1) / gcem::pow<uint64_t, uint64_t>(10, 8),  static_cast<DefFloatType>(1) / gcem::pow<uint64_t, uint64_t>(10, 9),  static_cast<DefFloatType>(1) / gcem::pow<uint64_t, uint64_t>(10, 10), static_cast<DefFloatType>(1) / gcem::pow<uint64_t, uint64_t>(10, 11), 
-    static_cast<DefFloatType>(1) / gcem::pow<uint64_t, uint64_t>(10, 12), static_cast<DefFloatType>(1) / gcem::pow<uint64_t, uint64_t>(10, 13), static_cast<DefFloatType>(1) / gcem::pow<uint64_t, uint64_t>(10, 14), static_cast<DefFloatType>(1) / gcem::pow<uint64_t, uint64_t>(10, 15),
-    static_cast<DefFloatType>(1) / gcem::pow<uint64_t, uint64_t>(10, 16), static_cast<DefFloatType>(1) / gcem::pow<uint64_t, uint64_t>(10, 17), static_cast<DefFloatType>(1) / gcem::pow<uint64_t, uint64_t>(10, 18), static_cast<DefFloatType>(1) / gcem::pow<uint64_t, uint64_t>(10, 19)
+    static_cast<DefaultFloatType>(1), static_cast<DefaultFloatType>(1) / 10, static_cast<DefaultFloatType>(1) / 100, static_cast<DefaultFloatType>(1) / 1000,
+    static_cast<DefaultFloatType>(1) / gcem::pow<uint64_t, uint64_t>(10, 4),  static_cast<DefaultFloatType>(1) / gcem::pow<uint64_t, uint64_t>(10, 5),  static_cast<DefaultFloatType>(1) / gcem::pow<uint64_t, uint64_t>(10, 6),  static_cast<DefaultFloatType>(1) / gcem::pow<uint64_t, uint64_t>(10, 7),
+    static_cast<DefaultFloatType>(1) / gcem::pow<uint64_t, uint64_t>(10, 8),  static_cast<DefaultFloatType>(1) / gcem::pow<uint64_t, uint64_t>(10, 9),  static_cast<DefaultFloatType>(1) / gcem::pow<uint64_t, uint64_t>(10, 10), static_cast<DefaultFloatType>(1) / gcem::pow<uint64_t, uint64_t>(10, 11), 
+    static_cast<DefaultFloatType>(1) / gcem::pow<uint64_t, uint64_t>(10, 12), static_cast<DefaultFloatType>(1) / gcem::pow<uint64_t, uint64_t>(10, 13), static_cast<DefaultFloatType>(1) / gcem::pow<uint64_t, uint64_t>(10, 14), static_cast<DefaultFloatType>(1) / gcem::pow<uint64_t, uint64_t>(10, 15),
+    static_cast<DefaultFloatType>(1) / gcem::pow<uint64_t, uint64_t>(10, 16), static_cast<DefaultFloatType>(1) / gcem::pow<uint64_t, uint64_t>(10, 17), static_cast<DefaultFloatType>(1) / gcem::pow<uint64_t, uint64_t>(10, 18), static_cast<DefaultFloatType>(1) / gcem::pow<uint64_t, uint64_t>(10, 19)
 };
 } // detail
 
@@ -57,7 +58,7 @@ constexpr inline DefFloatType kFastPower10NegativeLookup[20] =
 // Example: FastPower10<float>(2.3);
 // If exp > 19 or exp < -19, 1 is returned
 template<typename T = uint32_t, typename U>
-[[nodiscard]] constexpr inline T FastPower10(const U exp) noexcept
+[[nodiscard]] constexpr T FastPower10(const U exp) noexcept
 {
     if constexpr(!std::is_integral_v<U>)
         return gcem::pow(T(10), exp);
@@ -84,7 +85,7 @@ template<typename T = uint32_t, typename U>
 // If value is floating point, fraction part is ignored, by casting value to long long
 // Indexing starts at 0 and equals the same as (x / 10^index) % 10
 template<typename T = uint8_t, typename U, typename V, std::enable_if_t<!std::is_floating_point_v<U>, bool> = true>
-[[nodiscard]] constexpr inline T GetDigit(const U u, const V index) noexcept
+[[nodiscard]] constexpr T GetDigit(const U u, const V index) noexcept
 {
     // We might get division by 0 if we skip this line
     if(index < 0)
@@ -93,7 +94,7 @@ template<typename T = uint8_t, typename U, typename V, std::enable_if_t<!std::is
 }
 
 template<typename T = uint8_t, typename U, typename V, std::enable_if_t<std::is_floating_point_v<U>, bool> = true>
-[[nodiscard]] constexpr inline T GetDigit(const U u, const V index) noexcept
+[[nodiscard]] constexpr T GetDigit(const U u, const V index) noexcept
 {
     return GetDigit(static_cast<long long>(u), index);
 }
@@ -107,7 +108,7 @@ template<typename T = uint8_t, typename U, typename V, std::enable_if_t<std::is_
 //          first = -10, last = 5, number = -6543210 => 43210;
 // If number is floating point, fraction part is ignored by casting value to long long
 template<typename T, typename U, std::enable_if_t<!std::is_floating_point_v<T>, bool> = true>
-[[nodiscard]] constexpr inline T GetDigitSubstring(const T number, U first, const U last) noexcept
+[[nodiscard]] constexpr T GetDigitSubstring(const T number, U first, const U last) noexcept
 {
     // I am not sure about this line.
     // It might be better to throw an error, but it means we need to check for it anyway, so I would prefer doing it this way
@@ -123,7 +124,7 @@ template<typename T, typename U, std::enable_if_t<!std::is_floating_point_v<T>, 
 }
 
 template<typename T, typename U, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-[[nodiscard]] constexpr inline T GetDigitSubstring(const T number, const U first, const U last) noexcept
+[[nodiscard]] constexpr T GetDigitSubstring(const T number, const U first, const U last) noexcept
 {
     return GetDigitSubstring(static_cast<long long>(number), first, last);
 }
@@ -132,7 +133,7 @@ template<typename T, typename U, std::enable_if_t<std::is_floating_point_v<T>, b
 namespace detail
 {
 template <typename T>
-[[nodiscard]] constexpr inline uint32_t DigitCountImpl(T t) noexcept
+[[nodiscard]] constexpr uint32_t DigitCountImpl(T t) noexcept
 {
     if(t < T(0))
         return DigitCountImpl(-t);
@@ -145,20 +146,21 @@ template <typename T>
     return digits;
 }
 
+constexpr unsigned char kCharCountLookup[256] = { 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 };
+
 template<>
-[[nodiscard]] inline uint32_t DigitCountImpl<char>(char t) noexcept
+[[nodiscard]] constexpr inline uint32_t DigitCountImpl<char>(char t) noexcept
 {
     if(t < 0)
         return DigitCountImpl<char>(-t);
     
-    static const char x[128] = { 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 };
-    return x[static_cast<unsigned char>(t)];
+    return kCharCountLookup[static_cast<unsigned char>(t)];
 }
+
 template<>
-[[nodiscard]] inline uint32_t DigitCountImpl<unsigned char>(unsigned char t) noexcept
+[[nodiscard]] constexpr inline uint32_t DigitCountImpl<unsigned char>(unsigned char t) noexcept
 {
-    static const unsigned char x[256] = { 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 };
-    return x[t];
+  return kCharCountLookup[t];
 }
 
 template<>
@@ -409,22 +411,22 @@ template<>
 // Get number of whole digits in any type
 // 0 = 0 digits
 template<typename T = uint32_t, typename U>
-[[nodiscard]] constexpr inline T DigitCount(U number) noexcept
+[[nodiscard]] constexpr T DigitCount(U number) noexcept
 {
     return number == 0 ? 0 : static_cast<T>(detail::DigitCountImpl(number));
 }
 
 template<typename T = int, typename U>
-[[nodiscard]] constexpr inline T Bitmask(U bit) noexcept { GAME_ASSERT(bit < (sizeof(T) * CHAR_BIT)) << "Too large bit: " << bit; return static_cast<T>(1) << bit; }
+[[nodiscard]] constexpr T Bitmask(U bit) noexcept { GAME_ASSERT(bit < (sizeof(T) * CHAR_BIT)) << "Too large bit: " << bit; return static_cast<T>(1) << bit; }
 
 template<typename T = int, typename U>
-[[nodiscard]] constexpr inline T Sign(U value) noexcept { return value < U{0} ? static_cast<T>(-1) : static_cast<T>(1); } // return static_cast<T>(static_cast<int>(value < 0) * -2 + 1)    branchless approach
+[[nodiscard]] constexpr T Sign(U value) noexcept { return value < U{0} ? static_cast<T>(-1) : static_cast<T>(1); } // return static_cast<T>(static_cast<int>(value < 0) * -2 + 1)    branchless approach
 
 [[nodiscard]] inline auto Tob2Vec2(const Vector2 &vector) noexcept -> b2Vec2 { return b2Vec2{vector.x(), vector.y()}; }
-[[nodiscard]] inline auto Tob2Rot(DefFloatType angle) noexcept -> b2Rot { return b2Rot{std::cos(angle), std::sin(angle)}; }
+[[nodiscard]] inline auto Tob2Rot(DefaultFloatType angle) noexcept -> b2Rot { return b2Rot{std::cos(angle), std::sin(angle)}; }
 [[nodiscard]] inline auto Tob2Rot(const Vector2 &sin_and_cos) noexcept -> b2Rot { return b2Rot{sin_and_cos.y(), sin_and_cos.x()}; }
 [[nodiscard]] inline auto ToNormalVector2(const b2Vec2 &vector) noexcept -> Vector2 { return Vector2{vector.x, vector.y}; }
-[[nodiscard]] inline auto ToRotationAngle(const b2Rot &rotation) noexcept -> DefFloatType { return std::atan2(rotation.s, rotation.c); }
+[[nodiscard]] inline auto ToRotationAngle(const b2Rot &rotation) noexcept -> DefaultFloatType { return std::atan2(rotation.s, rotation.c); }
 } // game
 
 #endif // GAME_MATH_HPP

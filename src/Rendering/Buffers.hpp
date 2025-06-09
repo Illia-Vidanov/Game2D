@@ -3,6 +3,8 @@
 
 #include "Setup.hpp"
 
+#include "Utils/Logger.hpp"
+#include "Utils/MathConstants.hpp"
 #include "Rendering/Utils.hpp"
 #include "Rendering/DataStructures.hpp"
 
@@ -14,14 +16,14 @@ struct Vertex;
 class VBO
 {
 public:
-  inline VBO() noexcept { GL_CALL(glGenBuffers(1, &id_)); }
-  inline VBO(std::vector<Vertex> verts) noexcept { GL_CALL(glGenBuffers(1, &id_)); BufferData(verts); }
-  inline void Delete() const noexcept { GL_CALL(glDeleteBuffers(1, &id_)); }
+  VBO() noexcept { GL_CALL(glGenBuffers(1, &id_)); }
+  VBO(std::vector<Vertex> verts) noexcept { GL_CALL(glGenBuffers(1, &id_)); BufferData(verts); }
+  void Delete() const noexcept { GL_CALL(glDeleteBuffers(1, &id_)); }
 
-  inline void Bind() const noexcept { GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, id_)); }
-  inline void Unbind() const noexcept { GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, 0)); }
+  void Bind() const noexcept { GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, id_)); }
+  void Unbind() const noexcept { GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, 0)); }
 
-  inline void BufferData(const std::vector<Vertex> &verts) const noexcept;
+  void BufferData(const std::vector<Vertex> &verts) const noexcept;
 
 private:
   uint32_t id_;
@@ -31,15 +33,15 @@ private:
 class EBO
 {
 public:
-  inline EBO() noexcept { GL_CALL(glGenBuffers(1, &id_)); }
-  inline void Delete() const noexcept { GL_CALL(glDeleteBuffers(1, &id_)); }
+  EBO() noexcept { GL_CALL(glGenBuffers(1, &id_)); }
+  void Delete() const noexcept { GL_CALL(glDeleteBuffers(1, &id_)); }
 
-  inline void Bind() const noexcept { GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_)); }
-  inline void Unbind() const noexcept { GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0)); }
+  void Bind() const noexcept { GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_)); }
+  void Unbind() const noexcept { GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0)); }
 
-  inline void BufferData(const std::vector<Index> &inds) noexcept;
-  inline constexpr auto GetCount() const noexcept -> Index { return count_; }
-  inline constexpr auto GetGLType() const noexcept -> uint32_t { return GetGLTypeFromType<Index>(); }
+  void BufferData(const std::vector<Index> &inds) noexcept;
+  constexpr auto GetCount() const noexcept -> Index { return count_; }
+  constexpr auto GetGLType() const noexcept -> uint32_t { return GetGLTypeFromType<Index>(); }
 
 private:
   uint32_t id_;
