@@ -22,6 +22,8 @@ public:
 
   [[nodiscard]] auto GetVelocity() const noexcept -> Vector2 { return ToNormalVector2(b2Body_GetLinearVelocity(body_id_)); }
   void SetVelocity(const Vector2 &velocity) const { b2Body_SetLinearVelocity(body_id_, Tob2Vec2(velocity)); }
+  void AddForce(const Vector2 &force) const { b2Body_ApplyForceToCenter(body_id_, Tob2Vec2(force), true); }
+  void SetGravityScale(DefaultFloatType gravity_scale) const { b2Body_SetGravityScale(body_id_, gravity_scale); }
 
 private:
   Entity &entity_;

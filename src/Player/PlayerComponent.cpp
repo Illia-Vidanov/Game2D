@@ -33,26 +33,24 @@ void PlayerComponent::Update() noexcept
   TransformComponent &transform = entity_.GetComponent<TransformComponent>();
   Camera &camera = entity_.GetGame().GetCamera();
 
-  entity_.GetComponent<RigidbodyComponent>().SetVelocity(Vector2{
+  entity_.GetComponent<RigidbodyComponent>().AddForce(Vector2{
     (static_cast<float>(entity_.GetGame().GetInputSystem().GetKey(SDL_SCANCODE_D)) - static_cast<float>(entity_.GetGame().GetInputSystem().GetKey(SDL_SCANCODE_A))),
     (static_cast<float>(entity_.GetGame().GetInputSystem().GetKey(SDL_SCANCODE_W)) - static_cast<float>(entity_.GetGame().GetInputSystem().GetKey(SDL_SCANCODE_S)))
-  });
+  } * 100);
 
   float diff = transform.GetPosition().x() - camera.GetPosition().x(); 
   if(std::abs(diff) > 30)
     camera.SetPosition(Vector2{camera.GetPosition().x() + diff - 30 * Sign(diff), camera.GetPosition().y()});
-  //GAME_DLOG(LogType::kInfo) << game_.GetRegistry().get<RigidbodyComponent>(self_).GetVelocity().transpose();
 
-
-  static int counter = 0;
-  static int sprite_index = 0;
-  ++counter;
-  if(counter > 1000)
+  static std::chrono::duration<double> animation_speed = 0.5s;
+  static std::chrono::duration<double> animation_counter = 0s;
+  animation_counter += entity_.GetGame().GetDeltaTime();
+  if(animation_counter > animation_speed)
   {
-    counter = 0;
+    animation_counter = 0s;
+    static int sprite_index = 0;
     sprite_index = (sprite_index + 1) % 4;
     entity_.GetComponent<AnimatedSpriteComponent>().SetSpriteIndex(Vector2i{sprite_index % 2, sprite_index / 2});
-    GAME_DLOG(LogType::kInfo) << Vector2i{sprite_index % 2, sprite_index / 2}.transpose();
   } 
 }
 } // game

@@ -27,7 +27,7 @@ public:
 class Texture
 {
 public:
-  Texture(TextureDefinition texture_definition) noexcept;
+  Texture(const TextureDefinition &texture_definition) noexcept;
 
   void Delete() noexcept { GL_CALL(glDeleteTextures(1, &id_)); }
 

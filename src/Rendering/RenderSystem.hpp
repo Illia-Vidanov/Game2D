@@ -5,6 +5,7 @@
 
 #include "Utils/Logger.hpp"
 #include "Utils/MathConstants.hpp"
+#include "Core/EventSystem.hpp"
 
 
 namespace game
@@ -16,13 +17,21 @@ class RenderSystem
 public:
   RenderSystem(Game &game) noexcept;
   ~RenderSystem() noexcept;
+  RenderSystem(const RenderSystem &) noexcept = delete;
+  RenderSystem(RenderSystem &&) noexcept = delete;
+  RenderSystem &operator=(const RenderSystem &) noexcept = delete;
+  RenderSystem &operator=(RenderSystem &&) noexcept = delete;
   
   void StartFrame() noexcept;
   void EndFrame() noexcept;
   
 private:
+  auto RenderAreaResizeEvent(const Event &event) const noexcept -> bool;
+
   Game &game_;
-  Owner<void*> context_; // even in implementation SDL_GLContext is just typedef to void*
+  SDL_GLContext context_;
+
+  EventCleaner event_cleaner_;
 };
 } // game
 

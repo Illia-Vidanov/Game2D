@@ -22,6 +22,10 @@ public:
 
   Window(Game &game) noexcept;
   ~Window() noexcept;
+  Window(const Window &) noexcept = delete;
+  Window(Window &&) noexcept = delete;
+  Window &operator=(const Window &) noexcept = delete;
+  Window &operator=(Window &&) noexcept = delete;
   void InitEvents() noexcept;
 
   [[nodiscard]] constexpr auto GetWidth() noexcept -> int { return width_; }

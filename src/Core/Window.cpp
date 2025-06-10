@@ -18,6 +18,8 @@ Window::Window(Game &game) noexcept
   ZoneScopedC(0x00FFF2);
 
   SDL_Init(SDL_INIT_EVERYTHING);
+  SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
+  SDL_GL_SetSwapInterval(1); // Enable vsync
 
   SDL_DisplayMode display_mode;
   SDL_GetCurrentDisplayMode(0, &display_mode);
@@ -29,7 +31,7 @@ Window::Window(Game &game) noexcept
                                  SDL_WINDOWPOS_CENTERED,
                                  width_,
                                  height_,
-                                 SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+                                 SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI);
   
   GAME_ASSERT(sdl_window_ != nullptr) << "Couldn't create sdl window: " << SDL_GetError();
 
@@ -118,37 +120,16 @@ void Window::SetResolution(const int width, const int height) noexcept
 
 void Window::SetRenderResolution(const int render_width, const int render_height) noexcept
 {
-  GL_CALL(glViewport(
-    (width_ - render_width) / 2,
-    (height_ - render_height) / 2,
-    render_width,
-    render_height
-  ));
-
-  GL_CALL(glScissor(0, 0, width_, height_));
-
-  // glClearColor are temporary before we figure out how to make background
-  GL_CALL(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
-  GL_CALL(glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT));
-  GL_CALL(glClearColor(0.224f, 0.298f, 0.302f, 1.0f));
-
-  GL_CALL(glScissor(
-    (width_ - render_width) / 2,
-    (height_ - render_height) / 2,
-    render_width,
-    render_height
-  ));
-
   if(render_width_ == render_width && render_height_ == render_height)
     return;
     
-  game_.GetEventSystem().DispatchEvent(Event::RenderAreaResize{render_width_, render_height_, render_width, render_height});
-  
   render_width_ = render_width;
   render_height_ = render_height;
-
+  
   pixels_per_unit_x_ = static_cast<DefaultFloatType>(render_width_) / static_cast<DefaultFloatType>(kUnitsPerScreenX);
   pixels_per_unit_y_ = static_cast<DefaultFloatType>(render_height_) / static_cast<DefaultFloatType>(kUnitsPerScreenY);
+  
+  game_.GetEventSystem().DispatchEvent(Event::RenderAreaResize{render_width_, render_height_, render_width, render_height});
 }
 
 void Window::SetTitle(const std::string &title) noexcept

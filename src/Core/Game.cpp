@@ -41,6 +41,8 @@ Game::Game(const int argc, const char * const *argv) noexcept
 
   GAME_VLOG(1, LogType::kInfo) << "Running!!!";
 
+  frame_start_ = std::chrono::high_resolution_clock::now();
+
   event_system_.AddListener(event_cleaner_, EventType::kQuit, this, []([[maybe_unused]] const Event &event, void *game){ return reinterpret_cast<Game*>(game)->QuitEvent(); });
   event_system_.AddListener(event_cleaner_, EventType::kKeyDown, this, [](const Event &event, void *game){ if(event.GetKeycode() == static_cast<int>(SDLK_ESCAPE)) { reinterpret_cast<Game*>(game)->QuitEvent(); } return false; });
 
@@ -66,32 +68,49 @@ void Game::Run() noexcept
   player_sprite.SetShader(&resource_manager_.GetShader(ShaderType::kAnimatedSprite));
   player_sprite.SetTexture(&resource_manager_.GetTexture(TextureType::kPlayer));
   player_sprite.SetAtlasStep(0.5f);
-  player.AddComponent<RectangleColliderComponent>();
-  player.AddComponent<RigidbodyComponent>();
+  RectangleColliderComponent &player_collider = player.AddComponent<RectangleColliderComponent>();
+  player_collider.SetFriction(1.0f);
+  player_collider.SetRestitution(0.3f);
+  RigidbodyComponent &player_rigidbody = player.AddComponent<RigidbodyComponent>();
+  player_rigidbody.SetGravityScale(0.0f);
   PlayerComponent &player_component = player.AddComponent<PlayerComponent>();
 
   Entity box = Entity(*this);
   TransformComponent &box_transform = box.AddComponent<TransformComponent>();
-  box_transform.SetPosition(Vector2{20, 20});
-  box_transform.SetScale(Vector2{10, 10});
+  box_transform.SetPosition(Vector2{5, 5});
+  box_transform.SetScale(Vector2{100, 10});
   TexturedSpriteComponent &box_sprite = box.AddComponent<TexturedSpriteComponent>();
   box_sprite.SetShader(&resource_manager_.GetShader(ShaderType::kTexturedSprite));
   box_sprite.SetTexture(&resource_manager_.GetTexture(TextureType::kNoTexture64));
-  box.AddComponent<RectangleColliderComponent>();
+  RectangleColliderComponent &box_collider = box.AddComponent<RectangleColliderComponent>();
+
+  delta_time_ = std::chrono::high_resolution_clock::now() - frame_start_;
 
   running_ = true;
   while(running_)
   {
+    frame_start_ = std::chrono::high_resolution_clock::now();
+
     window_.DispatchSDLEvents();
     event_system_.DispatchEnquedEvents();
     
     render_system_.StartFrame();
 
     input_system_.Update();
-    physics_system_.Update();
     player_component.Update();
-
+    
     render_system_.EndFrame();
+    
+    if(fixed_delta_time_counter_ >= kFixedDeltaTime)
+    {
+      fixed_delta_time_ = fixed_delta_time_counter_;
+      fixed_delta_time_counter_ = std::clamp(fixed_delta_time_counter_ - kFixedDeltaTime, std::chrono::duration<double>(0.0f), kFixedDeltaTime);
+
+      physics_system_.FixedUpdate();
+    }
+
+    delta_time_ = std::chrono::high_resolution_clock::now() - frame_start_;
+    fixed_delta_time_counter_ += delta_time_;
 
     FrameMark;
   }

@@ -32,6 +32,26 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/glad)
 set(GTEST_LINKED_AS_SHARED_LIBRARY OFF)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/googletest)
 
+add_library(imgui STATIC
+  ${CMAKE_CURRENT_SOURCE_DIR}/libs/imgui/imgui.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/libs/imgui/imgui_draw.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/libs/imgui/imgui_demo.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/libs/imgui/imgui_tables.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/libs/imgui/imgui_widgets.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/libs/imgui/misc/cpp/imgui_stdlib.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/libs/imgui/backends/imgui_impl_sdl2.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/libs/imgui/backends/imgui_impl_opengl3.cpp
+)
+
+target_include_directories(imgui
+  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/imgui
+  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libs/SDL2/include/SDL2
+)
+
+target_link_libraries(imgui
+  PRIVATE SDL2
+)
+
 set(CMAKE_BUILD_TYPE ${REAL_BUILD_TYPE})
 
 
@@ -56,6 +76,7 @@ add_library(${GAME_OBJ_LIB_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Physics/ColliderComponents.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Physics/TransformComponent.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Physics/RigidbodyComponent.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/UI/UI.cpp
 )
 
 target_compile_options(
@@ -71,10 +92,10 @@ target_compile_options(
 target_include_directories(
   ${GAME_OBJ_LIB_NAME}
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
+  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/libs
+  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/libs/imgui # needed for backends
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/libs/glad/include
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/libs/tracy/public
-  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/libs/stb_image
-  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/libs/entt
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/libs/box2d/include
 )
 
@@ -120,6 +141,7 @@ target_link_libraries(
   PRIVATE glad
   PRIVATE TracyClient
   PRIVATE box2d
+  PRIVATE imgui
 )
 
 

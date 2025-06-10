@@ -36,6 +36,13 @@ RectangleColliderComponent::RectangleColliderComponent(Entity &entity) noexcept
   shape_id_ = b2CreatePolygonShape(body_id, &shape_definition, &polygon);
 }
 
+RectangleColliderComponent::~RectangleColliderComponent() noexcept
+{
+  ZoneScopedC(0xffa443);
+
+  b2DestroyShape(shape_id_, true);
+}
+
 void RectangleColliderComponent::Updateb2() const noexcept
 {
   ZoneScopedC(0xffa443);

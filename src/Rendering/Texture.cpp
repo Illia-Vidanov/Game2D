@@ -11,7 +11,7 @@
 
 namespace game
 {
-Texture::Texture(TextureDefinition texture_definition) noexcept
+Texture::Texture(const TextureDefinition &texture_definition) noexcept
   : type_{texture_definition.type}
 {
   ZoneScopedC(0x57005A);

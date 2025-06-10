@@ -47,6 +47,8 @@ public:
   [[nodiscard]] constexpr auto GetPhysicsSystem() const noexcept -> const PhysicsSystem& { return physics_system_; }
   [[nodiscard]] constexpr auto GetResourceManager() noexcept -> ResourceManager& { return resource_manager_; }
   [[nodiscard]] constexpr auto GetResourceManager() const noexcept -> const ResourceManager& { return resource_manager_; }
+  [[nodiscard]] constexpr auto GetDeltaTime() const noexcept -> std::chrono::duration<double> { return delta_time_; }
+  [[nodiscard]] constexpr auto GetFixedDeltaTime() const noexcept -> std::chrono::duration<double> { return fixed_delta_time_; }
 
 private:
   auto QuitEvent() noexcept -> bool;
@@ -64,6 +66,13 @@ private:
   InputSystem input_system_;
   PhysicsSystem physics_system_;
   Camera camera_;
+
+  static constexpr inline uint64_t kFixedFPS = 60;
+  static constexpr inline std::chrono::duration<double> kFixedDeltaTime = std::chrono::duration<double>{1.0f / static_cast<double>(kFixedFPS)};
+  std::chrono::duration<double> delta_time_;
+  std::chrono::duration<double> fixed_delta_time_ = kFixedDeltaTime;
+  std::chrono::duration<double> fixed_delta_time_counter_ = kFixedDeltaTime;
+  std::chrono::time_point<std::chrono::high_resolution_clock> frame_start_;
 };
 } // game
 

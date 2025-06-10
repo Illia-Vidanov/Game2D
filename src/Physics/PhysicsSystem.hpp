@@ -15,9 +15,14 @@ class PhysicsSystem
 {
   using MapType = std::unordered_map<entt::entity, b2BodyId>;
 public:
-  PhysicsSystem(Game &game);
+  PhysicsSystem(Game &game) noexcept;
+  ~PhysicsSystem() noexcept;
+  PhysicsSystem(const PhysicsSystem &) noexcept = delete;
+  PhysicsSystem(PhysicsSystem &&) noexcept = delete;
+  PhysicsSystem &operator=(const PhysicsSystem &) noexcept = delete;
+  PhysicsSystem &operator=(PhysicsSystem &&) noexcept = delete;
 
-  void Update() noexcept;
+  void FixedUpdate() noexcept;
 
   [[nodiscard]] constexpr auto GetWorldId() const noexcept -> b2WorldId { return world_id_; }
   [[nodiscard]] auto Getb2BodyId(entt::entity entity) const noexcept -> b2BodyId { MapType::const_iterator it = body_ids_.find(entity); return it == body_ids_.end() ? b2_nullBodyId : it->second; }

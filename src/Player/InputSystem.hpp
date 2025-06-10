@@ -16,6 +16,10 @@ class InputSystem
 {
 public:
   InputSystem(Game &game) noexcept;
+  InputSystem(const InputSystem &) noexcept = delete;
+  InputSystem(InputSystem &&) noexcept = delete;
+  InputSystem &operator=(const InputSystem &) noexcept = delete;
+  InputSystem &operator=(InputSystem &&) noexcept = delete;
   void InitEvents() noexcept;
 
   void Update() noexcept;

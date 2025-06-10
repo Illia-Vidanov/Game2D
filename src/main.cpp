@@ -1,15 +1,6 @@
 /*
 Todo:
-- Hide warnings with unused parametrs
-- Finish logger
-- Input
-- Flags
 - Background
-- Sprite
-- Animation
-- Simplest character controller
-- Gameobject class
-- Clean up
 - Delta time / limit fps
 - TODO in Enum
 */

@@ -16,6 +16,7 @@ namespace game
 {
 RenderSystem::RenderSystem(Game &game) noexcept
   : game_{game}
+  , event_cleaner_{game_.GetEventSystem()}
 {
   ZoneScopedC(0x07dbd4);
 
@@ -30,14 +31,21 @@ RenderSystem::RenderSystem(Game &game) noexcept
   if(!gladLoadGLLoader(SDL_GL_GetProcAddress))
     GAME_ASSERT(false) << "Failed to load GL loader";
 
+  if(SDL_GL_MakeCurrent(game_.GetWindow().GetSDLWindow(), context_) < 0)
+    GAME_ASSERT(false) << "Failed to associate GL context with current window";
+
   GAME_VLOG(1, LogType::kInfo) << "GL Vendor:           " << glGetString(GL_VENDOR)                   << '\n'
                                << "GL RenderSystem:     " << glGetString(GL_RENDERER)                 << '\n'
                                << "GL Version:          " << glGetString(GL_VERSION)                  << '\n'
                                << "GL Shading Lnaguage: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << '\n';
 
   GL_CALL(glEnable(GL_SCISSOR_TEST));
+  GL_CALL(glEnable(GL_BLEND));
+  GL_CALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
   
   GL_CALL(glClearColor(0.224f, 0.298f, 0.302f, 1.0f));
+
+  game_.GetEventSystem().AddListener(event_cleaner_, EventType::kWindowResize, this, [](const Event &event, void *render_system) -> bool { return reinterpret_cast<RenderSystem*>(render_system)->RenderAreaResizeEvent(event); });
 }
 
 RenderSystem::~RenderSystem() noexcept
@@ -104,5 +112,37 @@ void RenderSystem::EndFrame() noexcept
   }
 
   SDL_GL_SwapWindow(game_.GetWindow().GetSDLWindow());
+}
+auto RenderSystem::RenderAreaResizeEvent(const Event &event) const noexcept -> bool
+{
+  const int lowest_left_point_x = (event.GetNewResolutionX() - game_.GetWindow().GetRenderWidth()) / 2;
+  const int lowest_left_point_y = (event.GetNewResolutionY() - game_.GetWindow().GetRenderHeight()) / 2;
+
+  GL_CALL(glViewport(
+    lowest_left_point_x,
+    lowest_left_point_y,
+    game_.GetWindow().GetRenderWidth(),
+    game_.GetWindow().GetRenderHeight()
+  ));
+
+  //GL_CALL(glScissor(0, 0, game_.GetWindow().GetWidth(), game_.GetWindow().GetHeight()));
+
+  // glClearColor are temporary before we figure out how to make background
+  GL_CALL(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
+
+  GL_CALL(glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT));
+  SDL_GL_SwapWindow(game_.GetWindow().GetSDLWindow());
+  GL_CALL(glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT));
+
+  GL_CALL(glScissor(
+    lowest_left_point_x,
+    lowest_left_point_y,
+    game_.GetWindow().GetRenderWidth(),
+    game_.GetWindow().GetRenderHeight()
+  ));
+
+  GL_CALL(glClearColor(0.224f, 0.298f, 0.302f, 1.0f));
+
+  return false;
 }
 } // game

@@ -11,6 +11,7 @@
 #include <iostream>
 #include <algorithm>
 #include <chrono>
+using namespace std::chrono_literals;
 #include <ctime>
 #include <iomanip>
 #include <array>
@@ -52,14 +53,20 @@
 #include <tracy/Tracy.hpp>
 
 // EnTT - ECS
-#include <entt.hpp>
+#include <entt/entt.hpp>
 
 // STB Image - image reading
 // Implementation is defined in Utils/FileReader.cpp
-#include <stb_image.h>
+#include <stb_image/stb_image.h>
 
 // Box2D - 2d physics library
 #include <box2d/box2d.h>
+
+// ImGUI
+#include <imgui/imgui.h>
+#include <imgui/backends/imgui_impl_sdl2.h>
+#include <imgui/backends/imgui_impl_opengl3.h>
+#include <imgui/misc/cpp/imgui_stdlib.h>
 
 // Used to show who owns the memory
 template<typename T>

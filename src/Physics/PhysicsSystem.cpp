@@ -12,16 +12,24 @@
 
 namespace game
 {
-PhysicsSystem::PhysicsSystem(Game &game)
+PhysicsSystem::PhysicsSystem(Game &game) noexcept
   : game_{game}
 {
   ZoneScopedC(0xfc940a);
 
   b2WorldDef world_def = b2DefaultWorldDef();
+  world_def.gravity = b2Vec2{0.0f, -10.0f};
   world_id_ = b2CreateWorld(&world_def);
 }
 
-void PhysicsSystem::Update() noexcept
+PhysicsSystem::~PhysicsSystem() noexcept
+{
+  ZoneScopedC(0xfc940a);
+
+  b2DestroyWorld(world_id_);
+}
+
+void PhysicsSystem::FixedUpdate() noexcept
 {
   ZoneScopedC(0xfc940a);
 
