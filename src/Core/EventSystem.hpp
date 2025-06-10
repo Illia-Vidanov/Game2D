@@ -234,8 +234,14 @@ public:
   using CallbackType = bool(*)(const Event &, void *data);
   using ListenerMapValueType = std::pair<void*, CallbackType>;
   using ListenerMapType = std::unordered_map<std::size_t, ListenerMapValueType>;
-  using EventMapType = std::unordered_multimap<EventType, std::size_t>;
+  using EventMapType = std::multimap<EventType, std::size_t>;
   using QueueType = std::queue<Event>;
+
+  EventSystem() noexcept = default;
+  EventSystem(const EventSystem &) noexcept = delete;
+  EventSystem(EventSystem &&) noexcept = delete;
+  EventSystem &operator=(const EventSystem &) noexcept = delete;
+  EventSystem &operator=(EventSystem &&) noexcept = delete;
 
 
   // Add to type event listener that will be trigered when event fires
