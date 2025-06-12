@@ -18,19 +18,19 @@ void Shader::CompileShader(const std::string &path) noexcept
 
   int succes;
   uint32_t shader_id;
-  GL_CALL(shader_id = glCreateShader(ExtensionToShaderType(std::filesystem::path{path}.extension().generic_u8string())));
-  GL_CALL(glShaderSource(shader_id, 1, &char_source, NULL));
-  GL_CALL(glCompileShader(shader_id));
-  GL_CALL(glGetShaderiv(shader_id, GL_COMPILE_STATUS, &succes));
+  GAME_GL_CALL(shader_id = glCreateShader(ExtensionToShaderType(std::filesystem::path{path}.extension().generic_u8string())));
+  GAME_GL_CALL(glShaderSource(shader_id, 1, &char_source, NULL));
+  GAME_GL_CALL(glCompileShader(shader_id));
+  GAME_GL_CALL(glGetShaderiv(shader_id, GL_COMPILE_STATUS, &succes));
   if(!succes)
   {
     char buffer[512];
-    GL_CALL(glGetShaderInfoLog(shader_id, 512, NULL, buffer));
+    GAME_GL_CALL(glGetShaderInfoLog(shader_id, 512, NULL, buffer));
     GAME_VLOG(1, LogType::kError) << "During compiling of: \'" << path << "\'\n"
                                     "Got OpenGL error: " << buffer;
   }
 
-  GL_CALL(glAttachShader(id_, shader_id));
+  GAME_GL_CALL(glAttachShader(id_, shader_id));
 
   compiled_shaders_.push_back(shader_id);
 }
@@ -40,18 +40,18 @@ void Shader::LinkProgram() noexcept
   ZoneScopedC(0xDD9B00);
   
   int succes;
-  GL_CALL(glLinkProgram(id_));
-  GL_CALL(glGetProgramiv(id_, GL_LINK_STATUS, &succes));
+  GAME_GL_CALL(glLinkProgram(id_));
+  GAME_GL_CALL(glGetProgramiv(id_, GL_LINK_STATUS, &succes));
   if(!succes)
   {
     char buffer[512];
-    GL_CALL(glGetProgramInfoLog(id_, 512, NULL, buffer));
+    GAME_GL_CALL(glGetProgramInfoLog(id_, 512, NULL, buffer));
     GAME_VLOG(1, LogType::kError) << "During linking shaders\n"
                                     "Got OpenGL error: " << buffer;
   }
 
   for(std::size_t i = 0; i < compiled_shaders_.size(); i++)
-    GL_CALL(glDeleteShader(compiled_shaders_[i]));
+    GAME_GL_CALL(glDeleteShader(compiled_shaders_[i]));
 
   compiled_shaders_.clear();
 }

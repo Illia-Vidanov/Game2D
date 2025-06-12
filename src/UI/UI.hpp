@@ -3,6 +3,9 @@
 
 #include "Setup.hpp"
 
+#include "Core/EventSystem.hpp"
+#include "Utils/MathConstants.hpp"
+
 
 namespace game
 {
@@ -21,7 +24,17 @@ public:
   void Update() noexcept;
 
 private:
+  auto WindowResizeEvent(const Event &event) noexcept -> bool;
+  void UpdateWindow() const noexcept;
+
   Game &game_;
+  EventCleaner event_cleaner_;
+
+  Vector2 global_scale_;
+  Vector2 scale_multiplier_;
+  static constexpr inline DefaultFloatType kUnitScale = 100.0f;
+
+  bool window_resized_ = false;
 };
 } // game
 

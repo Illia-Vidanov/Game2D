@@ -29,10 +29,10 @@ class Texture
 public:
   Texture(const TextureDefinition &texture_definition) noexcept;
 
-  void Delete() noexcept { GL_CALL(glDeleteTextures(1, &id_)); }
+  void Delete() noexcept { GAME_GL_CALL(glDeleteTextures(1, &id_)); }
 
-  void Bind() const noexcept { GL_CALL(glBindTexture(type_, id_)); }
-  void Unbind() const noexcept { GL_CALL(glBindTexture(type_, 0)); }
+  void Bind() const noexcept { GAME_GL_CALL(glBindTexture(type_, id_)); }
+  void Unbind() const noexcept { GAME_GL_CALL(glBindTexture(type_, 0)); }
 
 private:
   const uint32_t type_;

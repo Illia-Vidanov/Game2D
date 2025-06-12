@@ -20,8 +20,8 @@ void VAO::AddVBO(const VBO &vbo, const BufferLayout &layout) const noexcept
 
   for(std::size_t i = 0; i < elements.size(); i++)
   {
-    GL_CALL(glVertexAttribPointer(i, elements[i].size, elements[i].type, elements[i].normalized, layout.GetStride(), reinterpret_cast<void*>(static_cast<uintptr_t>(elements[i].offset))));
-    GL_CALL(glEnableVertexAttribArray(i));
+    GAME_GL_CALL(glVertexAttribPointer(i, elements[i].size, elements[i].type, elements[i].normalized, layout.GetStride(), reinterpret_cast<void*>(static_cast<uintptr_t>(elements[i].offset))));
+    GAME_GL_CALL(glEnableVertexAttribArray(i));
   }
 }
 } // game

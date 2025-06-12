@@ -19,23 +19,23 @@ Texture::Texture(const TextureDefinition &texture_definition) noexcept
   if(texture_definition.is_empty)
     return;
 
-  GL_CALL(glGenTextures(1, &id_));
+  GAME_GL_CALL(glGenTextures(1, &id_));
   Bind();
 
   ImageData image_data = FileReader::Image(texture_definition.source_path);
-  GL_CALL(glTexStorage2D(type_, 1, texture_definition.internal_format, image_data.width, image_data.height));
-  GL_CALL(glTexSubImage2D(type_, 0, 0, 0, image_data.width, image_data.height, texture_definition.format, TypeToGLType<ImageData::DataType>(), image_data.data));
+  GAME_GL_CALL(glTexStorage2D(type_, 1, texture_definition.internal_format, image_data.width, image_data.height));
+  GAME_GL_CALL(glTexSubImage2D(type_, 0, 0, 0, image_data.width, image_data.height, texture_definition.format, TypeToGLType<ImageData::DataType>(), image_data.data));
   image_data.Free();
   
   switch(texture_definition.mipmap_count)
   {
   default:
-    GL_CALL(glTexParameteri(texture_definition.type, GL_TEXTURE_MAX_LEVEL, texture_definition.mipmap_count));
-    GL_CALL(glGenerateMipmap(type_));
+    GAME_GL_CALL(glTexParameteri(texture_definition.type, GL_TEXTURE_MAX_LEVEL, texture_definition.mipmap_count));
+    GAME_GL_CALL(glGenerateMipmap(type_));
     break;
     
   case static_cast<uint32_t>(-1):
-    GL_CALL(glGenerateMipmap(type_));
+    GAME_GL_CALL(glGenerateMipmap(type_));
     break;
 
   case static_cast<uint32_t>(0):

@@ -70,6 +70,7 @@ void Window::DispatchSDLEvents() noexcept
       ZoneValue(event.type);
     }
   #endif
+    ImGui_ImplSDL2_ProcessEvent(&event);
     switch(event.type)
     {
     case SDL_QUIT:
@@ -120,6 +121,9 @@ void Window::SetResolution(const int width, const int height) noexcept
 
 void Window::SetRenderResolution(const int render_width, const int render_height) noexcept
 {
+  render_pivot_x = (width_ - render_width) / 2;
+  render_pivot_y = (height_ - render_height) / 2;
+
   if(render_width_ == render_width && render_height_ == render_height)
     return;
     

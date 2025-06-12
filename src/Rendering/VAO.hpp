@@ -54,11 +54,11 @@ private:
 class VAO
 {
 public:
-  VAO() noexcept { GL_CALL(glGenVertexArrays(1, &id_)); }
-  void Delete() const noexcept { GL_CALL(glDeleteVertexArrays(1, &id_)); }
+  VAO() noexcept { GAME_GL_CALL(glGenVertexArrays(1, &id_)); }
+  void Delete() const noexcept { GAME_GL_CALL(glDeleteVertexArrays(1, &id_)); }
 
-  void Bind() const noexcept { GL_CALL(glBindVertexArray(id_)); }
-  void Unbind() const noexcept { GL_CALL(glBindVertexArray(0)); }
+  void Bind() const noexcept { GAME_GL_CALL(glBindVertexArray(id_)); }
+  void Unbind() const noexcept { GAME_GL_CALL(glBindVertexArray(0)); }
 
   void AddVBO(const VBO &vbo, const BufferLayout &layout) const noexcept;
   void AddEBO(const EBO &ebo) const noexcept { Bind(); ebo.Bind(); }

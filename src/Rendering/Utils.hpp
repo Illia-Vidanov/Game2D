@@ -7,13 +7,13 @@
 
 
 #ifndef NDEBUG
-#define GL_CALL(call) do { \
+#define GAME_GL_CALL(call) do { \
     call; \
     while(int error = glGetError()) \
       GAME_VLOG(1, LogType::kError) << __LINE__ << ' ' << __FILE__ << " OpenGL error: " << error; \
   } while(0)
 #else
-#define GL_CALL(call) call
+#define GAME_GL_CALL(call) call
 #endif
 
 namespace game

@@ -16,12 +16,12 @@ struct Vertex;
 class VBO
 {
 public:
-  VBO() noexcept { GL_CALL(glGenBuffers(1, &id_)); }
-  VBO(std::vector<Vertex> verts) noexcept { GL_CALL(glGenBuffers(1, &id_)); BufferData(verts); }
-  void Delete() const noexcept { GL_CALL(glDeleteBuffers(1, &id_)); }
+  VBO() noexcept { GAME_GL_CALL(glGenBuffers(1, &id_)); }
+  VBO(std::vector<Vertex> verts) noexcept { GAME_GL_CALL(glGenBuffers(1, &id_)); BufferData(verts); }
+  void Delete() const noexcept { GAME_GL_CALL(glDeleteBuffers(1, &id_)); }
 
-  void Bind() const noexcept { GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, id_)); }
-  void Unbind() const noexcept { GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, 0)); }
+  void Bind() const noexcept { GAME_GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, id_)); }
+  void Unbind() const noexcept { GAME_GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, 0)); }
 
   void BufferData(const std::vector<Vertex> &verts) const noexcept;
 
@@ -33,11 +33,11 @@ private:
 class EBO
 {
 public:
-  EBO() noexcept { GL_CALL(glGenBuffers(1, &id_)); }
-  void Delete() const noexcept { GL_CALL(glDeleteBuffers(1, &id_)); }
+  EBO() noexcept { GAME_GL_CALL(glGenBuffers(1, &id_)); }
+  void Delete() const noexcept { GAME_GL_CALL(glDeleteBuffers(1, &id_)); }
 
-  void Bind() const noexcept { GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_)); }
-  void Unbind() const noexcept { GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0)); }
+  void Bind() const noexcept { GAME_GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id_)); }
+  void Unbind() const noexcept { GAME_GL_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0)); }
 
   void BufferData(const std::vector<Index> &inds) noexcept;
   constexpr auto GetCount() const noexcept -> Index { return count_; }
@@ -53,7 +53,7 @@ inline void VBO::BufferData(const std::vector<Vertex> &verts) const noexcept
   ZoneScopedC(0x4400FF);
 
   Bind();
-  GL_CALL(glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(Vertex), verts.data(), GL_STATIC_DRAW));
+  GAME_GL_CALL(glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(Vertex), verts.data(), GL_STATIC_DRAW));
 }
 
 inline void EBO::BufferData(const std::vector<Index> &inds) noexcept
@@ -62,7 +62,7 @@ inline void EBO::BufferData(const std::vector<Index> &inds) noexcept
 
   Bind();
   count_ = inds.size();
-  GL_CALL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, inds.size() * sizeof(Index), inds.data(), GL_STATIC_DRAW));
+  GAME_GL_CALL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, inds.size() * sizeof(Index), inds.data(), GL_STATIC_DRAW));
 }
 } // game
 

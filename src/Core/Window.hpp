@@ -33,6 +33,8 @@ public:
   void SetResolution(const int width, const int height) noexcept;
   [[nodiscard]] constexpr auto GetRenderWidth() noexcept -> int { return render_width_; }
   [[nodiscard]] constexpr auto GetRenderHeight() noexcept -> int { return render_height_; }
+  [[nodiscard]] constexpr auto GetRenderPivotX() noexcept -> int { return render_pivot_x; }
+  [[nodiscard]] constexpr auto GetRenderPivotY() noexcept -> int { return render_pivot_y; }
   void SetRenderResolution(const int render_width, const int render_height) noexcept;
   [[nodiscard]] constexpr auto GetPixelsPerUnitX() noexcept -> int { return pixels_per_unit_x_; }
   [[nodiscard]] constexpr auto GetPixelsPerUnitY() noexcept -> int { return pixels_per_unit_y_; }
@@ -56,6 +58,8 @@ public:
   int height_;
   int render_width_ = 0;
   int render_height_ = 0;
+  int render_pivot_x = 0;
+  int render_pivot_y = 0;
   std::string title_ = "Game";
 
   DefaultFloatType pixels_per_unit_x_;

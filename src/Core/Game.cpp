@@ -32,6 +32,7 @@ Game::Game(const int argc, const char * const *argv) noexcept
   , event_cleaner_{event_system_}
   , window_{*this}
   , render_system_{*this}
+  , ui_{*this}
   , resource_manager_{*this}
   , input_system_{*this}
   , physics_system_{*this}
@@ -61,28 +62,28 @@ void Game::Run() noexcept
 {
   ZoneScopedC(0xb3041b);
 
-  Entity player = Entity(*this);
-  TransformComponent &player_transform = player.AddComponent<TransformComponent>();
+  entities_.emplace("player", Entity(*this));
+  TransformComponent &player_transform = player_->AddComponent<TransformComponent>();
   player_transform.SetScale(Vector2{10, 10});
-  AnimatedSpriteComponent &player_sprite = player.AddComponent<AnimatedSpriteComponent>();
+  AnimatedSpriteComponent &player_sprite = player_->AddComponent<AnimatedSpriteComponent>();
   player_sprite.SetShader(&resource_manager_.GetShader(ShaderType::kAnimatedSprite));
   player_sprite.SetTexture(&resource_manager_.GetTexture(TextureType::kPlayer));
   player_sprite.SetAtlasStep(0.5f);
-  RectangleColliderComponent &player_collider = player.AddComponent<RectangleColliderComponent>();
+  RectangleColliderComponent &player_collider = player_->AddComponent<RectangleColliderComponent>();
   player_collider.SetFriction(1.0f);
   player_collider.SetRestitution(0.3f);
-  RigidbodyComponent &player_rigidbody = player.AddComponent<RigidbodyComponent>();
+  RigidbodyComponent &player_rigidbody = player_->AddComponent<RigidbodyComponent>();
   player_rigidbody.SetGravityScale(0.0f);
-  PlayerComponent &player_component = player.AddComponent<PlayerComponent>();
+  PlayerComponent &player_component = player_->AddComponent<PlayerComponent>();
 
-  Entity box = Entity(*this);
-  TransformComponent &box_transform = box.AddComponent<TransformComponent>();
+  box_ = new Entity(*this);
+  TransformComponent &box_transform = box_->AddComponent<TransformComponent>();
   box_transform.SetPosition(Vector2{5, 5});
   box_transform.SetScale(Vector2{100, 10});
-  TexturedSpriteComponent &box_sprite = box.AddComponent<TexturedSpriteComponent>();
+  TexturedSpriteComponent &box_sprite = box_->AddComponent<TexturedSpriteComponent>();
   box_sprite.SetShader(&resource_manager_.GetShader(ShaderType::kTexturedSprite));
   box_sprite.SetTexture(&resource_manager_.GetTexture(TextureType::kNoTexture64));
-  RectangleColliderComponent &box_collider = box.AddComponent<RectangleColliderComponent>();
+  RectangleColliderComponent &box_collider = box_->AddComponent<RectangleColliderComponent>();
 
   delta_time_ = std::chrono::high_resolution_clock::now() - frame_start_;
 
@@ -98,6 +99,7 @@ void Game::Run() noexcept
 
     input_system_.Update();
     player_component.Update();
+    ui_.Update();
     
     render_system_.EndFrame();
     

@@ -24,12 +24,17 @@ public:
   
   void StartFrame() noexcept;
   void EndFrame() noexcept;
+
+  [[nodiscard]] auto GetSDLGLContext() const noexcept -> SDL_GLContext { return sdl_gl_context_; }
   
 private:
-  auto RenderAreaResizeEvent(const Event &event) const noexcept -> bool;
+  void DrawUI() noexcept;
+  void DrawSprites() noexcept;
+
+  auto WindowResizeEvent(const Event &event) const noexcept -> bool;
 
   Game &game_;
-  SDL_GLContext context_;
+  SDL_GLContext sdl_gl_context_;
 
   EventCleaner event_cleaner_;
 };
