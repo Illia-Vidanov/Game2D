@@ -7,5 +7,9 @@ uniform sampler2D image;
 
 void main()
 {
-  color = texture(image, texture_coordinates);
+  vec4 texture_color = texture(image, texture_coordinates);
+  // Test for outlining
+  if(texture_color.a == 0)
+    discard;
+  color = texture_color;
 }

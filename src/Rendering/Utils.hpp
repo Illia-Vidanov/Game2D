@@ -2,13 +2,14 @@
 #define GAME_UTILS_GL_HPP
 
 #include "Setup.hpp"
+
 #include "Utils/Logger.hpp"
 #include "Utils/MathConstants.hpp"
 
 
 #ifndef NDEBUG
 #define GAME_GL_CALL(call) do { \
-    call; \
+    GAME_MEASURE_TIME(call); \
     while(int error = glGetError()) \
       GAME_VLOG(1, LogType::kError) << __LINE__ << ' ' << __FILE__ << " OpenGL error: " << error; \
   } while(0)

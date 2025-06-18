@@ -16,21 +16,60 @@ class Texture;
 class Shader;
 class Game;
 
-
-class DefaultSpriteComponent
+enum class SpriteType : uint32_t
 {
-public:
-  DefaultSpriteComponent(Entity &entity) noexcept : entity_{entity} { GAME_ASSERT(entity_.HasComponent<TransformComponent>()); }
-
-private:
-  Entity &entity_;
+  kNone = 0,
+  kDefault,
+  kTextured,
+  kAnimated
 };
 
 
-class TexturedSpriteComponent
+class SpriteDataBase
 {
 public:
-  TexturedSpriteComponent(Entity &entity) noexcept : entity_{entity} { GAME_ASSERT(entity_.HasComponent<TransformComponent>()); }
+  virtual ~SpriteDataBase() noexcept = default;
+  [[nodiscard]] virtual auto GetCopy() const noexcept -> Owner<SpriteDataBase*> { return new SpriteDataBase{*this}; }
+};
+
+class SpriteComponent
+{
+public:
+  SpriteComponent(Entity *entity) : entity_{entity} {}
+  ~SpriteComponent() noexcept { delete data_; }
+  SpriteComponent(const SpriteComponent &other) noexcept : entity_{other.entity_}, type_{other.type_}, data_{other.data_->GetCopy()}, layer_{other.layer_} {}
+  SpriteComponent(SpriteComponent &&other) noexcept : entity_{other.entity_}, type_{other.type_}, data_{other.data_}, layer_{other.layer_} { other.data_ = nullptr; }
+  SpriteComponent &operator=(const SpriteComponent &other) noexcept { entity_ = other.entity_; type_ = other.type_; data_ = other.data_->GetCopy(); layer_ = other.layer_;  return *this; };
+  SpriteComponent &operator=(SpriteComponent &&other) noexcept { entity_ = other.entity_; type_ = other.type_; data_ = other.data_; other.data_ = nullptr; layer_ = other.layer_;  return *this; }
+
+  [[nodiscard]] constexpr auto GetType() const noexcept -> SpriteType { return type_; }
+  constexpr void SetType(const SpriteType type) noexcept { type_ = type; }
+  [[nodiscard]] constexpr auto GetData() const noexcept -> const SpriteDataBase * { return data_; }
+  [[nodiscard]] constexpr auto GetData() noexcept -> SpriteDataBase * { return data_; }
+  constexpr void SetData(Owner<SpriteDataBase*> data) noexcept { data_ = data; }
+  [[nodiscard]] constexpr auto GetLayer() const noexcept -> int { return layer_; }
+  constexpr void SetLayer(int layer) noexcept { layer_ = layer; }
+
+private:
+  Entity *entity_;
+
+  SpriteType type_;
+  Owner<SpriteDataBase*> data_;
+  int layer_ = 0;
+};
+
+
+class DefaultSpriteData : public SpriteDataBase
+{
+public:
+  [[nodiscard]] virtual auto GetCopy() const noexcept -> Owner<SpriteDataBase*> override { return new DefaultSpriteData{*this}; }
+};
+
+
+class TexturedSpriteData : public SpriteDataBase
+{
+public:
+  [[nodiscard]] virtual auto GetCopy() const noexcept -> Owner<SpriteDataBase*> override { return new TexturedSpriteData{*this}; }
 
   constexpr void SetShader(const Shader *shader) noexcept { shader_ = shader; }
   [[nodiscard]] auto GetShader() const noexcept -> const Shader & { GAME_ASSERT(shader_ != nullptr); return *shader_; }
@@ -38,17 +77,15 @@ public:
   [[nodiscard]] auto GetTexture() const noexcept -> const Texture & { GAME_ASSERT(texture_ != nullptr); return *texture_; }
 
 private:
-  Entity &entity_;
-
   const Shader *shader_ = nullptr;
   const Texture *texture_ = nullptr;
 };
 
 
-class AnimatedSpriteComponent
+class AnimatedSpriteData : public SpriteDataBase
 {
 public:
-  AnimatedSpriteComponent(Entity &entity) noexcept : entity_{entity} { GAME_ASSERT(entity_.HasComponent<TransformComponent>()); }
+  [[nodiscard]] virtual auto GetCopy() const noexcept -> Owner<SpriteDataBase*> override { return new AnimatedSpriteData{*this}; }
 
   void SetSpriteIndex(const Vector2i &sprite_index) noexcept { sprite_index_ = sprite_index; }
   [[nodiscard]] auto GetSpriteIndex() const noexcept -> const Vector2i & { return sprite_index_; }
@@ -61,8 +98,6 @@ public:
   [[nodiscard]] auto GetTexture() const noexcept -> const Texture & { GAME_ASSERT(texture_ != nullptr); return *texture_; }
 
 private:
-  Entity &entity_;
-
   Vector2i sprite_index_ = Vector2i::Zero();
   DefaultFloatType atlas_step_ = 1;
   const Shader *shader_ = nullptr;

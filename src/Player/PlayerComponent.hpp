@@ -14,11 +14,11 @@ class Entity;
 class PlayerComponent
 {
 public:
-  PlayerComponent(Entity &entity) noexcept;
+  PlayerComponent(Entity *entity) noexcept;
   void Update() noexcept;
 
 private:
-  Entity &entity_;
+  Entity *entity_;
 };
 } // game
 

@@ -3,38 +3,44 @@
 
 #include "Setup.hpp"
 
-#include "Core/Game.hpp"
 #include "Utils/Logger.hpp"
 #include "Utils/MathConstants.hpp"
 
 
 namespace game
 {
+class Game;
+
 class Entity
 {
 public:
-  Entity(entt::entity id, Game &game) noexcept : id_{id}, game_{game} {};
-  Entity(Game &game) noexcept : id_{game.GetRegistry().create()}, game_{game} {};
+  Entity(Game &game) noexcept;
 
   [[nodiscard]] constexpr auto GetID() const noexcept -> entt::entity { return id_; }
   [[nodiscard]] constexpr auto GetGame() noexcept -> Game& { return game_; }
   [[nodiscard]] constexpr auto GetGame() const noexcept -> const Game& { return game_; }
 
   template<typename T>
-  [[nodiscard]] auto GetComponent() noexcept -> T& { return game_.GetRegistry().get<T>(id_); }
+  [[nodiscard]] auto GetComponent() noexcept -> T&;
   template<typename T>
-  [[nodiscard]] auto TryGetComponent() noexcept -> T* { return game_.GetRegistry().try_get<T>(id_); }
+  [[nodiscard]] auto TryGetComponent() noexcept -> T*;
   template<typename T>
-  auto AddComponent() noexcept -> T& { return game_.GetRegistry().emplace<T>(id_, *this); }
+  auto AddComponent() noexcept -> T&;
+  template<typename T, typename... Args>
+  auto AddComponent(Args&&... args) noexcept -> T&;
   template<typename T>
-  [[nodiscard]] auto HasComponent() const noexcept -> bool { return game_.GetRegistry().all_of<T>(id_); }
+  [[nodiscard]] auto HasComponent() const noexcept -> bool;
   template<typename... Args>
-  [[nodiscard]] auto HasAllComponents() const noexcept -> bool { return game_.GetRegistry().all_of<Args...>(id_); }
+  [[nodiscard]] auto HasAllComponents() const noexcept -> bool;
 
 private:
   entt::entity id_;
   Game &game_;
 };
 } // game
+
+#ifndef GAME_GAME_HPP
+#include "Core/Entity.tpp"
+#endif // GAME_GAME_HPP
 
 #endif

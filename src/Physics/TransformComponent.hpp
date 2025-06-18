@@ -14,13 +14,14 @@ class Entity;
 class TransformComponent : public Eigen::Transform<DefaultFloatType, 2, 2>
 {
 public:
-  TransformComponent(Entity &entity) noexcept : Eigen::Transform<DefaultFloatType, 2, 2>{Eigen::Transform<DefaultFloatType, 2, 2>::Identity()}, entity_{entity} {}
-  TransformComponent &operator=(const Transform &other) noexcept;
-  TransformComponent &operator=(Transform &&other) noexcept;
-  TransformComponent &operator=(const TransformComponent &) noexcept = default;
+  TransformComponent(Entity *entity) noexcept : Eigen::Transform<DefaultFloatType, 2, 2>{Eigen::Transform<DefaultFloatType, 2, 2>::Identity()}, entity_{entity} {}
   ~TransformComponent() noexcept = default;
+  TransformComponent &operator=(const TransformComponent &) noexcept = default;
   TransformComponent(TransformComponent &&) noexcept = default;
   TransformComponent &operator=(TransformComponent &&) noexcept = default;
+  
+  TransformComponent &operator=(const Transform &other) noexcept;
+  TransformComponent &operator=(Transform &&other) noexcept;
 
   [[nodiscard]] auto GetPosition() noexcept -> Vector2 { return translation(); }
   void SetPosition(const Vector2 &position) noexcept { translation() = position; }
@@ -40,7 +41,7 @@ public:
   [[nodiscard]] auto Getb2Rotation() const noexcept -> b2Rot { return b2Rot{cos_, sin_}; }
 
 private:
-  Entity &entity_;
+  Entity *entity_;
 
   DefaultFloatType angle_ = 0;
   DefaultFloatType sin_ = 0;

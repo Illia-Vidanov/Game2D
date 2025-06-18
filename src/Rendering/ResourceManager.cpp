@@ -32,9 +32,20 @@ ResourceManager::ResourceManager(Game &game) noexcept
   sprite_vao_.AddVBO(sprite_vbo_, BufferLayout{GL_FLOAT, 2, GL_FALSE});
   sprite_vao_.AddEBO(sprite_ebo_);
 
+  screen_plane_vbo_.BufferData({
+    {-1.0f, -1.0f}, {1.0f, -1.0f}, {-1.0f, 1.0f}, {1.0f, 1.0f}
+  });
+  screen_plane_ebo_.BufferData({
+    0, 1, 2,
+    1, 2, 3
+  });
+  screen_plane_vao_.AddVBO(screen_plane_vbo_, BufferLayout{GL_FLOAT, 2, GL_FALSE});
+  screen_plane_vao_.AddEBO(screen_plane_ebo_);
+
   LoadShader(ShaderType::kDefaultSprite, {"res/Shaders/DefaultSprite.vert", "res/Shaders/DefaultSprite.frag"});
   LoadShader(ShaderType::kTexturedSprite, {"res/Shaders/TexturedSprite.vert", "res/Shaders/TexturedSprite.frag"});
   LoadShader(ShaderType::kAnimatedSprite, {"res/Shaders/AnimatedSprite.vert", "res/Shaders/AnimatedSprite.frag"});
+  LoadShader(ShaderType::kColoredSprite, {"res/Shaders/ColoredSprite.vert", "res/Shaders/ColoredSprite.frag"});
 
   orthographic_projection_ = TransformComponent::OrthographicProjection2D(0, Window::kUnitsPerScreenX, 0, Window::kUnitsPerScreenY);
   orthographic_projection_.block<2, 1>(0, 2) += Vector2{1.0f, 1.0f}; // shift projection such that 0 0 is at the center

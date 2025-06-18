@@ -68,6 +68,8 @@ private:
 template<>
 inline void Shader::SetUniform<int>(const std::string &name, int t0) const noexcept
 {
+  ZoneScopedC(0xDD9B00);
+  
   Use();
   GAME_GL_CALL(glUniform1i(GetLocation(name), t0));
 }
@@ -75,6 +77,8 @@ inline void Shader::SetUniform<int>(const std::string &name, int t0) const noexc
 template<>
 inline void Shader::SetUniform<int>(const std::string &name, int t0, int t1) const noexcept
 {
+  ZoneScopedC(0xDD9B00);
+
   Use();
   GAME_GL_CALL(glUniform2i(GetLocation(name), t0, t1));
 }
@@ -89,6 +93,8 @@ inline void Shader::SetUniform<int>(const std::string &name, int t0, int t1, int
 template<>
 inline void Shader::SetUniform<int>(const std::string &name, int t0, int t1, int t2, int t3) const noexcept
 {
+  ZoneScopedC(0xDD9B00);
+
   Use();
   GAME_GL_CALL(glUniform4i(GetLocation(name), t0, t1, t2, t3));
 }
@@ -103,6 +109,8 @@ inline void Shader::SetUniform1v<int>(const std::string &name, int count, const 
 template<>
 inline void Shader::SetUniform2v<int>(const std::string &name, int count, const int *t) const noexcept
 {
+  ZoneScopedC(0xDD9B00);
+
   Use();
   GAME_GL_CALL(glUniform2iv(GetLocation(name), count, t));
 }
@@ -117,6 +125,8 @@ inline void Shader::SetUniform3v<int>(const std::string &name, int count, const 
 template<>
 inline void Shader::SetUniform4v<int>(const std::string &name, int count, const int *t) const noexcept
 {
+  ZoneScopedC(0xDD9B00);
+
   Use();
   GAME_GL_CALL(glUniform4iv(GetLocation(name), count, t));
 }
@@ -125,6 +135,8 @@ inline void Shader::SetUniform4v<int>(const std::string &name, int count, const 
 template<>
 inline void Shader::SetUniform<float>(const std::string &name, float t0) const noexcept
 {
+  ZoneScopedC(0xDD9B00);
+
   Use();
   GAME_GL_CALL(glUniform1f(GetLocation(name), t0));
 }
@@ -132,6 +144,8 @@ inline void Shader::SetUniform<float>(const std::string &name, float t0) const n
 template<>
 inline void Shader::SetUniform<float>(const std::string &name, float t0, float t1) const noexcept
 {
+  ZoneScopedC(0xDD9B00);
+
   Use();
   GAME_GL_CALL(glUniform2f(GetLocation(name), t0, t1));
 }
@@ -139,6 +153,8 @@ inline void Shader::SetUniform<float>(const std::string &name, float t0, float t
 template<>
 inline void Shader::SetUniform<float>(const std::string &name, float t0, float t1, float t2) const noexcept
 {
+  ZoneScopedC(0xDD9B00);
+
   Use();
   GAME_GL_CALL(glUniform3f(GetLocation(name), t0, t1, t2));
 }
@@ -146,6 +162,8 @@ inline void Shader::SetUniform<float>(const std::string &name, float t0, float t
 template<>
 inline void Shader::SetUniform<float>(const std::string &name, float t0, float t1, float t2, float t3) const noexcept
 {
+  ZoneScopedC(0xDD9B00);
+
   Use();
   GAME_GL_CALL(glUniform4f(GetLocation(name), t0, t1, t2, t3));
 }
@@ -153,6 +171,8 @@ inline void Shader::SetUniform<float>(const std::string &name, float t0, float t
 template<>
 inline void Shader::SetUniform1v<float>(const std::string &name, int count, const float *t) const noexcept
 {
+  ZoneScopedC(0xDD9B00);
+
   Use();
   GAME_GL_CALL(glUniform1fv(GetLocation(name), count, t));
 }
@@ -160,6 +180,8 @@ inline void Shader::SetUniform1v<float>(const std::string &name, int count, cons
 template<>
 inline void Shader::SetUniform2v<float>(const std::string &name, int count, const float *t) const noexcept
 {
+  ZoneScopedC(0xDD9B00);
+
   Use();
   GAME_GL_CALL(glUniform2fv(GetLocation(name), count, t));
 }
@@ -167,6 +189,8 @@ inline void Shader::SetUniform2v<float>(const std::string &name, int count, cons
 template<>
 inline void Shader::SetUniform3v<float>(const std::string &name, int count, const float *t) const noexcept
 {
+  ZoneScopedC(0xDD9B00);
+
   Use();
   GAME_GL_CALL(glUniform3fv(GetLocation(name), count, t));
 }
@@ -174,6 +198,8 @@ inline void Shader::SetUniform3v<float>(const std::string &name, int count, cons
 template<>
 inline void Shader::SetUniform4v<float>(const std::string &name, int count, const float *t) const noexcept
 {
+  ZoneScopedC(0xDD9B00);
+
   Use();
   GAME_GL_CALL(glUniform4fv(GetLocation(name), count, t));
 }
@@ -182,6 +208,8 @@ inline void Shader::SetUniform4v<float>(const std::string &name, int count, cons
 template<>
 inline void Shader::SetUniform<uint32_t>(const std::string &name, uint32_t t0) const noexcept
 {
+  ZoneScopedC(0xDD9B00);
+
   Use();
   GAME_GL_CALL(glUniform1ui(GetLocation(name), t0));
 }
@@ -189,6 +217,8 @@ inline void Shader::SetUniform<uint32_t>(const std::string &name, uint32_t t0) c
 template<>
 inline void Shader::SetUniform<uint32_t>(const std::string &name, uint32_t t0, uint32_t t1) const noexcept
 {
+  ZoneScopedC(0xDD9B00);
+
   Use();
   GAME_GL_CALL(glUniform2ui(GetLocation(name), t0, t1));
 }
@@ -196,6 +226,8 @@ inline void Shader::SetUniform<uint32_t>(const std::string &name, uint32_t t0, u
 template<>
 inline void Shader::SetUniform<uint32_t>(const std::string &name, uint32_t t0, uint32_t t1, uint32_t t2) const noexcept
 {
+  ZoneScopedC(0xDD9B00);
+
   Use();
   GAME_GL_CALL(glUniform3ui(GetLocation(name), t0, t1, t2));
 }
@@ -203,6 +235,8 @@ inline void Shader::SetUniform<uint32_t>(const std::string &name, uint32_t t0, u
 template<>
 inline void Shader::SetUniform<uint32_t>(const std::string &name, uint32_t t0, uint32_t t1, uint32_t t2, uint32_t t3) const noexcept
 {
+  ZoneScopedC(0xDD9B00);
+
   Use();
   GAME_GL_CALL(glUniform4ui(GetLocation(name), t0, t1, t2, t3));
 }
@@ -210,6 +244,8 @@ inline void Shader::SetUniform<uint32_t>(const std::string &name, uint32_t t0, u
 template<>
 inline void Shader::SetUniform1v<uint32_t>(const std::string &name, int count, const uint32_t *t) const noexcept
 {
+  ZoneScopedC(0xDD9B00);
+
   Use();
   GAME_GL_CALL(glUniform1uiv(GetLocation(name), count, t));
 }
@@ -217,6 +253,8 @@ inline void Shader::SetUniform1v<uint32_t>(const std::string &name, int count, c
 template<>
 inline void Shader::SetUniform2v<uint32_t>(const std::string &name, int count, const uint32_t *t) const noexcept
 {
+  ZoneScopedC(0xDD9B00);
+
   Use();
   GAME_GL_CALL(glUniform2uiv(GetLocation(name), count, t));
 }
@@ -224,6 +262,8 @@ inline void Shader::SetUniform2v<uint32_t>(const std::string &name, int count, c
 template<>
 inline void Shader::SetUniform3v<uint32_t>(const std::string &name, int count, const uint32_t *t) const noexcept
 {
+  ZoneScopedC(0xDD9B00);
+
   Use();
   GAME_GL_CALL(glUniform3uiv(GetLocation(name), count, t));
 }
@@ -231,12 +271,16 @@ inline void Shader::SetUniform3v<uint32_t>(const std::string &name, int count, c
 template<>
 inline void Shader::SetUniform4v<uint32_t>(const std::string &name, int count, const uint32_t *t) const noexcept
 {
+  ZoneScopedC(0xDD9B00);
+
   Use();
   GAME_GL_CALL(glUniform4uiv(GetLocation(name), count, t));
 }
 
 inline auto Shader::GetLocation(const std::string &name) const noexcept -> int
 {
+  ZoneScopedC(0xDD9B00);
+
   int result;
   GAME_GL_CALL(result = glGetUniformLocation(id_, name.c_str()));
   GAME_LOG_IF(result == -1, LogType::kError) << '\'' << name << '\'' << " does not correspond to an active uniform variable in program, name starts with the reserved prefix gl_, or name is associated with an atomic counter or a named uniform block.";

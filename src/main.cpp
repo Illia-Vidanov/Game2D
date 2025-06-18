@@ -1,8 +1,12 @@
 /*
 Todo:
 - Background
-- Delta time / limit fps
 - TODO in Enum
+- Save uniform locations
+- Cache uniform values
+- Saving
+- Outlining
+- Camera code
 */
 #include "Setup.hpp"
 

@@ -42,4 +42,19 @@ Texture::Texture(const TextureDefinition &texture_definition) noexcept
     break;
   }
 }
+
+void Texture::UnbindAll() noexcept
+{
+  GAME_GL_CALL(glBindTexture(GL_TEXTURE_1D, 0));
+  GAME_GL_CALL(glBindTexture(GL_TEXTURE_2D, 0));
+  GAME_GL_CALL(glBindTexture(GL_TEXTURE_3D, 0));
+  GAME_GL_CALL(glBindTexture(GL_TEXTURE_1D_ARRAY, 0));
+  GAME_GL_CALL(glBindTexture(GL_TEXTURE_2D_ARRAY, 0));
+  GAME_GL_CALL(glBindTexture(GL_TEXTURE_RECTANGLE, 0));
+  GAME_GL_CALL(glBindTexture(GL_TEXTURE_CUBE_MAP, 0));
+  GAME_GL_CALL(glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, 0));
+  GAME_GL_CALL(glBindTexture(GL_TEXTURE_BUFFER, 0));
+  GAME_GL_CALL(glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0));
+  GAME_GL_CALL(glBindTexture(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, 0));
+}
 } // game

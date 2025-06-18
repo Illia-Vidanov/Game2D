@@ -22,6 +22,7 @@ enum class ShaderType : uint32_t
   kDefaultSprite = 0,
   kTexturedSprite,
   kAnimatedSprite,
+  kColoredSprite,
 };
 
 enum class TextureType : uint32_t
@@ -54,6 +55,8 @@ public:
   
   [[nodiscard]] auto GetSpriteIndexCount() -> Index { return sprite_ebo_.GetCount(); }
   void BindSpriteVAO() { sprite_vao_.Bind(); }
+  [[nodiscard]] auto GetScreenPlaneIndexCount() -> Index { return screen_plane_ebo_.GetCount(); }
+  void BindScreenPlaneVAO() { screen_plane_vao_.Bind(); }
   [[nodiscard]] auto GetOrthographicProjection() const noexcept -> Matrix3 { return orthographic_projection_; }
   
   
@@ -66,6 +69,9 @@ public:
   VBO sprite_vbo_;
   EBO sprite_ebo_;
   VAO sprite_vao_;
+  VBO screen_plane_vbo_;
+  EBO screen_plane_ebo_;
+  VAO screen_plane_vao_;
   Matrix3 orthographic_projection_;
   
   Game &game_;

@@ -32,6 +32,7 @@ using namespace std::chrono_literals;
 #include <locale>
 #include <bitset>
 #include <filesystem>
+#include <any>
 
 // std windows
 #include <windows.h>
@@ -98,7 +99,8 @@ using NotNull = T;
   #define GAME_ASSERT_STD(...) GAME_ASSERT_STD_CHOOSER(, ##__VA_ARGS__, GAME_ASSERT_STD_MESSAGE, GAME_ASSERT_STD_NO_MESSAGE, sstatic_assert(false, "Wrong number of arguments"))(__VA_ARGS__)
   // Remove line on build
   #define GAME_DEBUG_LINE(command) do { command; } while(0)
-#endif
-
+  #endif
+  
+#define GAME_MEASURE_TIME(command) do { ZoneScopedNC(#command, 0xbf39f4); command; } while(0)
 
 #endif // GAME_SETUP_HPP

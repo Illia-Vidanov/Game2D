@@ -14,6 +14,7 @@
 #include "Player/InputSystem.hpp"
 #include "Player/Camera.hpp"
 #include "Physics/PhysicsSystem.hpp"
+#include "Core/Entity.hpp"
 
 
 namespace game
@@ -52,8 +53,10 @@ public:
   [[nodiscard]] constexpr auto GetResourceManager() const noexcept -> const ResourceManager & { return resource_manager_; }
   [[nodiscard]] constexpr auto GetDeltaTime() const noexcept -> std::chrono::duration<double> { return delta_time_; }
   [[nodiscard]] constexpr auto GetFixedDeltaTime() const noexcept -> std::chrono::duration<double> { return fixed_delta_time_; }
-  [[nodiscard]] constexpr auto GetEntity(const std::string &name) noexcept -> Entity & { return entities_.at(name); }
-  [[nodiscard]] constexpr auto GetEntity(const std::string &name) const noexcept -> const Entity & { return entities_.at(name); }
+  [[nodiscard]] auto GetEntity(const std::string &name) noexcept -> Entity & { return entities_.at(name); }
+  [[nodiscard]] auto GetEntity(const std::string &name) const noexcept -> const Entity & { return entities_.at(name); }
+
+  auto CreateEntity(const std::string &name) noexcept -> Entity & { GAME_ASSERT(entities_.find(name) == entities_.end()); return (*entities_.emplace(name, Entity{*this}).first).second; }
 
 private:
   auto QuitEvent() noexcept -> bool;
@@ -83,5 +86,7 @@ private:
   std::chrono::time_point<std::chrono::high_resolution_clock> frame_start_;
 };
 } // game
+
+#include "Core/Entity.tpp"
 
 #endif // GAME_GAME_HPP

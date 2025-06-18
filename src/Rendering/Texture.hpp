@@ -34,6 +34,8 @@ public:
   void Bind() const noexcept { GAME_GL_CALL(glBindTexture(type_, id_)); }
   void Unbind() const noexcept { GAME_GL_CALL(glBindTexture(type_, 0)); }
 
+  static void UnbindAll() noexcept;
+
 private:
   const uint32_t type_;
   uint32_t id_ = 0;

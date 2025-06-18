@@ -5,6 +5,7 @@
 #include "Core/Game.hpp"
 #include "Core/EventSystem.hpp"
 #include "Utils/Logger.hpp"
+#include "Rendering/OutlineComponent.hpp"
 
 
 namespace game
@@ -44,8 +45,7 @@ void UI::Update() noexcept
   if(ImGui::Begin("Debug"))
   {
     ImGui::SetWindowPos(ImVec2{10 * scale_multiplier_.x(), 10 * scale_multiplier_.y()}, ImGuiCond_Once);
-
-    ImGui::Text("This is some useful text.");
+    ImGui::SetWindowSize(ImVec2{20 * scale_multiplier_.x(), 10 * scale_multiplier_.y()}, ImGuiCond_Once);
 
     if(window_resized_)
       UpdateWindow();

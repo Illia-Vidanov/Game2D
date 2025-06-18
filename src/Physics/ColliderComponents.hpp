@@ -15,7 +15,7 @@ class Entity;
 class RectangleColliderComponent
 {
 public:
-  RectangleColliderComponent(Entity &entity) noexcept;
+  RectangleColliderComponent(Entity *entity) noexcept;
   ~RectangleColliderComponent() noexcept;
 
   [[nodiscard]] constexpr auto GetHalfSize() const noexcept -> const Vector2 & { return half_size_; }
@@ -32,7 +32,7 @@ public:
   void Updateb2() const noexcept;
   
 private:
-  Entity &entity_;
+  Entity *entity_;
 
   b2ShapeId shape_id_;
   Vector2 half_size_ = Vector2{0.5f, 0.5f};

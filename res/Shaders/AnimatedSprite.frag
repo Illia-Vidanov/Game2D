@@ -9,5 +9,9 @@ uniform float atlas_step;
 
 void main()
 {
-  color = texture(image, (texture_coordinates + sprite_index) * atlas_step);
+  vec4 texture_color = texture(image, (texture_coordinates + sprite_index) * atlas_step);
+  // Test for outlining
+  if(texture_color.a == 0.0)
+    discard;
+  color = texture_color;
 }
