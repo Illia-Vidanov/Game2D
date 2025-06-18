@@ -71,13 +71,13 @@ class TexturedSpriteData : public SpriteDataBase
 public:
   [[nodiscard]] virtual auto GetCopy() const noexcept -> Owner<SpriteDataBase*> override { return new TexturedSpriteData{*this}; }
 
-  constexpr void SetShader(const Shader *shader) noexcept { shader_ = shader; }
-  [[nodiscard]] auto GetShader() const noexcept -> const Shader & { GAME_ASSERT(shader_ != nullptr); return *shader_; }
+  constexpr void SetShader(Shader *shader) noexcept { shader_ = shader; }
+  [[nodiscard]] auto GetShader() noexcept -> Shader & { GAME_ASSERT(shader_ != nullptr); return *shader_; }
   constexpr void SetTexture(const Texture *texture) noexcept { texture_ = texture; }
   [[nodiscard]] auto GetTexture() const noexcept -> const Texture & { GAME_ASSERT(texture_ != nullptr); return *texture_; }
 
 private:
-  const Shader *shader_ = nullptr;
+  Shader *shader_ = nullptr;
   const Texture *texture_ = nullptr;
 };
 
@@ -92,15 +92,15 @@ public:
   // Atlas step is 1 / max(width, height)
   constexpr void SetAtlasStep(const DefaultFloatType &atlas_step) noexcept { atlas_step_ = atlas_step; }
   [[nodiscard]] auto GetAtlasStep() const noexcept -> DefaultFloatType { return atlas_step_; }
-  constexpr void SetShader(const Shader *shader) noexcept { shader_ = shader; }
-  [[nodiscard]] auto GetShader() const noexcept -> const Shader & { GAME_ASSERT(shader_ != nullptr); return *shader_; }
+  constexpr void SetShader(Shader *shader) noexcept { shader_ = shader; }
+  [[nodiscard]] auto GetShader() noexcept -> Shader & { GAME_ASSERT(shader_ != nullptr); return *shader_; }
   constexpr void SetTexture(const Texture *texture) noexcept { texture_ = texture; }
   [[nodiscard]] auto GetTexture() const noexcept -> const Texture & { GAME_ASSERT(texture_ != nullptr); return *texture_; }
 
 private:
   Vector2i sprite_index_ = Vector2i::Zero();
   DefaultFloatType atlas_step_ = 1;
-  const Shader *shader_ = nullptr;
+  Shader *shader_ = nullptr;
   const Texture *texture_ = nullptr;
 };
 } // game

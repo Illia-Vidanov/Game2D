@@ -52,6 +52,10 @@ RenderSystem::RenderSystem(Game &game) noexcept
   GAME_GL_CALL(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
   GAME_GL_CALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
+  GAME_GL_CALL(glEnable(GL_STENCIL_TEST));
+  GAME_GL_CALL(glClearStencil(0));
+  GAME_GL_CALL(glDisable(GL_STENCIL_TEST));
+
   game_.GetEventSystem().AddListener(event_cleaner_, EventType::kWindowResize, this, [](const Event &event, void *render_system) -> bool { return reinterpret_cast<RenderSystem*>(render_system)->WindowResizeEvent(event); });
 }
 
@@ -116,56 +120,52 @@ void RenderSystem::DrawSprites() noexcept
     return lhs.GetLayer() < rhs.GetLayer();
   });
 
-  const Shader &kColoredSpriteShader = game_.GetResourceManager().GetShader(ShaderType::kColoredSprite);
   const Matrix3 view_projection_matrix = game_.GetResourceManager().GetOrthographicProjection() * game_.GetCamera().GetViewMatrix().inverse();
 
   entt::view<entt::get_t<SpriteComponent>> sprites = game_.GetRegistry().view<SpriteComponent>();
   for(entt::entity entity : sprites)
   {
+    ZoneScopedNC("Draw entity", 0x07dbd4);
+    ZoneValue(static_cast<entt::id_type>(entity));
+
     SpriteComponent &sprite = sprites.get<SpriteComponent>(entity);
+    TransformComponent &transform = game_.GetRegistry().get<TransformComponent>(entity);
+    OutlineComponent *outline = game_.GetRegistry().try_get<OutlineComponent>(entity);
     
     switch(sprite.GetType())
     {
     case SpriteType::kDefault:
     {
-      static const Shader &kDefaultSpriteShader = game_.GetResourceManager().GetShader(ShaderType::kDefaultSprite);
-      
-      TransformComponent &transform = game_.GetRegistry().get<TransformComponent>(entity);
-      OutlineComponent *outline = game_.GetRegistry().try_get<OutlineComponent>(entity);
+      static Shader &kDefaultSpriteShader = game_.GetResourceManager().GetShader(ShaderType::kDefaultSprite);
 
       if(outline && outline->GetWidth() > 0.0f)
       {
-        GAME_GL_CALL(glEnable(GL_STENCIL_TEST));
-        GAME_GL_CALL(glClearStencil(0));
-        GAME_GL_CALL(glClear(GL_STENCIL_BUFFER_BIT));
-        GAME_GL_CALL(glStencilFunc(GL_ALWAYS, 1, 0xFF));
-        GAME_GL_CALL(glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE));
-        GAME_GL_CALL(glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE));
+        InitializeOutline();
         
         kDefaultSpriteShader.Use();
         transform.SetScale(Vector2(transform.GetScale().x() + outline->GetWidth() * 2, transform.GetScale().y() + outline->GetWidth() * 2));
         kDefaultSpriteShader.SetUniformMatrix3("mvp", 1, false, Matrix3{view_projection_matrix * transform.matrix()}.data());
-
+        
         game_.GetResourceManager().BindSpriteVAO();
         GAME_GL_CALL(glDrawElements(GL_TRIANGLES, game_.GetResourceManager().GetSpriteIndexCount(), GL_UNSIGNED_INT, 0));
+
+        transform.SetScale(Vector2(transform.GetScale().x() - outline->GetWidth() * 2, transform.GetScale().y() - outline->GetWidth() * 2));
+        kDefaultSpriteShader.SetUniformMatrix3("mvp", 1, false, Matrix3{view_projection_matrix * transform.matrix()}.data());
 
         GAME_GL_CALL(glStencilFunc(GL_EQUAL, 1, 0xFF));
         GAME_GL_CALL(glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE));
         
-        kColoredSpriteShader.Use();
-        kColoredSpriteShader.SetUniform4v("u_color", 1, outline->GetColor().data());
-        kColoredSpriteShader.SetUniformMatrix3("mvp", 1, false, Matrix3{Matrix3::Identity()}.data());
-
-        game_.GetResourceManager().BindScreenPlaneVAO();
-        GAME_GL_CALL(glDrawElements(GL_TRIANGLES, game_.GetResourceManager().GetSpriteIndexCount(), GL_UNSIGNED_INT, 0));
+        DrawColoredScreenQuad(outline->GetColor());
 
         GAME_GL_CALL(glDisable(GL_STENCIL_TEST));
 
-        transform.SetScale(Vector2(transform.GetScale().x() - outline->GetWidth() * 2, transform.GetScale().y() - outline->GetWidth() * 2));
+        kDefaultSpriteShader.Use();
       }
-
-      kDefaultSpriteShader.Use();
-      kDefaultSpriteShader.SetUniformMatrix3("mvp", 1, false, Matrix3{view_projection_matrix * transform.matrix()}.data());
+      else
+      {
+        kDefaultSpriteShader.Use();
+        kDefaultSpriteShader.SetUniformMatrix3("mvp", 1, false, Matrix3{view_projection_matrix * transform.matrix()}.data());
+      }
 
       game_.GetResourceManager().BindSpriteVAO();
       GAME_GL_CALL(glDrawElements(GL_TRIANGLES, game_.GetResourceManager().GetSpriteIndexCount(), GL_UNSIGNED_INT, 0));
@@ -180,43 +180,35 @@ void RenderSystem::DrawSprites() noexcept
       GAME_GL_CALL(glActiveTexture(GL_TEXTURE0));
       sprite_data->GetTexture().Bind();
 
-      TransformComponent &transform = game_.GetRegistry().get<TransformComponent>(entity);
-      OutlineComponent *outline = game_.GetRegistry().try_get<OutlineComponent>(entity);
-
       if(outline && outline->GetWidth() > 0.0f)
       {
-        GAME_GL_CALL(glEnable(GL_STENCIL_TEST));
-        GAME_GL_CALL(glClearStencil(0));
-        GAME_GL_CALL(glClear(GL_STENCIL_BUFFER_BIT));
-        GAME_GL_CALL(glStencilFunc(GL_ALWAYS, 1, 0xFF));
-        GAME_GL_CALL(glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE));
-        GAME_GL_CALL(glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE));
+        InitializeOutline();
         
         sprite_data->GetShader().Use();
         transform.SetScale(Vector2(transform.GetScale().x() + outline->GetWidth() * 2, transform.GetScale().y() + outline->GetWidth() * 2));
         sprite_data->GetShader().SetUniformMatrix3("mvp", 1, false, Matrix3{view_projection_matrix * transform.matrix()}.data());
-
+        
         game_.GetResourceManager().BindSpriteVAO();
         GAME_GL_CALL(glDrawElements(GL_TRIANGLES, game_.GetResourceManager().GetSpriteIndexCount(), GL_UNSIGNED_INT, 0));
 
+        transform.SetScale(Vector2(transform.GetScale().x() - outline->GetWidth() * 2, transform.GetScale().y() - outline->GetWidth() * 2));
+        sprite_data->GetShader().SetUniformMatrix3("mvp", 1, false, Matrix3{view_projection_matrix * transform.matrix()}.data());
+        
         GAME_GL_CALL(glStencilFunc(GL_EQUAL, 1, 0xFF));
         GAME_GL_CALL(glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE));
         
-        kColoredSpriteShader.Use();
-        kColoredSpriteShader.SetUniform4v("u_color", 1, outline->GetColor().data());
-        kColoredSpriteShader.SetUniformMatrix3("mvp", 1, false, Matrix3{Matrix3::Identity()}.data());
-
-        game_.GetResourceManager().BindScreenPlaneVAO();
-        GAME_GL_CALL(glDrawElements(GL_TRIANGLES, game_.GetResourceManager().GetSpriteIndexCount(), GL_UNSIGNED_INT, 0));
+        DrawColoredScreenQuad(outline->GetColor());
 
         GAME_GL_CALL(glDisable(GL_STENCIL_TEST));
 
-        transform.SetScale(Vector2(transform.GetScale().x() - outline->GetWidth() * 2, transform.GetScale().y() - outline->GetWidth() * 2));
+        sprite_data->GetShader().Use();
+      }
+      else
+      {
+        sprite_data->GetShader().Use();
+        sprite_data->GetShader().SetUniformMatrix3("mvp", 1, false, Matrix3{view_projection_matrix * transform.matrix()}.data());
       }
       
-      sprite_data->GetShader().Use();
-      sprite_data->GetShader().SetUniformMatrix3("mvp", 1, false, Matrix3{view_projection_matrix * transform.matrix()}.data());
-
       game_.GetResourceManager().BindSpriteVAO();
       GAME_GL_CALL(glDrawElements(GL_TRIANGLES, game_.GetResourceManager().GetSpriteIndexCount(), GL_UNSIGNED_INT, 0));
 
@@ -231,44 +223,39 @@ void RenderSystem::DrawSprites() noexcept
       GAME_GL_CALL(glActiveTexture(GL_TEXTURE0));
       sprite_data->GetTexture().Bind();
 
-      TransformComponent &transform = game_.GetRegistry().get<TransformComponent>(entity);
-      OutlineComponent *outline = game_.GetRegistry().try_get<OutlineComponent>(entity);
-
       if(outline && outline->GetWidth() > 0.0f)
       {
-        GAME_GL_CALL(glEnable(GL_STENCIL_TEST));
-        GAME_GL_CALL(glClearStencil(0));
-        GAME_GL_CALL(glClear(GL_STENCIL_BUFFER_BIT));
-        GAME_GL_CALL(glStencilFunc(GL_ALWAYS, 1, 0xFF));
-        GAME_GL_CALL(glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE));
-        GAME_GL_CALL(glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE));
-        
+        InitializeOutline();
+
         sprite_data->GetShader().Use();
-        transform.SetScale(Vector2(transform.GetScale().x() + outline->GetWidth() * 2, transform.GetScale().y() + outline->GetWidth() * 2));
-        sprite_data->GetShader().SetUniformMatrix3("mvp", 1, false, Matrix3{view_projection_matrix * transform.matrix()}.data());
         sprite_data->GetShader().SetUniform("sprite_index", sprite_data->GetSpriteIndex().x(), sprite_data->GetSpriteIndex().y());
         sprite_data->GetShader().SetUniform("atlas_step", sprite_data->GetAtlasStep());
 
+        transform.SetScale(Vector2(transform.GetScale().x() + outline->GetWidth() * 2, transform.GetScale().y() + outline->GetWidth() * 2));
+        sprite_data->GetShader().SetUniformMatrix3("mvp", 1, false, Matrix3{view_projection_matrix * transform.matrix()}.data());
+        
         game_.GetResourceManager().BindSpriteVAO();
         GAME_GL_CALL(glDrawElements(GL_TRIANGLES, game_.GetResourceManager().GetSpriteIndexCount(), GL_UNSIGNED_INT, 0));
 
+        transform.SetScale(Vector2(transform.GetScale().x() - outline->GetWidth() * 2, transform.GetScale().y() - outline->GetWidth() * 2));
+        sprite_data->GetShader().SetUniformMatrix3("mvp", 1, false, Matrix3{view_projection_matrix * transform.matrix()}.data());
+
         GAME_GL_CALL(glStencilFunc(GL_EQUAL, 1, 0xFF));
         GAME_GL_CALL(glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE));
-        
-        kColoredSpriteShader.Use();
-        kColoredSpriteShader.SetUniform4v("u_color", 1, outline->GetColor().data());
-        kColoredSpriteShader.SetUniformMatrix3("mvp", 1, false, Matrix3{Matrix3::Identity()}.data());
 
-        game_.GetResourceManager().BindScreenPlaneVAO();
-        GAME_GL_CALL(glDrawElements(GL_TRIANGLES, game_.GetResourceManager().GetSpriteIndexCount(), GL_UNSIGNED_INT, 0));
+        DrawColoredScreenQuad(outline->GetColor());
 
         GAME_GL_CALL(glDisable(GL_STENCIL_TEST));
 
-        transform.SetScale(Vector2(transform.GetScale().x() - outline->GetWidth() * 2, transform.GetScale().y() - outline->GetWidth() * 2));
+        sprite_data->GetShader().Use();
       }
-
-      sprite_data->GetShader().Use();
-      sprite_data->GetShader().SetUniformMatrix3("mvp", 1, false, Matrix3{view_projection_matrix * transform.matrix()}.data());
+      else
+      {
+        sprite_data->GetShader().Use();
+        sprite_data->GetShader().SetUniformMatrix3("mvp", 1, false, Matrix3{view_projection_matrix * transform.matrix()}.data());
+        sprite_data->GetShader().SetUniform("sprite_index", sprite_data->GetSpriteIndex().x(), sprite_data->GetSpriteIndex().y());
+        sprite_data->GetShader().SetUniform("atlas_step", sprite_data->GetAtlasStep());
+      }
 
       game_.GetResourceManager().BindSpriteVAO();
       GAME_GL_CALL(glDrawElements(GL_TRIANGLES, game_.GetResourceManager().GetSpriteIndexCount(), GL_UNSIGNED_INT, 0));
@@ -280,6 +267,27 @@ void RenderSystem::DrawSprites() noexcept
       GAME_ASSERT(false) << "Unhandled SpriteType";
     }
   }
+}
+
+void RenderSystem::DrawColoredScreenQuad(const Vector4 &color) noexcept
+{
+  static Shader &kColoredSpriteShader = game_.GetResourceManager().GetShader(ShaderType::kColoredSprite);
+
+  kColoredSpriteShader.Use();
+  kColoredSpriteShader.SetUniform4v("u_color", 1, color.data());
+  kColoredSpriteShader.SetUniformMatrix3("mvp", 1, false, Matrix3{Matrix3::Identity()}.data());
+
+  game_.GetResourceManager().BindScreenPlaneVAO();
+  GAME_GL_CALL(glDrawElements(GL_TRIANGLES, game_.GetResourceManager().GetSpriteIndexCount(), GL_UNSIGNED_INT, 0));
+}
+
+void RenderSystem::InitializeOutline() noexcept
+{
+  GAME_GL_CALL(glEnable(GL_STENCIL_TEST));
+  GAME_GL_CALL(glClear(GL_STENCIL_BUFFER_BIT));
+  GAME_GL_CALL(glStencilFunc(GL_ALWAYS, 1, 0xFF));
+  GAME_GL_CALL(glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE));
+  GAME_GL_CALL(glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE));
 }
 
 void RenderSystem::DrawUI() noexcept

@@ -16,6 +16,8 @@ UI::UI(Game &game) noexcept
   , global_scale_{static_cast<DefaultFloatType>(game_.GetWindow().kUnitsPerScreenX) / static_cast<DefaultFloatType>(game_.GetWindow().GetWidth()), static_cast<DefaultFloatType>(game_.GetWindow().kUnitsPerScreenY) / static_cast<DefaultFloatType>(game_.GetWindow().GetHeight())}
   , scale_multiplier_{global_scale_}
 {
+  ZoneScopedC(0xa5bfc7);
+
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImGuiIO& io = ImGui::GetIO();
@@ -31,6 +33,8 @@ UI::UI(Game &game) noexcept
 
 UI::~UI() noexcept
 {
+  ZoneScopedC(0xa5bfc7);
+
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplSDL2_Shutdown();
   ImGui::DestroyContext();
@@ -38,6 +42,8 @@ UI::~UI() noexcept
 
 void UI::Update() noexcept
 {
+  ZoneScopedC(0xa5bfc7);
+
   ImGui_ImplOpenGL3_NewFrame();
   ImGui_ImplSDL2_NewFrame();
   ImGui::NewFrame();
@@ -59,6 +65,8 @@ void UI::Update() noexcept
 
 auto UI::WindowResizeEvent(const Event &event) noexcept -> bool
 {
+  ZoneScopedC(0xa5bfc7);
+
   window_resized_ = true;
   Vector2 last_global_scale = global_scale_;
   global_scale_ = Vector2{static_cast<DefaultFloatType>(game_.GetWindow().kUnitsPerScreenX) / static_cast<DefaultFloatType>(game_.GetWindow().GetWidth()), static_cast<DefaultFloatType>(game_.GetWindow().kUnitsPerScreenY) / static_cast<DefaultFloatType>(game_.GetWindow().GetHeight())};
@@ -69,6 +77,8 @@ auto UI::WindowResizeEvent(const Event &event) noexcept -> bool
 
 void UI::UpdateWindow() const noexcept
 {
+  ZoneScopedC(0xa5bfc7);
+
   ImVec2 position = ImGui::GetWindowPos();
   ImGui::SetWindowPos(ImVec2{position.x * scale_multiplier_.x(), position.y * scale_multiplier_.y()});
   ImVec2 size = ImGui::GetWindowSize();

@@ -2,8 +2,7 @@
 Todo:
 - Background
 - TODO in Enum
-- Save uniform locations
-- Cache uniform values
+- Profile and cache uniform values
 - Saving
 - Camera code
 - Postprocessing

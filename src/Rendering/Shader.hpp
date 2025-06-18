@@ -21,33 +21,36 @@ public:
 
   void Use() const noexcept { GAME_GL_CALL(glUseProgram(id_)); }
   
-  [[nodiscard]] auto HasUniform(const std::string &name) const noexcept -> bool { int result; GAME_GL_CALL(result = glGetUniformLocation(id_, name.c_str())); return result != -1; }
-  template<typename T> constexpr void SetUniform(const std::string &name, T t0) const noexcept { GAME_ASSERT_STD(false, "No overload with such parametrs exists"); }
-  template<typename T> constexpr void SetUniform(const std::string &name, T t0, T t1) const noexcept { GAME_ASSERT_STD(false, "No overload with such parametrs exists"); }
-  template<typename T> constexpr void SetUniform(const std::string &name, T t0, T t1, T t2) const noexcept { GAME_ASSERT_STD(false, "No overload with such parametrs exists"); }
-  template<typename T> constexpr void SetUniform(const std::string &name, T t0, T t1, T t2, T t3) const noexcept { GAME_ASSERT_STD(false, "No overload with such parametrs exists"); }
-  template<typename T> constexpr void SetUniform1v(const std::string &name, int count, const T *t) const noexcept { GAME_ASSERT_STD(false, "No overload with such parametrs exists"); }
-  template<typename T> constexpr void SetUniform2v(const std::string &name, int count, const T *t) const noexcept { GAME_ASSERT_STD(false, "No overload with such parametrs exists"); }
-  template<typename T> constexpr void SetUniform3v(const std::string &name, int count, const T *t) const noexcept { GAME_ASSERT_STD(false, "No overload with such parametrs exists"); }
-  template<typename T> constexpr void SetUniform4v(const std::string &name, int count, const T *t) const noexcept { GAME_ASSERT_STD(false, "No overload with such parametrs exists"); }
-  void SetUniformMatrix2(const std::string &name, int count, bool transpose, const float *t) const noexcept { Use(); GAME_GL_CALL(glUniformMatrix2fv(GetLocation(name), count, transpose, t)); }
-  void SetUniformMatrix3(const std::string &name, int count, bool transpose, const float *t) const noexcept { Use(); GAME_GL_CALL(glUniformMatrix3fv(GetLocation(name), count, transpose, t)); }
-  void SetUniformMatrix4(const std::string &name, int count, bool transpose, const float *t) const noexcept { Use(); GAME_GL_CALL(glUniformMatrix4fv(GetLocation(name), count, transpose, t)); }
-  void SetUniformMatrix2x3(const std::string &name, int count, bool transpose, const float *t) const noexcept { Use(); GAME_GL_CALL(glUniformMatrix2x3fv(GetLocation(name), count, transpose, t)); }
-  void SetUniformMatrix3x2(const std::string &name, int count, bool transpose, const float *t) const noexcept { Use(); GAME_GL_CALL(glUniformMatrix3x2fv(GetLocation(name), count, transpose, t)); }
-  void SetUniformMatrix2x4(const std::string &name, int count, bool transpose, const float *t) const noexcept { Use(); GAME_GL_CALL(glUniformMatrix2x4fv(GetLocation(name), count, transpose, t)); }
-  void SetUniformMatrix4x2(const std::string &name, int count, bool transpose, const float *t) const noexcept { Use(); GAME_GL_CALL(glUniformMatrix4x2fv(GetLocation(name), count, transpose, t)); }
-  void SetUniformMatrix3x4(const std::string &name, int count, bool transpose, const float *t) const noexcept { Use(); GAME_GL_CALL(glUniformMatrix3x4fv(GetLocation(name), count, transpose, t)); }
-  void SetUniformMatrix4x3(const std::string &name, int count, bool transpose, const float *t) const noexcept { Use(); GAME_GL_CALL(glUniformMatrix4x3fv(GetLocation(name), count, transpose, t)); }
+  [[nodiscard]] auto HasUniform(const std::string &name) const noexcept -> bool { return locations_.find(name) != locations_.end(); }
+  template<typename T> void SetUniform(const std::string &name, const T t0) noexcept { GAME_ASSERT(false) << "No overload with such parametrs exists"; }
+  template<typename T> void SetUniform(const std::string &name, const T t0, const T t1) noexcept { GAME_ASSERT(false) << "No overload with such parametrs exists"; }
+  template<typename T> void SetUniform(const std::string &name, const T t0, const T t1, const T t2) noexcept { GAME_ASSERT(false) << "No overload with such parametrs exists"; }
+  template<typename T> void SetUniform(const std::string &name, const T t0, const T t1, const T t2, const T t3) noexcept { GAME_ASSERT(false) << "No overload with such parametrs exists"; }
+  template<typename T> void SetUniform1v(const std::string &name, const int count, const T *t) noexcept { GAME_ASSERT(false) << "No overload with such parametrs exists"; }
+  template<typename T> void SetUniform2v(const std::string &name, const int count, const T *t) noexcept { GAME_ASSERT(false) << "No overload with such parametrs exists"; }
+  template<typename T> void SetUniform3v(const std::string &name, const int count, const T *t) noexcept { GAME_ASSERT(false) << "No overload with such parametrs exists"; }
+  template<typename T> void SetUniform4v(const std::string &name, const int count, const T *t) noexcept { GAME_ASSERT(false) << "No overload with such parametrs exists"; }
+  void SetUniformMatrix2(const std::string &name, const int count, const bool transpose, const float *t) noexcept;
+  void SetUniformMatrix3(const std::string &name, const int count, const bool transpose, const float *t) noexcept;
+  void SetUniformMatrix4(const std::string &name, const int count, const bool transpose, const float *t) noexcept;
+  void SetUniformMatrix2x3(const std::string &name, const int count, const bool transpose, const float *t) noexcept;
+  void SetUniformMatrix3x2(const std::string &name, const int count, const bool transpose, const float *t) noexcept;
+  void SetUniformMatrix2x4(const std::string &name, const int count, const bool transpose, const float *t) noexcept;
+  void SetUniformMatrix4x2(const std::string &name, const int count, const bool transpose, const float *t) noexcept;
+  void SetUniformMatrix3x4(const std::string &name, const int count, const bool transpose, const float *t) noexcept;
+  void SetUniformMatrix4x3(const std::string &name, const int count, const bool transpose, const float *t) noexcept;
 
   bool operator==(const Shader &other) noexcept { return id_ == other.id_; }
   bool operator!=(const Shader &other) noexcept { return id_ != other.id_; }
 
-  void CompileShaders(const std::string *begin, const std::string *end) noexcept { GAME_ASSERT(begin <= end) << "Invalid range"; for(; begin != end; begin++) CompileShader(*begin); }
+  void CompileShaders(const std::string *begin, const std::string *end) noexcept { GAME_ASSERT(begin <= end); for(; begin != end; ++begin) CompileShader(*begin); }
   void CompileShader(const std::string &path) noexcept;
   void LinkProgram() noexcept;
+  
+  
+  private:
+  static inline auto ExtensionToShaderType(const std::string &extension) noexcept -> uint32_t { GAME_ASSERT(kExtensionToShaderType.find(extension) != kExtensionToShaderType.end()); return kExtensionToShaderType.at(extension); }
 
-private:
   static inline const std::unordered_map<std::string, uint32_t> kExtensionToShaderType = 
   {
     { ".vert", GL_VERTEX_SHADER },
@@ -58,234 +61,324 @@ private:
     { ".gs", GL_GEOMETRY_SHADER },
   };
 
+  
   uint32_t id_;
   std::vector<uint32_t> compiled_shaders_;
-
-  auto GetLocation(const std::string &name) const noexcept -> int;
-  static auto ExtensionToShaderType(const std::string &extension) noexcept -> uint32_t;
+  std::unordered_map<std::string, std::pair<GLuint, std::any>> locations_;
 };
 
 template<>
-inline void Shader::SetUniform<int>(const std::string &name, int t0) const noexcept
+inline void Shader::SetUniform<int>(const std::string &name, int t0) noexcept
 {
+  GAME_ASSERT(HasUniform(name));
+  ZoneScopedC(0xDD9B00);
+  
+  std::pair<GLuint, std::any> &data = locations_.at(name);
+  if(data.second.type() == typeid(int) && std::any_cast<int>(data.second) == t0)
+    return;
+  
+  data.second.emplace<int>(t0);
+
+  Use();
+  GAME_GL_CALL(glUniform1i(data.first, t0));
+}
+
+template<>
+inline void Shader::SetUniform<int>(const std::string &name, int t0, int t1) noexcept
+{
+  GAME_ASSERT(HasUniform(name));
+  ZoneScopedC(0xDD9B00);
+  
+  std::pair<GLuint, std::any> &data = locations_.at(name);
+  if(data.second.type() == typeid(std::array<int, 2>) && std::any_cast<std::array<int, 2>>(data.second) == std::array<int, 2>{t0, t1})
+    return;
+  
+  data.second.emplace<std::array<int, 2>>(std::array<int, 2>{t0, t1});
+
+  Use();
+  GAME_GL_CALL(glUniform2i(data.first, t0, t1));
+}
+
+template<>
+inline void Shader::SetUniform<int>(const std::string &name, int t0, int t1, int t2) noexcept
+{
+  GAME_ASSERT(HasUniform(name));
+  ZoneScopedC(0xDD9B00);
+  
+  std::pair<GLuint, std::any> &data = locations_.at(name);
+  if(data.second.type() == typeid(std::array<int, 3>) && std::any_cast<std::array<int, 3>>(data.second) == std::array<int, 3>{t0, t1, t2})
+    return;
+  
+  data.second.emplace<std::array<int, 3>>(std::array<int, 3>{t0, t1, t2});
+
+  Use();
+  GAME_GL_CALL(glUniform3i(data.first, t0, t1, t2));
+}
+
+template<>
+inline void Shader::SetUniform<int>(const std::string &name, int t0, int t1, int t2, int t3) noexcept
+{
+  GAME_ASSERT(HasUniform(name));
+  ZoneScopedC(0xDD9B00);
+  
+  std::pair<GLuint, std::any> &data = locations_.at(name);
+  if(data.second.type() == typeid(std::array<int, 4>) && std::any_cast<std::array<int, 4>>(data.second) == std::array<int, 4>{t0, t1, t2, t3})
+    return;
+  
+  data.second.emplace<std::array<int, 4>>(std::array<int, 4>{t0, t1, t2, t3});
+
+  Use();
+  GAME_GL_CALL(glUniform4i(data.first, t0, t1, t2, t3));
+}
+
+template<>
+inline void Shader::SetUniform1v<int>(const std::string &name, int count, const int *t) noexcept
+{
+  GAME_ASSERT(HasUniform(name));
   ZoneScopedC(0xDD9B00);
   
   Use();
-  GAME_GL_CALL(glUniform1i(GetLocation(name), t0));
+  GAME_GL_CALL(glUniform1iv(locations_.at(name).first, count, t));
 }
 
 template<>
-inline void Shader::SetUniform<int>(const std::string &name, int t0, int t1) const noexcept
+inline void Shader::SetUniform2v<int>(const std::string &name, int count, const int *t) noexcept
 {
+  GAME_ASSERT(HasUniform(name));
   ZoneScopedC(0xDD9B00);
-
-  Use();
-  GAME_GL_CALL(glUniform2i(GetLocation(name), t0, t1));
-}
-
-template<>
-inline void Shader::SetUniform<int>(const std::string &name, int t0, int t1, int t2) const noexcept
-{
-  Use();
-  GAME_GL_CALL(glUniform3i(GetLocation(name), t0, t1, t2));
-}
-
-template<>
-inline void Shader::SetUniform<int>(const std::string &name, int t0, int t1, int t2, int t3) const noexcept
-{
-  ZoneScopedC(0xDD9B00);
-
-  Use();
-  GAME_GL_CALL(glUniform4i(GetLocation(name), t0, t1, t2, t3));
-}
-
-template<>
-inline void Shader::SetUniform1v<int>(const std::string &name, int count, const int *t) const noexcept
-{
-  Use();
-  GAME_GL_CALL(glUniform1iv(GetLocation(name), count, t));
-}
-
-template<>
-inline void Shader::SetUniform2v<int>(const std::string &name, int count, const int *t) const noexcept
-{
-  ZoneScopedC(0xDD9B00);
-
-  Use();
-  GAME_GL_CALL(glUniform2iv(GetLocation(name), count, t));
-}
-
-template<>
-inline void Shader::SetUniform3v<int>(const std::string &name, int count, const int *t) const noexcept
-{
-  Use();
-  GAME_GL_CALL(glUniform3iv(GetLocation(name), count, t));
-}
-
-template<>
-inline void Shader::SetUniform4v<int>(const std::string &name, int count, const int *t) const noexcept
-{
-  ZoneScopedC(0xDD9B00);
-
-  Use();
-  GAME_GL_CALL(glUniform4iv(GetLocation(name), count, t));
-}
-
-
-template<>
-inline void Shader::SetUniform<float>(const std::string &name, float t0) const noexcept
-{
-  ZoneScopedC(0xDD9B00);
-
-  Use();
-  GAME_GL_CALL(glUniform1f(GetLocation(name), t0));
-}
-
-template<>
-inline void Shader::SetUniform<float>(const std::string &name, float t0, float t1) const noexcept
-{
-  ZoneScopedC(0xDD9B00);
-
-  Use();
-  GAME_GL_CALL(glUniform2f(GetLocation(name), t0, t1));
-}
-
-template<>
-inline void Shader::SetUniform<float>(const std::string &name, float t0, float t1, float t2) const noexcept
-{
-  ZoneScopedC(0xDD9B00);
-
-  Use();
-  GAME_GL_CALL(glUniform3f(GetLocation(name), t0, t1, t2));
-}
-
-template<>
-inline void Shader::SetUniform<float>(const std::string &name, float t0, float t1, float t2, float t3) const noexcept
-{
-  ZoneScopedC(0xDD9B00);
-
-  Use();
-  GAME_GL_CALL(glUniform4f(GetLocation(name), t0, t1, t2, t3));
-}
-
-template<>
-inline void Shader::SetUniform1v<float>(const std::string &name, int count, const float *t) const noexcept
-{
-  ZoneScopedC(0xDD9B00);
-
-  Use();
-  GAME_GL_CALL(glUniform1fv(GetLocation(name), count, t));
-}
-
-template<>
-inline void Shader::SetUniform2v<float>(const std::string &name, int count, const float *t) const noexcept
-{
-  ZoneScopedC(0xDD9B00);
-
-  Use();
-  GAME_GL_CALL(glUniform2fv(GetLocation(name), count, t));
-}
-
-template<>
-inline void Shader::SetUniform3v<float>(const std::string &name, int count, const float *t) const noexcept
-{
-  ZoneScopedC(0xDD9B00);
-
-  Use();
-  GAME_GL_CALL(glUniform3fv(GetLocation(name), count, t));
-}
-
-template<>
-inline void Shader::SetUniform4v<float>(const std::string &name, int count, const float *t) const noexcept
-{
-  ZoneScopedC(0xDD9B00);
-
-  Use();
-  GAME_GL_CALL(glUniform4fv(GetLocation(name), count, t));
-}
-
-
-template<>
-inline void Shader::SetUniform<uint32_t>(const std::string &name, uint32_t t0) const noexcept
-{
-  ZoneScopedC(0xDD9B00);
-
-  Use();
-  GAME_GL_CALL(glUniform1ui(GetLocation(name), t0));
-}
-
-template<>
-inline void Shader::SetUniform<uint32_t>(const std::string &name, uint32_t t0, uint32_t t1) const noexcept
-{
-  ZoneScopedC(0xDD9B00);
-
-  Use();
-  GAME_GL_CALL(glUniform2ui(GetLocation(name), t0, t1));
-}
-
-template<>
-inline void Shader::SetUniform<uint32_t>(const std::string &name, uint32_t t0, uint32_t t1, uint32_t t2) const noexcept
-{
-  ZoneScopedC(0xDD9B00);
-
-  Use();
-  GAME_GL_CALL(glUniform3ui(GetLocation(name), t0, t1, t2));
-}
-
-template<>
-inline void Shader::SetUniform<uint32_t>(const std::string &name, uint32_t t0, uint32_t t1, uint32_t t2, uint32_t t3) const noexcept
-{
-  ZoneScopedC(0xDD9B00);
-
-  Use();
-  GAME_GL_CALL(glUniform4ui(GetLocation(name), t0, t1, t2, t3));
-}
-
-template<>
-inline void Shader::SetUniform1v<uint32_t>(const std::string &name, int count, const uint32_t *t) const noexcept
-{
-  ZoneScopedC(0xDD9B00);
-
-  Use();
-  GAME_GL_CALL(glUniform1uiv(GetLocation(name), count, t));
-}
-
-template<>
-inline void Shader::SetUniform2v<uint32_t>(const std::string &name, int count, const uint32_t *t) const noexcept
-{
-  ZoneScopedC(0xDD9B00);
-
-  Use();
-  GAME_GL_CALL(glUniform2uiv(GetLocation(name), count, t));
-}
-
-template<>
-inline void Shader::SetUniform3v<uint32_t>(const std::string &name, int count, const uint32_t *t) const noexcept
-{
-  ZoneScopedC(0xDD9B00);
-
-  Use();
-  GAME_GL_CALL(glUniform3uiv(GetLocation(name), count, t));
-}
-
-template<>
-inline void Shader::SetUniform4v<uint32_t>(const std::string &name, int count, const uint32_t *t) const noexcept
-{
-  ZoneScopedC(0xDD9B00);
-
-  Use();
-  GAME_GL_CALL(glUniform4uiv(GetLocation(name), count, t));
-}
-
-inline auto Shader::GetLocation(const std::string &name) const noexcept -> int
-{
-  ZoneScopedC(0xDD9B00);
-
-  int result;
-  GAME_GL_CALL(result = glGetUniformLocation(id_, name.c_str()));
-  GAME_LOG_IF(result == -1, LogType::kError) << '\'' << name << '\'' << " does not correspond to an active uniform variable in program, name starts with the reserved prefix gl_, or name is associated with an atomic counter or a named uniform block.";
   
-  return result;
+  Use();
+  GAME_GL_CALL(glUniform2iv(locations_.at(name).first, count, t));
+}
+
+template<>
+inline void Shader::SetUniform3v<int>(const std::string &name, int count, const int *t) noexcept
+{
+  GAME_ASSERT(HasUniform(name));
+  ZoneScopedC(0xDD9B00);
+  
+  Use();
+  GAME_GL_CALL(glUniform3iv(locations_.at(name).first, count, t));
+}
+
+template<>
+inline void Shader::SetUniform4v<int>(const std::string &name, int count, const int *t) noexcept
+{
+  GAME_ASSERT(HasUniform(name));
+  ZoneScopedC(0xDD9B00);
+  
+  Use();
+  GAME_GL_CALL(glUniform4iv(locations_.at(name).first, count, t));
+}
+
+
+template<>
+inline void Shader::SetUniform<float>(const std::string &name, float t0) noexcept
+{
+  GAME_ASSERT(HasUniform(name));
+  ZoneScopedC(0xDD9B00);
+  
+  std::pair<GLuint, std::any> &data = locations_.at(name);
+  if(data.second.type() == typeid(float) && std::any_cast<float>(data.second) == t0)
+    return;
+  
+  data.second.emplace<float>(t0);
+
+  Use();
+  GAME_GL_CALL(glUniform1f(data.first, t0));
+}
+
+template<>
+inline void Shader::SetUniform<float>(const std::string &name, float t0, float t1) noexcept
+{
+  GAME_ASSERT(HasUniform(name));
+  ZoneScopedC(0xDD9B00);
+  
+  std::pair<GLuint, std::any> &data = locations_.at(name);
+  if(data.second.type() == typeid(std::array<float, 2>) && std::any_cast<std::array<float, 2>>(data.second) == std::array<float, 2>{t0, t1})
+    return;
+  
+  data.second.emplace<std::array<float, 2>>(std::array<float, 2>{t0, t1});
+
+  Use();
+  GAME_GL_CALL(glUniform2f(data.first, t0, t1));
+}
+
+template<>
+inline void Shader::SetUniform<float>(const std::string &name, float t0, float t1, float t2) noexcept
+{
+  GAME_ASSERT(HasUniform(name));
+  ZoneScopedC(0xDD9B00);
+  
+  std::pair<GLuint, std::any> &data = locations_.at(name);
+  if(data.second.type() == typeid(std::array<float, 3>) && std::any_cast<std::array<float, 3>>(data.second) == std::array<float, 3>{t0, t1, t2})
+    return;
+  
+  data.second.emplace<std::array<float, 3>>(std::array<float, 3>{t0, t1, t2});
+
+  Use();
+  GAME_GL_CALL(glUniform3f(data.first, t0, t1, t2));
+}
+
+template<>
+inline void Shader::SetUniform<float>(const std::string &name, float t0, float t1, float t2, float t3) noexcept
+{
+  GAME_ASSERT(HasUniform(name));
+  ZoneScopedC(0xDD9B00);
+  
+  std::pair<GLuint, std::any> &data = locations_.at(name);
+  if(data.second.type() == typeid(std::array<float, 4>) && std::any_cast<std::array<float, 4>>(data.second) == std::array<float, 4>{t0, t1, t2, t3})
+    return;
+  
+  data.second.emplace<std::array<float, 4>>(std::array<float, 4>{t0, t1, t2, t3});
+
+  Use();
+  GAME_GL_CALL(glUniform4f(data.first, t0, t1, t2, t3));
+}
+
+template<>
+inline void Shader::SetUniform1v<float>(const std::string &name, int count, const float *t) noexcept
+{
+  GAME_ASSERT(HasUniform(name));
+  ZoneScopedC(0xDD9B00);
+  
+  Use();
+  GAME_GL_CALL(glUniform1fv(locations_.at(name).first, count, t));
+}
+
+template<>
+inline void Shader::SetUniform2v<float>(const std::string &name, int count, const float *t) noexcept
+{
+  GAME_ASSERT(HasUniform(name));
+  ZoneScopedC(0xDD9B00);
+  
+  Use();
+  GAME_GL_CALL(glUniform2fv(locations_.at(name).first, count, t));
+}
+
+template<>
+inline void Shader::SetUniform3v<float>(const std::string &name, int count, const float *t) noexcept
+{
+  GAME_ASSERT(HasUniform(name));
+  ZoneScopedC(0xDD9B00);
+  
+  Use();
+  GAME_GL_CALL(glUniform3fv(locations_.at(name).first, count, t));
+}
+
+template<>
+inline void Shader::SetUniform4v<float>(const std::string &name, int count, const float *t) noexcept
+{
+  GAME_ASSERT(HasUniform(name));
+  ZoneScopedC(0xDD9B00);
+  
+  Use();
+  GAME_GL_CALL(glUniform4fv(locations_.at(name).first, count, t));
+}
+
+
+template<>
+inline void Shader::SetUniform<uint32_t>(const std::string &name, uint32_t t0) noexcept
+{
+  GAME_ASSERT(HasUniform(name));
+  ZoneScopedC(0xDD9B00);
+  
+  std::pair<GLuint, std::any> &data = locations_.at(name);
+  if(data.second.type() == typeid(uint32_t) && std::any_cast<uint32_t>(data.second) == t0)
+    return;
+  
+  data.second.emplace<uint32_t>(t0);
+
+  Use();
+  GAME_GL_CALL(glUniform1ui(data.first, t0));
+}
+
+template<>
+inline void Shader::SetUniform<uint32_t>(const std::string &name, uint32_t t0, uint32_t t1) noexcept
+{
+  GAME_ASSERT(HasUniform(name));
+  ZoneScopedC(0xDD9B00);
+  
+  std::pair<GLuint, std::any> &data = locations_.at(name);
+  if(data.second.type() == typeid(std::array<uint32_t, 2>) && std::any_cast<std::array<uint32_t, 2>>(data.second) == std::array<uint32_t, 2>{t0, t1})
+    return;
+  
+  data.second.emplace<std::array<uint32_t, 2>>(std::array<uint32_t, 2>{t0, t1});
+
+  Use();
+  GAME_GL_CALL(glUniform2ui(data.first, t0, t1));
+}
+
+template<>
+inline void Shader::SetUniform<uint32_t>(const std::string &name, uint32_t t0, uint32_t t1, uint32_t t2) noexcept
+{
+  GAME_ASSERT(HasUniform(name));
+  ZoneScopedC(0xDD9B00);
+  
+  std::pair<GLuint, std::any> &data = locations_.at(name);
+  if(data.second.type() == typeid(std::array<uint32_t, 3>) && std::any_cast<std::array<uint32_t, 3>>(data.second) == std::array<uint32_t, 3>{t0, t1, t2})
+    return;
+  
+  data.second.emplace<std::array<uint32_t, 3>>(std::array<uint32_t, 3>{t0, t1, t2});
+
+  Use();
+  GAME_GL_CALL(glUniform3ui(data.first, t0, t1, t2));
+}
+
+template<>
+inline void Shader::SetUniform<uint32_t>(const std::string &name, uint32_t t0, uint32_t t1, uint32_t t2, uint32_t t3) noexcept
+{
+  GAME_ASSERT(HasUniform(name));
+  ZoneScopedC(0xDD9B00);
+  
+  std::pair<GLuint, std::any> &data = locations_.at(name);
+  if(data.second.type() == typeid(std::array<uint32_t, 4>) && std::any_cast<std::array<uint32_t, 4>>(data.second) == std::array<uint32_t, 4>{t0, t1, t2, t3})
+    return;
+  
+  data.second.emplace<std::array<uint32_t, 4>>(std::array<uint32_t, 4>{t0, t1, t2, t3});
+
+  Use();
+  GAME_GL_CALL(glUniform4ui(data.first, t0, t1, t2, t3));
+}
+
+template<>
+inline void Shader::SetUniform1v<uint32_t>(const std::string &name, int count, const uint32_t *t) noexcept
+{
+  GAME_ASSERT(HasUniform(name));
+  ZoneScopedC(0xDD9B00);
+
+  Use();
+  GAME_GL_CALL(glUniform1uiv(locations_.at(name).first, count, t));
+}
+
+template<>
+inline void Shader::SetUniform2v<uint32_t>(const std::string &name, int count, const uint32_t *t) noexcept
+{
+  GAME_ASSERT(HasUniform(name));
+  ZoneScopedC(0xDD9B00);
+
+  Use();
+  GAME_GL_CALL(glUniform2uiv(locations_.at(name).first, count, t));
+}
+
+template<>
+inline void Shader::SetUniform3v<uint32_t>(const std::string &name, int count, const uint32_t *t) noexcept
+{
+  GAME_ASSERT(HasUniform(name));
+  ZoneScopedC(0xDD9B00);
+  
+  Use();
+  GAME_GL_CALL(glUniform3uiv(locations_.at(name).first, count, t));
+}
+
+template<>
+inline void Shader::SetUniform4v<uint32_t>(const std::string &name, int count, const uint32_t *t) noexcept
+{
+  GAME_ASSERT(HasUniform(name));
+  ZoneScopedC(0xDD9B00);
+  
+  Use();
+  GAME_GL_CALL(glUniform4uiv(locations_.at(name).first, count, t));
 }
 } // game
 

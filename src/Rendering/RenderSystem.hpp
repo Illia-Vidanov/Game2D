@@ -30,6 +30,9 @@ public:
 private:
   void DrawUI() noexcept;
   void DrawSprites() noexcept;
+  void DrawColoredScreenQuad(const Vector4 &color) noexcept;
+
+  void InitializeOutline() noexcept;
 
   auto WindowResizeEvent(const Event &event) const noexcept -> bool;
 

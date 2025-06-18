@@ -115,6 +115,8 @@ void Game::Run() noexcept
     
     if(fixed_delta_time_counter_ >= kFixedDeltaTime)
     {
+      ZoneScopedNC("Fixed Update", 0xb3041b);
+
       fixed_delta_time_ = fixed_delta_time_counter_;
       fixed_delta_time_counter_ = std::clamp(fixed_delta_time_counter_ - kFixedDeltaTime, std::chrono::duration<double>(0.0f), kFixedDeltaTime);
 
