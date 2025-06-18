@@ -50,9 +50,13 @@ ResourceManager::ResourceManager(Game &game) noexcept
   orthographic_projection_ = TransformComponent::OrthographicProjection2D(0, Window::kUnitsPerScreenX, 0, Window::kUnitsPerScreenY);
   orthographic_projection_.block<2, 1>(0, 2) += Vector2{1.0f, 1.0f}; // shift projection such that 0 0 is at the center
 
-  LoadTexture(TextureType::kNoTexture64, TextureDefinition{"res/Textures/NoTexture64.png"});
-  LoadTexture(TextureType::kWhite, TextureDefinition{"res/Textures/White.png"});
-  LoadTexture(TextureType::kPlayer, TextureDefinition{"res/Textures/Player/Idle.png"});
+  LoadTexture(TextureType::kNoTexture64, TextureDefinition{}.SetSourcePath("res/Textures/NoTexture64.png")
+                                                            .AddParametrInt(std::pair<GLenum, int>{GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST})
+                                                            .AddParametrInt(std::pair<GLenum, int>{GL_TEXTURE_MAG_FILTER, GL_NEAREST}));
+  LoadTexture(TextureType::kWhite, TextureDefinition{}.SetSourcePath("res/Textures/White.png"));
+  LoadTexture(TextureType::kPlayer, TextureDefinition{}.SetSourcePath("res/Textures/Player/Idle.png")
+                                                       .AddParametrInt(std::pair<GLenum, int>{GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST})
+                                                       .AddParametrInt(std::pair<GLenum, int>{GL_TEXTURE_MAG_FILTER, GL_NEAREST}));
 }
 
 ResourceManager::~ResourceManager() noexcept

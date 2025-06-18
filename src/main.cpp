@@ -5,8 +5,8 @@ Todo:
 - Save uniform locations
 - Cache uniform values
 - Saving
-- Outlining
 - Camera code
+- Postprocessing
 */
 #include "Setup.hpp"
 

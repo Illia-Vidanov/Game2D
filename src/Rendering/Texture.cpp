@@ -22,6 +22,18 @@ Texture::Texture(const TextureDefinition &texture_definition) noexcept
   GAME_GL_CALL(glGenTextures(1, &id_));
   Bind();
 
+  for(const std::pair<GLenum, int> &parametr : texture_definition.parametrs_int)
+    GAME_GL_CALL(glTexParameteri(type_, parametr.first, parametr.second));
+  
+  for(const std::pair<GLenum, float> &parametr : texture_definition.parametrs_float)
+    GAME_GL_CALL(glTexParameterf(type_, parametr.first, parametr.second));
+  
+  for(const std::pair<GLenum, int*> &parametr : texture_definition.parametrs_int_vector)
+    GAME_GL_CALL(glTexParameteriv(type_, parametr.first, parametr.second));
+    
+  for(const std::pair<GLenum, float*> &parametr : texture_definition.parametrs_float_vector)
+    GAME_GL_CALL(glTexParameterfv(type_, parametr.first, parametr.second));
+
   ImageData image_data = FileReader::Image(texture_definition.source_path);
   GAME_GL_CALL(glTexStorage2D(type_, 1, texture_definition.internal_format, image_data.width, image_data.height));
   GAME_GL_CALL(glTexSubImage2D(type_, 0, 0, 0, image_data.width, image_data.height, texture_definition.format, TypeToGLType<ImageData::DataType>(), image_data.data));
