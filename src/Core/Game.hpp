@@ -12,7 +12,7 @@
 #include "UI/UI.hpp"
 #include "Rendering/ResourceManager.hpp"
 #include "Player/InputSystem.hpp"
-#include "Player/Camera.hpp"
+#include "Player/CameraComponent.hpp"
 #include "Physics/PhysicsSystem.hpp"
 #include "Core/Entity.hpp"
 
@@ -35,8 +35,6 @@ public:
   [[nodiscard]] constexpr auto GetUI() noexcept -> UI & { return ui_; }
   [[nodiscard]] constexpr auto GetFlags() noexcept -> Flags & { return flags_; }
   [[nodiscard]] constexpr auto GetFlags() const noexcept -> const Flags & { return flags_; }
-  [[nodiscard]] constexpr auto GetCamera() noexcept -> Camera & { return camera_; }
-  [[nodiscard]] constexpr auto GetCamera() const noexcept -> const Camera & { return camera_; }
   [[nodiscard]] constexpr auto GetWindow() noexcept -> Window & { return window_; }
   [[nodiscard]] constexpr auto GetWindow() const noexcept -> const Window & { return window_; }
   [[nodiscard]] constexpr auto GetRegistry() noexcept -> entt::registry & { return registry_; }
@@ -53,10 +51,12 @@ public:
   [[nodiscard]] constexpr auto GetResourceManager() const noexcept -> const ResourceManager & { return resource_manager_; }
   [[nodiscard]] constexpr auto GetDeltaTime() const noexcept -> std::chrono::duration<double> { return delta_time_; }
   [[nodiscard]] constexpr auto GetFixedDeltaTime() const noexcept -> std::chrono::duration<double> { return fixed_delta_time_; }
+  [[nodiscard]] auto GetCamera() noexcept -> CameraComponent &;
+  
   [[nodiscard]] auto GetEntity(const std::string &name) noexcept -> Entity & { return entities_.at(name); }
   [[nodiscard]] auto GetEntity(const std::string &name) const noexcept -> const Entity & { return entities_.at(name); }
-
   auto CreateEntity(const std::string &name) noexcept -> Entity & { GAME_ASSERT(entities_.find(name) == entities_.end()); return (*entities_.emplace(name, Entity{*this}).first).second; }
+  auto GetOrCreateEntity(const std::string &name) noexcept -> Entity &;
 
 private:
   auto QuitEvent() noexcept -> bool;
@@ -74,7 +74,6 @@ private:
   entt::registry registry_;
   InputSystem input_system_;
   PhysicsSystem physics_system_;
-  Camera camera_;
 
   std::unordered_map<std::string, Entity> entities_;
 

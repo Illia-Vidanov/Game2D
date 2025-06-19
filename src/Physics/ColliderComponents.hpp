@@ -30,6 +30,9 @@ public:
   void SetDensity(DefaultFloatType density) const noexcept { b2Shape_SetDensity(shape_id_, density, true); }
   
   void Updateb2() const noexcept;
+
+  [[nodiscard]] constexpr auto GetEntity() const noexcept -> const Entity * { return entity_; }
+  [[nodiscard]] constexpr auto GetEntity() noexcept -> Entity * { return entity_; }
   
 private:
   Entity *entity_;

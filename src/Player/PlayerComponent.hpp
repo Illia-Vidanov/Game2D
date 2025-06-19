@@ -17,6 +17,9 @@ public:
   PlayerComponent(Entity *entity) noexcept;
   void Update() noexcept;
 
+  [[nodiscard]] constexpr auto GetEntity() const noexcept -> const Entity * { return entity_; }
+  [[nodiscard]] constexpr auto GetEntity() noexcept -> Entity * { return entity_; }
+
 private:
   Entity *entity_;
 };

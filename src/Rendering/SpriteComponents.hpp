@@ -50,6 +50,9 @@ public:
   [[nodiscard]] constexpr auto GetLayer() const noexcept -> int { return layer_; }
   constexpr void SetLayer(int layer) noexcept { layer_ = layer; }
 
+  [[nodiscard]] constexpr auto GetEntity() const noexcept -> const Entity * { return entity_; }
+  [[nodiscard]] constexpr auto GetEntity() noexcept -> Entity * { return entity_; }
+
 private:
   Entity *entity_;
 

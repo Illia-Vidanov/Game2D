@@ -12,7 +12,7 @@
 #include "Rendering/ResourceManager.hpp"
 #include "Rendering/OutlineComponent.hpp"
 #include "Player/InputSystem.hpp"
-#include "Player/Camera.hpp"
+#include "Player/CameraComponent.hpp"
 #include "Player/PlayerComponent.hpp"
 #include "Utils/Type.hpp"
 #include "Physics/PhysicsSystem.hpp"
@@ -37,7 +37,6 @@ Game::Game(const int argc, const char * const *argv) noexcept
   , resource_manager_{*this}
   , input_system_{*this}
   , physics_system_{*this}
-  , camera_{*this}
 {
   ZoneScopedC(0xb3041b);
 
@@ -128,6 +127,29 @@ void Game::Run() noexcept
 
     FrameMark;
   }
+}
+
+auto Game::GetCamera() noexcept -> CameraComponent &
+{
+  entt::view<entt::get_t<CameraComponent>> cameras = registry_.view<CameraComponent>();
+  for(entt::entity entity : cameras)
+  {
+    return cameras.get<CameraComponent>(entity);
+  }
+
+  // Creating default camera
+  Entity &camera = GetOrCreateEntity("Camera");
+  camera.AddComponent<TransformComponent>();
+  return camera.AddComponent<CameraComponent>();
+}
+
+auto Game::GetOrCreateEntity(const std::string &name) noexcept -> Entity &
+{
+  std::unordered_map<std::string, Entity>::iterator it = entities_.find(name);
+  if(it == entities_.end())
+    return (*entities_.emplace(name, Entity{*this}).first).second;
+  
+  return it->second;
 }
 
 auto Game::QuitEvent() noexcept -> bool

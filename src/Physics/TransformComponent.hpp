@@ -40,6 +40,9 @@ public:
   [[nodiscard]] auto Getb2Position() const noexcept -> b2Vec2 { return b2Vec2{translation().x(), translation().y()}; }
   [[nodiscard]] auto Getb2Rotation() const noexcept -> b2Rot { return b2Rot{cos_, sin_}; }
 
+  [[nodiscard]] constexpr auto GetEntity() const noexcept -> const Entity * { return entity_; }
+  [[nodiscard]] constexpr auto GetEntity() noexcept -> Entity * { return entity_; }
+
 private:
   Entity *entity_;
 

@@ -2,10 +2,10 @@
 Todo:
 - Background
 - TODO in Enum
-- Profile and cache uniform values
 - Saving
-- Camera code
 - Postprocessing
+- FPS counter in Debug menu
+- Screen raycast
 */
 #include "Setup.hpp"
 

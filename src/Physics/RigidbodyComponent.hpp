@@ -25,6 +25,9 @@ public:
   void AddForce(const Vector2 &force) const { b2Body_ApplyForceToCenter(body_id_, Tob2Vec2(force), true); }
   void SetGravityScale(DefaultFloatType gravity_scale) const { b2Body_SetGravityScale(body_id_, gravity_scale); }
 
+  [[nodiscard]] constexpr auto GetEntity() const noexcept -> const Entity * { return entity_; }
+  [[nodiscard]] constexpr auto GetEntity() noexcept -> Entity * { return entity_; }
+
 private:
   Entity *entity_;
 
