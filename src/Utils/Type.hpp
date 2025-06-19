@@ -122,23 +122,152 @@ template<typename... Args>
 using MakeVoidT = typename MakeVoid<Args...>::type;
 
 
-// TODO: generic operator check approach
-
-enum class Operator : uint8_t
+enum class OperatorType : uint8_t
 {
-  kModule, 
+  kModule,
+  kPointerToMemberDot,
+  kPointerToMemberArrow,
+  kMultiplication,
+  kDivision,
+  kAddition,
+  kSubtraction,
+  kBitwiseLeftShift,
+  kBitwiseRightShift,
+  kLessThen,
+  kLessEqualThen,
+  kMoreThen,
+  kMoreEqualThen,
+  kEqual,
+  kNotEqual,
+  kBitwiseAnd, 
+  kBitwiseXor,
+  kBitwiseOr,
+  kLogicalAnd,
+  kLogicalOr,
+  kAssigment,
+  kAddAssign,
+  kSubtractAssign,
+  kMultiplyAssign,
+  kDivideAssign,
+  kModuleAssign,
+  kBitwiseLeftShiftAssign,
+  kBitwiseRightShiftAssign,
+  kBitwiseAndAssign,
+  kBitwiseXorAssign,
+  kBitwiseOrAssign,
+  kComma
 };
 
-template<Operator Oper, typename T, typename U, typename = void>
-struct HaveOperator : std::false_type
-{};
+namespace detail
+{
+template<OperatorType Operator, typename T, typename U, typename = void>
+struct OperatorDefinedImpl : std::false_type
+{ static_assert(Operator >= OperatorType::kModule && Operator <= OperatorType::kComma); };
 
 template<typename T, typename U>
-struct HaveOperator<Operator::kModule, T, U, MakeVoidT<decltype(std::declval<T>() % std::declval<U>())>> : std::true_type
+struct OperatorDefinedImpl<OperatorType::kModule, T, U, MakeVoidT<decltype(std::declval<T>() % std::declval<U>())>> : std::true_type
+{};
+template<typename T, typename U>
+struct OperatorDefinedImpl<OperatorType::kPointerToMemberDot, T, U, MakeVoidT<decltype(std::declval<T>() .* std::declval<U>())>> : std::true_type
+{};
+template<typename T, typename U>
+struct OperatorDefinedImpl<OperatorType::kPointerToMemberArrow, T, U, MakeVoidT<decltype(std::declval<T>() ->* std::declval<U>())>> : std::true_type
+{};
+template<typename T, typename U>
+struct OperatorDefinedImpl<OperatorType::kMultiplication, T, U, MakeVoidT<decltype(std::declval<T>() * std::declval<U>())>> : std::true_type
+{};
+template<typename T, typename U>
+struct OperatorDefinedImpl<OperatorType::kDivision, T, U, MakeVoidT<decltype(std::declval<T>() / std::declval<U>())>> : std::true_type
+{};
+template<typename T, typename U>
+struct OperatorDefinedImpl<OperatorType::kAddition, T, U, MakeVoidT<decltype(std::declval<T>() + std::declval<U>())>> : std::true_type
+{};
+template<typename T, typename U>
+struct OperatorDefinedImpl<OperatorType::kSubtraction, T, U, MakeVoidT<decltype(std::declval<T>() - std::declval<U>())>> : std::true_type
+{};
+template<typename T, typename U>
+struct OperatorDefinedImpl<OperatorType::kBitwiseLeftShift, T, U, MakeVoidT<decltype(std::declval<T>() << std::declval<U>())>> : std::true_type
+{};
+template<typename T, typename U>
+struct OperatorDefinedImpl<OperatorType::kBitwiseRightShift, T, U, MakeVoidT<decltype(std::declval<T>() >> std::declval<U>())>> : std::true_type
+{};
+template<typename T, typename U>
+struct OperatorDefinedImpl<OperatorType::kLessThen, T, U, MakeVoidT<decltype(std::declval<T>() < std::declval<U>())>> : std::true_type
+{};
+template<typename T, typename U>
+struct OperatorDefinedImpl<OperatorType::kLessEqualThen, T, U, MakeVoidT<decltype(std::declval<T>() <= std::declval<U>())>> : std::true_type
+{};
+template<typename T, typename U>
+struct OperatorDefinedImpl<OperatorType::kMoreThen, T, U, MakeVoidT<decltype(std::declval<T>() > std::declval<U>())>> : std::true_type
+{};
+template<typename T, typename U>
+struct OperatorDefinedImpl<OperatorType::kMoreEqualThen, T, U, MakeVoidT<decltype(std::declval<T>() >= std::declval<U>())>> : std::true_type
+{};
+template<typename T, typename U>
+struct OperatorDefinedImpl<OperatorType::kEqual, T, U, MakeVoidT<decltype(std::declval<T>() == std::declval<U>())>> : std::true_type
+{};
+template<typename T, typename U>
+struct OperatorDefinedImpl<OperatorType::kNotEqual, T, U, MakeVoidT<decltype(std::declval<T>() != std::declval<U>())>> : std::true_type
+{};
+template<typename T, typename U>
+struct OperatorDefinedImpl<OperatorType::kBitwiseAnd, T, U, MakeVoidT<decltype(std::declval<T>() & std::declval<U>())>> : std::true_type
+{};
+template<typename T, typename U>
+struct OperatorDefinedImpl<OperatorType::kBitwiseXor, T, U, MakeVoidT<decltype(std::declval<T>() ^ std::declval<U>())>> : std::true_type
+{};
+template<typename T, typename U>
+struct OperatorDefinedImpl<OperatorType::kBitwiseOr, T, U, MakeVoidT<decltype(std::declval<T>() | std::declval<U>())>> : std::true_type
+{};
+template<typename T, typename U>
+struct OperatorDefinedImpl<OperatorType::kLogicalAnd, T, U, MakeVoidT<decltype(std::declval<T>() && std::declval<U>())>> : std::true_type
+{};
+template<typename T, typename U>
+struct OperatorDefinedImpl<OperatorType::kLogicalOr, T, U, MakeVoidT<decltype(std::declval<T>() || std::declval<U>())>> : std::true_type
+{};
+template<typename T, typename U>
+struct OperatorDefinedImpl<OperatorType::kAssigment, T, U, MakeVoidT<decltype(std::declval<T>() = std::declval<U>())>> : std::true_type
+{};
+template<typename T, typename U>
+struct OperatorDefinedImpl<OperatorType::kAddAssign, T, U, MakeVoidT<decltype(std::declval<T>() += std::declval<U>())>> : std::true_type
+{};
+template<typename T, typename U>
+struct OperatorDefinedImpl<OperatorType::kSubtractAssign, T, U, MakeVoidT<decltype(std::declval<T>() -= std::declval<U>())>> : std::true_type
+{};
+template<typename T, typename U>
+struct OperatorDefinedImpl<OperatorType::kMultiplyAssign, T, U, MakeVoidT<decltype(std::declval<T>() *= std::declval<U>())>> : std::true_type
+{};
+template<typename T, typename U>
+struct OperatorDefinedImpl<OperatorType::kDivideAssign, T, U, MakeVoidT<decltype(std::declval<T>() /= std::declval<U>())>> : std::true_type
+{};
+template<typename T, typename U>
+struct OperatorDefinedImpl<OperatorType::kModuleAssign, T, U, MakeVoidT<decltype(std::declval<T>() %= std::declval<U>())>> : std::true_type
+{};
+template<typename T, typename U>
+struct OperatorDefinedImpl<OperatorType::kBitwiseLeftShiftAssign, T, U, MakeVoidT<decltype(std::declval<T>() <<= std::declval<U>())>> : std::true_type
+{};
+template<typename T, typename U>
+struct OperatorDefinedImpl<OperatorType::kBitwiseRightShiftAssign, T, U, MakeVoidT<decltype(std::declval<T>() >>= std::declval<U>())>> : std::true_type
+{};
+template<typename T, typename U>
+struct OperatorDefinedImpl<OperatorType::kBitwiseAndAssign, T, U, MakeVoidT<decltype(std::declval<T>() &= std::declval<U>())>> : std::true_type
+{};
+template<typename T, typename U>
+struct OperatorDefinedImpl<OperatorType::kBitwiseXorAssign, T, U, MakeVoidT<decltype(std::declval<T>() ^= std::declval<U>())>> : std::true_type
+{};
+template<typename T, typename U>
+struct OperatorDefinedImpl<OperatorType::kBitwiseOrAssign, T, U, MakeVoidT<decltype(std::declval<T>() |= std::declval<U>())>> : std::true_type
+{};
+template<typename T, typename U>
+struct OperatorDefinedImpl<OperatorType::kComma, T, U, MakeVoidT<decltype(std::declval<T>() , std::declval<U>())>> : std::true_type
+{};
+} // detail
+
+template<OperatorType Operator, typename T, typename U>
+struct OperatorDefined : std::bool_constant<detail::OperatorDefinedImpl<Operator, T, U>::value>
 {};
 
-template<Operator Oper, typename T, typename U>
-constexpr inline bool kHaveOperator = HaveOperator<Oper, T, U>::value;
+template<OperatorType Operator, typename T, typename U>
+constexpr inline bool kOperatorDefined = OperatorDefined<Operator, T, U>::value;
 } // game
 
 #endif // GAME_TYPE_HPP

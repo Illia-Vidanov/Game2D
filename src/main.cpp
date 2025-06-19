@@ -1,7 +1,6 @@
 /*
 Todo:
 - Background
-- TODO in Enum
 - Saving
 - Postprocessing
 - FPS counter in Debug menu
