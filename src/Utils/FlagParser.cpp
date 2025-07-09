@@ -2,16 +2,23 @@
 
 #include "Setup.hpp"
 
+#include <unordered_map>
+#include <utility>
+#include <string>
+#include <stdint.h>
+
 #include "Utils/String.hpp"
 #include "Utils/Logger.hpp"
 #include "Utils/MathConstants.hpp"
 
 
-namespace game
+namespace tolik
 {
 auto Flags::ParseFlag(ConstArgvType flag_begin, const ConstArgvType possible_flag_end, std::size_t *strings_used, const std::string &delim) noexcept -> MapType::value_type
 {
-  ZoneScopedC(0xbaed00);
+  #ifdef TRACY_ENABLE
+	ZoneScopedC(0xbaed00);
+	#endif
 
   enum
   {
@@ -193,7 +200,9 @@ auto Flags::ParseFlag(ConstArgvType flag_begin, const ConstArgvType possible_fla
 
 void Flags::Parse() noexcept
 {
-  ZoneScopedC(0xbaed00);
+  #ifdef TRACY_ENABLE
+	ZoneScopedC(0xbaed00);
+	#endif
   
   std::size_t strings_used = 0;
   for(ConstArgvType str = begin_; str != end_;)
@@ -204,4 +213,4 @@ void Flags::Parse() noexcept
     str += strings_used;
   }
 }
-} // game
+} // tolik

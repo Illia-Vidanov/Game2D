@@ -1,7 +1,12 @@
-#ifndef GAME_FLAG_PARSER_HPP
-#define GAME_FLAG_PARSER_HPP
+#ifndef FILE_FLAG_PARSER_HPP
+#define FILE_FLAG_PARSER_HPP
 
 #include "Setup.hpp"
+
+#include <unordered_map>
+#include <utility>
+#include <string>
+#include <stdint.h>
 
 #include "Utils/String.hpp"
 #include "Utils/Logger.hpp"
@@ -9,7 +14,7 @@
 
 
 
-namespace game
+namespace tolik
 {
 // Class to parse flags
 //
@@ -59,6 +64,6 @@ private:
   static auto ParseFlag(ConstArgvType flag_begin, const ConstArgvType possible_flag_end, std::size_t *strings_used = nullptr, const std::string &delim = kDefDelim) noexcept -> MapType::value_type;
   void Parse() noexcept;
 };
-} // game
+} // tolik
 
-#endif // GAME_FLAG_PARSER_HPP
+#endif // FILE_FLAG_PARSER_HPP

@@ -1,10 +1,12 @@
-#ifndef GAME_HASH_HPP
-#define GAME_HASH_HPP
+#ifndef FILE_HASH_HPP
+#define FILE_HASH_HPP
 
 #include "Setup.hpp"
 
+#include <stdint.h>
 
-namespace game
+
+namespace tolik
 {
 namespace detail
 {
@@ -93,6 +95,6 @@ struct NumToStr : detail::NumToStrImpl<(Number < 0), (Number < 0 ? -Number : Num
 // Constexpr convertion of number to const char array
 template<auto Number>
 constexpr char *kNumToStr = NumToStr<Number>::value;
-} // game
+} // tolik
 
-#endif // GAME_HASH_HPP
+#endif // FILE_HASH_HPP

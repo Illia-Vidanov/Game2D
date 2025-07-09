@@ -1,12 +1,16 @@
-#ifndef GAME_STRING_UTILS_HPP
-#define GAME_STRING_UTILS_HPP
+#ifndef FILE_STRING_UTILS_HPP
+#define FILE_STRING_UTILS_HPP
 
 #include "Setup.hpp"
+
+#include <string>
+#include <stdint.h>
+#include <algorithm>
 
 #include "Utils/MathConstants.hpp"
 
 
-namespace game
+namespace tolik
 {
 namespace detail
 {
@@ -32,7 +36,9 @@ template<typename CharT>
 template<typename T>
 StringBuilder<CharT> &StringBuilder<CharT>::operator<<(T &&t) noexcept
 {
-  ZoneScopedC(0xbaed00);
+  #ifdef TRACY_ENABLE
+	ZoneScopedC(0xbaed00);
+	#endif
   
   string_stream_ << std::forward<T>(t);
 	return *this;
@@ -92,7 +98,9 @@ auto ConcatRawStringArrayToRaw(std::initializer_list<const CharT*> raw_strings, 
 template<typename CharT>
 auto RemoveCurrentPathFromString(const std::basic_string<CharT> &str) -> std::basic_string<CharT>
 {
-  ZoneScopedC(0x3e2ed1);
+  #ifdef TRACY_ENABLE
+	ZoneScopedC(0x3e2ed1);
+	#endif
 
   const std::basic_string<CharT> &path = std::filesystem::current_path().generic_string<CharT>();
   if(str.size() == path.size())
@@ -107,7 +115,9 @@ auto SplitString(const std::basic_string<CharT> &str, const std::basic_string<Ch
 {
   GAME_ASSERT_STD(delim.size() != 0);
 
-  ZoneScopedC(0x3e2ed1);
+  #ifdef TRACY_ENABLE
+	ZoneScopedC(0x3e2ed1);
+	#endif
 
 	std::vector<std::basic_string<CharT>> result(SubstringCount(str, delim) + 1);
 	
@@ -137,7 +147,9 @@ auto StringStartsWith(const std::basic_string<CharT> &prefix, const std::basic_s
 {
   GAME_ASSERT_STD(str.size() == 0);
 
-  ZoneScopedC(0x3e2ed1);
+  #ifdef TRACY_ENABLE
+	ZoneScopedC(0x3e2ed1);
+	#endif
 
     for(std::size_t i = 0; i < prefix.size(); i++)
     {
@@ -154,7 +166,9 @@ auto SubstringCount(const std::basic_string<CharT> &str, const std::basic_string
   if(str.size() == 0 || substr.size() == 0)
     return 0;
 
-  ZoneScopedC(0x3e2ed1);
+  #ifdef TRACY_ENABLE
+	ZoneScopedC(0x3e2ed1);
+	#endif
 
 	std::size_t count = 0;
 	std::size_t substrPos = str.find(substr);
@@ -184,7 +198,9 @@ auto ConcatRawStringArray(detail::ConstRawStrArray<CharT> first, const detail::C
 {
   GAME_ASSERT_STD(first != nullptr && last != nullptr && first < last);
 
-  ZoneScopedC(0x3e2ed1);
+  #ifdef TRACY_ENABLE
+	ZoneScopedC(0x3e2ed1);
+	#endif
 
 	std::string result;
 	result.reserve(RawStringArrayLength(first, last) + (last - first - 1) * delim.size());
@@ -203,7 +219,9 @@ auto ConcatRawStringArrayToRaw(detail::ConstRawStrArray<CharT> first, const deta
 {
   GAME_ASSERT_STD(first != nullptr && last != nullptr && first < last);
 
-  ZoneScopedC(0x3e2ed1);
+  #ifdef TRACY_ENABLE
+	ZoneScopedC(0x3e2ed1);
+	#endif
 
   const std::size_t delim_size = std::char_traits<CharT>::length(delim);
   char *result = new char[RawStringArrayLength(first, last) + (last - first - 1) * delim_size];
@@ -218,6 +236,6 @@ auto ConcatRawStringArrayToRaw(detail::ConstRawStrArray<CharT> first, const deta
 
   return result;
 }
-} // game
+} // tolik
 
-#endif // GAME_STRING_UTILS_HPP
+#endif // FILE_STRING_UTILS_HPP

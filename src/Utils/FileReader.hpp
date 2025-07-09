@@ -1,13 +1,21 @@
-#ifndef GAME_FILE_READER_HPP
-#define GAME_FILE_READER_HPP
+#ifndef FILE_FILE_READER_HPP
+#define FILE_FILE_READER_HPP
 
 #include "Setup.hpp"
+
+#include <fstream>
+#include <string>
+#include <sstream>
+#include <filesystem>
+#include <stdint.h>
+
+#include "stb_image.h"
 
 #include "Utils/Logger.hpp"
 #include "Utils/MathConstants.hpp"
 
 
-namespace game
+namespace tolik
 {
 struct ImageData
 {
@@ -34,6 +42,6 @@ public:
 
 private:
 };
-} // game
+} // tolik
 
-#endif // GAME_FILE_READER_HPP
+#endif // FILE_FILE_READER_HPP

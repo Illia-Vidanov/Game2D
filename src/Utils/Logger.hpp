@@ -3,6 +3,12 @@
 
 #include "Setup.hpp"
 
+#include <iostream>
+#include <chrono>
+#include <string>
+#include <fstream>
+#include <stdint.h>
+
 #include "Utils/Enum.hpp"
 #include "Utils/String.hpp"
 #include "Utils/MathConstants.hpp"
@@ -12,7 +18,7 @@
 */
 
 #if defined(NDEBUG) && !defined(TRACY_ENABLE)
-  #define GAME_DLOG(type) if constexpr (false) game::LogStream{LogData{__LINE__, __FILE__, LogType::kNone, std::chrono::system_clock::now(), #condition, static_cast<Logger::VerboseLevelType>{-1}}}
+  #define GAME_DLOG(type) if constexpr (false) tolik::LogStream{LogData{__LINE__, __FILE__, LogType::kNone, std::chrono::system_clock::now(), #condition, static_cast<Logger::VerboseLevelType>{-1}}}
   #define GAME_VDLOG(level, type) GAME_DLOG(void)
   #define GAME_ASSERT(condition) GAME_DLOG(void)
   #define GAME_DLOG_IF(condition, type) GAME_DLOG(void)
@@ -22,22 +28,22 @@
   #define GAME_DLOG(type) GAME_LOG(type)
   // DLOG if verbose level is smaller than current Logger's verbose level
   #define GAME_VDLOG(level, type) GAME_VLOG(level, type)
-  #define GAME_ASSERT(condition) if(GAME_IS_UNLIKELY(!(static_cast<bool>(condition)))) game::LogStream{game::LogData{__LINE__, __FILE__, game::LogType::kFatal, std::chrono::system_clock::now(), #condition, static_cast<game::Logger::VerboseLevelType>(-1)}}
+  #define GAME_ASSERT(condition) if(GAME_IS_UNLIKELY(!(static_cast<bool>(condition)))) tolik::LogStream{tolik::LogData{__LINE__, __FILE__, tolik::LogType::kFatal, std::chrono::system_clock::now(), #condition, static_cast<tolik::Logger::VerboseLevelType>(-1)}}
   // DLOG if condition is true
   #define GAME_DLOG_IF(condition, type) GAME_LOG_IF(condition, type)
   // DLOG if verbose level is smaller than current Logger's verbose level and condition is true
   #define GAME_VDLOG_IF(condition, level, type) GAME_VLOG_IF(condition, level, type)
 #endif
 
-#define GAME_LOG(type) game::LogStream{game::LogData{__LINE__, __FILE__, type, std::chrono::system_clock::now(), "", static_cast<game::Logger::VerboseLevelType>(-1)}}
+#define GAME_LOG(type) tolik::LogStream{tolik::LogData{__LINE__, __FILE__, type, std::chrono::system_clock::now(), "", static_cast<tolik::Logger::VerboseLevelType>(-1)}}
 // LOG if verbose level is smaller than current Logger's verbose level
-#define GAME_VLOG(level, type) if(level < game::Logger::Get().GetVerboseLevel()) game::LogStream{game::LogData{__LINE__, __FILE__, type, std::chrono::system_clock::now(), "", static_cast<game::Logger::VerboseLevelType>(level)}}
+#define GAME_VLOG(level, type) if(level < tolik::Logger::Get().GetVerboseLevel()) tolik::LogStream{tolik::LogData{__LINE__, __FILE__, type, std::chrono::system_clock::now(), "", static_cast<tolik::Logger::VerboseLevelType>(level)}}
 // LOG if condition is true
-#define GAME_LOG_IF(condition, type) if(static_cast<bool>(condition)) game::LogStream{game::LogData{__LINE__, __FILE__, type, std::chrono::system_clock::now(), #condition, static_cast<game::Logger::VerboseLevelType>(-1)}}
+#define GAME_LOG_IF(condition, type) if(static_cast<bool>(condition)) tolik::LogStream{tolik::LogData{__LINE__, __FILE__, type, std::chrono::system_clock::now(), #condition, static_cast<tolik::Logger::VerboseLevelType>(-1)}}
 // LOG if verbose level is smaller than current Logger's verbose level and condition is true
-#define GAME_VLOG_IF(condition, level, type) if(static_cast<bool>(condition)) game::LogStream{game::LogData{__LINE__, __FILE__, type, std::chrono::system_clock::now(), #condition, static_cast<game::Logger::VerboseLevelType>(level)}}
+#define GAME_VLOG_IF(condition, level, type) if(static_cast<bool>(condition)) tolik::LogStream{tolik::LogData{__LINE__, __FILE__, type, std::chrono::system_clock::now(), #condition, static_cast<tolik::Logger::VerboseLevelType>(level)}}
 
-namespace game
+namespace tolik
 {
 enum class LogType : uint8_t
 {
@@ -124,6 +130,6 @@ private:
   const bool fatal_ = false;
   StringBuilder<Logger::StreamCharT> string_builder_;
 };
-} // game
+} // tolik
 
-#endif // GAME_LOGGER_HPP
+#endif // FILE_LOGGER_HPP

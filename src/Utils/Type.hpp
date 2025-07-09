@@ -1,23 +1,26 @@
-#ifndef GAME_TYPE_HPP
-#define GAME_TYPE_HPP
+#ifndef FILE_TYPE_HPP
+#define FILE_TYPE_HPP
 
 #include "Setup.hpp"
 
+#include <type_traits>
+#include <stdint.h>
 
-namespace game
+
+namespace tolik
 {
 namespace detail
 {
-	template<bool Condition>
-	struct Warning
-	{};
+template<bool Condition>
+struct Warning
+{};
 
-	template<>
-	struct __attribute__((deprecated)) Warning<false>
-	{ constexpr Warning() {} };
+template<>
+struct __attribute__((deprecated)) Warning<false>
+{ constexpr Warning() {} };
 } // detail
 
-#define StaticWarn(x, ...) ((void) Warning<x>())
+#define StaticWarning(x, ...) ((void)Warning<x>())
 
 
 namespace detail
@@ -263,11 +266,11 @@ struct OperatorDefinedImpl<OperatorType::kComma, T, U, MakeVoidT<decltype(std::d
 } // detail
 
 template<OperatorType Operator, typename T, typename U>
-struct OperatorDefined : std::bool_constant<detail::OperatorDefinedImpl<Operator, T, U>::value>
+struct OperatorDefined : detail::OperatorDefinedImpl<Operator, T, U>
 {};
 
 template<OperatorType Operator, typename T, typename U>
 constexpr inline bool kOperatorDefined = OperatorDefined<Operator, T, U>::value;
-} // game
+} // tolik
 
-#endif // GAME_TYPE_HPP
+#endif // FILE_TYPE_HPP

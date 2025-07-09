@@ -77,6 +77,22 @@ using Owner = T;
 template<typename T>
 using NotNull = T;
 
+namespace tolik {}
+using namespace tolik;
+
+using DefaultFloatType = float;
+
+using Transform = Eigen::Transform<DefaultFloatType, 2, 2>;
+using Vector2 = Eigen::Vector2<DefaultFloatType>;
+using Vector3 = Eigen::Vector3<DefaultFloatType>;
+using Vector4 = Eigen::Vector4<DefaultFloatType>;
+using Vector2i = Eigen::Vector2<int>;
+using Vector3i = Eigen::Vector3<int>;
+using Vector4i = Eigen::Vector4<int>;
+using Matrix2 = Eigen::Matrix2<DefaultFloatType>;
+using Matrix3 = Eigen::Matrix3<DefaultFloatType>;
+using Matrix4 = Eigen::Matrix4<DefaultFloatType>;
+
 // Wraper around __builtin_expect
 #define GAME_IS_LIKELY(condition) __builtin_expect(!!(condition), 1)
 // Wraper around __builtin_expect

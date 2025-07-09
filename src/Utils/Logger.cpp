@@ -2,28 +2,42 @@
 
 #include "Setup.hpp"
 
+#include <iostream>
+#include <chrono>
+#include <string>
+#include <fstream>
+#include <stdint.h>
+
+#include "Utils/Enum.hpp"
+#include "Utils/String.hpp"
 #include "Utils/MathConstants.hpp"
 
 
-namespace game
+namespace tolik
 {
 Logger::Logger() noexcept
 {
-  ZoneScopedC(0xbaed00);
+  #ifdef TRACY_ENABLE
+	ZoneScopedC(0xbaed00);
+	#endif
 
   OpenFile();
 }
 
 Logger::~Logger() noexcept
 {
-  ZoneScopedC(0xbaed00);
+  #ifdef TRACY_ENABLE
+	ZoneScopedC(0xbaed00);
+	#endif
 
   file_.close();
 }
 
 void Logger::OpenFile() noexcept
 {
-  ZoneScopedC(0xbaed00);
+  #ifdef TRACY_ENABLE
+	ZoneScopedC(0xbaed00);
+	#endif
 
   std::filesystem::create_directories(std::filesystem::path{file_path_}.parent_path());
   file_.open(file_path_, kOpenMode);
@@ -38,7 +52,9 @@ LogStream::LogStream(const LogData &log_data) noexcept
 
 LogStream::~LogStream() noexcept
 {
-  ZoneScopedNC("Log whole", 0xbaed00);
+  #ifdef TRACY_ENABLE
+	ZoneScopedNC("Log whole", 0xbaed00);
+	#endif
 
   string_builder_ << '\n';
 
@@ -57,4 +73,4 @@ void LogStream::Output(const std::string &string) noexcept
 	  Logger::Get().GetFile().flush();
   }
 }
-} // game
+} // tolik
