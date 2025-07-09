@@ -37,6 +37,7 @@ Game::Game(const int argc, const char * const *argv) noexcept
   , resource_manager_{*this}
   , input_system_{*this}
   , physics_system_{*this}
+  , debug_{*this}
 {
   ZoneScopedC(0xb3041b);
 
@@ -45,10 +46,10 @@ Game::Game(const int argc, const char * const *argv) noexcept
   frame_start_ = std::chrono::high_resolution_clock::now();
 
   event_system_.AddListener(event_cleaner_, EventType::kQuit, this, []([[maybe_unused]] const Event &event, void *game){ return reinterpret_cast<Game*>(game)->QuitEvent(); });
-  event_system_.AddListener(event_cleaner_, EventType::kKeyDown, this, [](const Event &event, void *game){ if(event.GetKeycode() == static_cast<int>(SDLK_ESCAPE)) { reinterpret_cast<Game*>(game)->QuitEvent(); } return false; });
+  event_system_.AddListener(event_cleaner_, EventType::kKeyDown, this, [](const Event &event, void *game){ if(event.GetKeycode() == static_cast<int>(SDLK_ESCAPE)) { return reinterpret_cast<Game*>(game)->QuitEvent(); } return false; });
+  event_system_.AddListener(event_cleaner_, EventType::kKeyDown, this, [](const Event &event, void *game){ if(event.GetKeycode() == static_cast<int>(SDLK_F3)) { return reinterpret_cast<Game*>(game)->DebugEvent(); } return false; });
 
   window_.InitEvents();
-  input_system_.InitEvents();
 }
 
 Game::~Game() noexcept
@@ -63,7 +64,7 @@ void Game::Run() noexcept
   ZoneScopedC(0xb3041b);
 
   Entity &player = CreateEntity("player");
-  player.AddComponent<OutlineComponent>();
+  OutlineComponent &player_outline = player.AddComponent<OutlineComponent>();
   TransformComponent &player_transform = player.AddComponent<TransformComponent>();
   player_transform.SetScale(Vector2{10, 10});
   SpriteComponent &player_sprite = player.AddComponent<SpriteComponent>();
@@ -82,7 +83,7 @@ void Game::Run() noexcept
   PlayerComponent &player_component = player.AddComponent<PlayerComponent>();
 
   Entity &box = CreateEntity("box");
-  box.AddComponent<OutlineComponent>();
+  OutlineComponent &box_outline = box.AddComponent<OutlineComponent>();
   TransformComponent &box_transform = box.AddComponent<TransformComponent>();
   box_transform.SetPosition(Vector2{5, 5});
   box_transform.SetScale(Vector2{100, 10});
@@ -108,6 +109,8 @@ void Game::Run() noexcept
 
     input_system_.Update();
     player_component.Update();
+    debug_.Update();
+
     ui_.Update();
     
     render_system_.EndFrame();
@@ -155,6 +158,13 @@ auto Game::GetOrCreateEntity(const std::string &name) noexcept -> Entity &
 auto Game::QuitEvent() noexcept -> bool
 {
   running_ = false;
+
+  return false;
+}
+
+auto Game::DebugEvent() noexcept -> bool
+{
+  debug_.SetActive(!debug_.GetActive());
 
   return false;
 }

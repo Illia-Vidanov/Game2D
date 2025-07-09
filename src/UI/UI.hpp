@@ -27,6 +27,8 @@ private:
   auto WindowResizeEvent(const Event &event) noexcept -> bool;
   void UpdateWindow() const noexcept;
 
+  void DrawDebugWindow() const noexcept;
+
   Game &game_;
   EventCleaner event_cleaner_;
 

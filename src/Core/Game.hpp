@@ -15,6 +15,7 @@
 #include "Player/CameraComponent.hpp"
 #include "Physics/PhysicsSystem.hpp"
 #include "Core/Entity.hpp"
+#include "Core/Debug.hpp"
 
 
 namespace game
@@ -35,6 +36,8 @@ public:
   [[nodiscard]] constexpr auto GetUI() noexcept -> UI & { return ui_; }
   [[nodiscard]] constexpr auto GetFlags() noexcept -> Flags & { return flags_; }
   [[nodiscard]] constexpr auto GetFlags() const noexcept -> const Flags & { return flags_; }
+  [[nodiscard]] constexpr auto GetDebug() noexcept -> Debug & { return debug_; }
+  [[nodiscard]] constexpr auto GetDebug() const noexcept -> const Debug & { return debug_; }
   [[nodiscard]] constexpr auto GetWindow() noexcept -> Window & { return window_; }
   [[nodiscard]] constexpr auto GetWindow() const noexcept -> const Window & { return window_; }
   [[nodiscard]] constexpr auto GetRegistry() noexcept -> entt::registry & { return registry_; }
@@ -58,8 +61,10 @@ public:
   auto CreateEntity(const std::string &name) noexcept -> Entity & { GAME_ASSERT(entities_.find(name) == entities_.end()); return (*entities_.emplace(name, Entity{*this}).first).second; }
   auto GetOrCreateEntity(const std::string &name) noexcept -> Entity &;
 
+
 private:
   auto QuitEvent() noexcept -> bool;
+  auto DebugEvent() noexcept -> bool;
 
   bool running_ = false;
   Flags flags_;
@@ -74,6 +79,7 @@ private:
   entt::registry registry_;
   InputSystem input_system_;
   PhysicsSystem physics_system_;
+  Debug debug_;
 
   std::unordered_map<std::string, Entity> entities_;
 

@@ -23,7 +23,7 @@ public:
   TransformComponent &operator=(const Transform &other) noexcept;
   TransformComponent &operator=(Transform &&other) noexcept;
 
-  [[nodiscard]] auto GetPosition() noexcept -> Vector2 { return translation(); }
+  [[nodiscard]] auto GetPosition() const noexcept -> Vector2 { return translation(); }
   void SetPosition(const Vector2 &position) noexcept { translation() = position; }
   [[nodiscard]] constexpr auto GetRotationAngle() const noexcept -> DefaultFloatType { return angle_; }
   void SetRotationAngle(DefaultFloatType angle) noexcept { angle_ = angle; sin_ = std::sin(angle_); cos_ = std::cos(angle_); linear() = Eigen::Scaling(scale_) * Matrix2{ {cos_, -sin_}, {sin_, cos_} }; }
@@ -40,8 +40,8 @@ public:
   [[nodiscard]] auto Getb2Position() const noexcept -> b2Vec2 { return b2Vec2{translation().x(), translation().y()}; }
   [[nodiscard]] auto Getb2Rotation() const noexcept -> b2Rot { return b2Rot{cos_, sin_}; }
 
-  [[nodiscard]] constexpr auto GetEntity() const noexcept -> const Entity * { return entity_; }
-  [[nodiscard]] constexpr auto GetEntity() noexcept -> Entity * { return entity_; }
+  [[nodiscard]] constexpr auto GetEntity() const noexcept -> const Entity & { return *entity_; }
+  [[nodiscard]] constexpr auto GetEntity() noexcept -> Entity & { return *entity_; }
 
 private:
   Entity *entity_;

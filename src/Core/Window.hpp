@@ -46,8 +46,10 @@ public:
   [[nodiscard]] auto GetTitle() noexcept -> const std::string & { return title_; }
   void SetTitle(const std::string &title) noexcept;
 
+  [[nodiscard]] auto ScreenToWorldPosition(const Vector2i &screen_point) noexcept -> Vector2;
+
   
-  private:
+private:
   auto WindowResizedEvent(const Event &event) noexcept -> bool;
 
   

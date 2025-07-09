@@ -7,6 +7,7 @@
 #include "Utils/MathConstants.hpp"
 #include "Core/Entity.hpp"
 #include "Utils/Math.hpp"
+#include "Physics/VectorMath.hpp"
 #include "Physics/TransformComponent.hpp"
 
 
@@ -20,7 +21,7 @@ RectangleColliderComponent::RectangleColliderComponent(Entity *entity) noexcept
   b2Polygon polygon = Getb2Polygon();
   b2ShapeDef shape_definition = b2DefaultShapeDef();
 
-  b2BodyId body_id = entity_->GetGame().GetPhysicsSystem().Getb2BodyId(entity_->GetID());
+  b2BodyId body_id = entity_->GetGame().GetPhysicsSystem().TryGetb2BodyId(entity_);
   if(PhysicsSystem::Isb2BodyIdNull(body_id))
   {
     b2BodyDef body_definition = b2DefaultBodyDef();
@@ -28,7 +29,7 @@ RectangleColliderComponent::RectangleColliderComponent(Entity *entity) noexcept
     body_definition.position = transform.Getb2Position();
     body_definition.rotation = transform.Getb2Rotation();
     body_id = b2CreateBody(entity_->GetGame().GetPhysicsSystem().GetWorldId(), &body_definition);
-    entity_->GetGame().GetPhysicsSystem().Addb2BodyId(entity_->GetID(), body_id);
+    entity_->GetGame().GetPhysicsSystem().Addb2BodyId(entity_, body_id);
   }
 
   shape_id_ = b2CreatePolygonShape(body_id, &shape_definition, &polygon);

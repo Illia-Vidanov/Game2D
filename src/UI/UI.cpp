@@ -6,6 +6,8 @@
 #include "Core/EventSystem.hpp"
 #include "Utils/Logger.hpp"
 #include "Rendering/OutlineComponent.hpp"
+#include "Physics/TransformComponent.hpp"
+#include "Physics/RigidbodyComponent.hpp"
 
 
 namespace game
@@ -48,15 +50,11 @@ void UI::Update() noexcept
   ImGui_ImplSDL2_NewFrame();
   ImGui::NewFrame();
 
-  if(ImGui::Begin("Debug"))
-  {
-    ImGui::SetWindowPos(ImVec2{10 * scale_multiplier_.x(), 10 * scale_multiplier_.y()}, ImGuiCond_Once);
-    ImGui::SetWindowSize(ImVec2{20 * scale_multiplier_.x(), 10 * scale_multiplier_.y()}, ImGuiCond_Once);
+  if(game_.GetDebug().GetActive())
+    DrawDebugWindow();
 
-    if(window_resized_)
-      UpdateWindow();
-  }
-  ImGui::End();
+  //ImGui::ShowDemoWindow();
+  
 
   window_resized_ = false;
 
@@ -83,5 +81,45 @@ void UI::UpdateWindow() const noexcept
   ImGui::SetWindowPos(ImVec2{position.x * scale_multiplier_.x(), position.y * scale_multiplier_.y()});
   ImVec2 size = ImGui::GetWindowSize();
   ImGui::SetWindowSize(ImVec2{size.x * scale_multiplier_.x(), size.y * scale_multiplier_.y()});
+}
+
+void UI::DrawDebugWindow() const noexcept
+{
+  if(ImGui::Begin("Debug"))
+  {
+    ImGui::SetWindowPos(ImVec2{10 * scale_multiplier_.x(), 10 * scale_multiplier_.y()}, ImGuiCond_Once);
+    ImGui::SetWindowSize(ImVec2{20 * scale_multiplier_.x(), 10 * scale_multiplier_.y()}, ImGuiCond_Once);
+
+    if(window_resized_)
+      UpdateWindow();
+
+    static bool select_mode = game_.GetDebug().GetSelectMode();
+    if(ImGui::Checkbox("Select Mode", &select_mode))
+      game_.GetDebug().SetSelectMode(select_mode);
+      
+    if(!game_.GetDebug().GetSelectedEntities().empty())
+    {
+      bool first = true;
+      for(Entity *entity : game_.GetDebug().GetSelectedEntities())
+      {
+        if(!ImGui::CollapsingHeader("Entity", first ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None))
+          continue;
+        first = false;
+
+        TransformComponent *transform = entity->TryGetComponent<TransformComponent>();
+
+        if(transform && ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+          Vector2 position = transform->GetPosition();
+          if(ImGui::InputFloat2("Position", position.data()))
+          {
+            transform->SetPosition(position);
+            game_.GetPhysicsSystem().Updateb2Transform(entity);
+          }
+        }
+      }
+    }
+  }
+  ImGui::End();
 }
 } // game

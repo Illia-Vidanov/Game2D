@@ -15,6 +15,9 @@ enum class EventType : uint32_t
   kNone = 0,
   kKeyDown,
   kKeyUp,
+  kMouseButtonDown,
+  kMouseButtonUp,
+  kMouseMotion,
   kWindowResize,
   kRenderAreaResize,
   kQuit
@@ -23,201 +26,124 @@ enum class EventType : uint32_t
 union Event
 {
 public:
-  struct Common
-  {
-    friend Event;
-  public:
-    explicit constexpr Common(EventType new_type) noexcept
-    : type{new_type}
-    {}
+  Event(EventType type) noexcept : common_{type} {}
+  ~Event() noexcept;
+  Event(const Event &other) noexcept { *this = other; }
+  Event(Event &&other) noexcept { *this = other; }
+  Event &operator=(const Event &other) noexcept;
+  Event &operator=(Event &&other) noexcept;
 
-  // private here is used as const to make it immutable by users
-  private:
-    EventType type;
-  };
 
+  static constexpr std::underlying_type_t<EventType> kCustomTypeMask = static_cast<std::underlying_type_t<EventType>>(1) << (sizeof(EventType) * CHAR_BIT - 1);
+
+  [[nodiscard]] constexpr auto GetType() const noexcept -> EventType { return common_.type; }
+  [[nodiscard]] auto GetName() const noexcept -> std::string;
+
+  [[nodiscard]] constexpr auto GetKeycode() const noexcept -> int { GAME_ASSERT(common_.type == EventType::kKeyDown || common_.type == EventType::kKeyUp); return key_data_.keycode; }
+  constexpr auto SetKeycode(int keycode) noexcept -> Event & { GAME_ASSERT(common_.type == EventType::kKeyDown || common_.type == EventType::kKeyUp); key_data_.keycode = keycode; return *this; }
+  [[nodiscard]] constexpr auto GetScancode() const noexcept -> int { GAME_ASSERT(common_.type == EventType::kKeyDown || common_.type == EventType::kKeyUp); return key_data_.scancode; }
+  constexpr auto SetScancode(int scancode) noexcept -> Event & { GAME_ASSERT(common_.type == EventType::kKeyDown || common_.type == EventType::kKeyUp); key_data_.scancode = scancode; return *this; }
+  [[nodiscard]] constexpr auto GetModKeys() const noexcept -> int { GAME_ASSERT(common_.type == EventType::kKeyDown || common_.type == EventType::kKeyUp); return key_data_.mod_keys; }
+  constexpr auto SetModKeys(uint16_t mod_keys) noexcept -> Event & { GAME_ASSERT(common_.type == EventType::kKeyDown || common_.type == EventType::kKeyUp); key_data_.mod_keys = mod_keys; return *this; }
+
+  [[nodiscard]] constexpr auto GetMouseButton() const noexcept -> uint8_t { GAME_ASSERT(common_.type == EventType::kMouseButtonDown || common_.type == EventType::kMouseButtonUp); return mouse_button_.button; }
+  constexpr auto SetMouseButton(uint8_t button) noexcept -> Event & { GAME_ASSERT(common_.type == EventType::kMouseButtonDown || common_.type == EventType::kMouseButtonUp); mouse_button_.button = button; return *this; }
+  
+  [[nodiscard]] constexpr auto GetNewWindowWidth() const noexcept -> int { GAME_ASSERT(common_.type == EventType::kWindowResize); return window_resize_.new_width; }
+  constexpr auto SetNewWindowWidth(int new_width) noexcept -> Event & { GAME_ASSERT(common_.type == EventType::kWindowResize); window_resize_.new_width = new_width; return *this; }
+  [[nodiscard]] constexpr auto GetNewWindowHeight() const noexcept -> int { GAME_ASSERT(common_.type == EventType::kWindowResize); return window_resize_.new_height; }
+  constexpr auto SetNewWindowHeight(int new_height) noexcept -> Event & { GAME_ASSERT(common_.type == EventType::kWindowResize); window_resize_.new_height = new_height; return *this; }
+  [[nodiscard]] constexpr auto GetOldWindowWidth() const noexcept -> int { GAME_ASSERT(common_.type == EventType::kWindowResize); return window_resize_.old_width; }
+  constexpr auto SetOldWindowWidth(int old_width) noexcept -> Event & { GAME_ASSERT(common_.type == EventType::kWindowResize); window_resize_.old_width = old_width; return *this; }
+  [[nodiscard]] constexpr auto GetOldWindowHeight() const noexcept -> int { GAME_ASSERT(common_.type == EventType::kWindowResize); return window_resize_.old_height; }
+  constexpr auto SetOldWindowHeight(int old_height) noexcept -> Event & { GAME_ASSERT(common_.type == EventType::kWindowResize); window_resize_.old_height = old_height; return *this; }
+  [[nodiscard]] auto GetNewWindowResolution() const noexcept -> Vector2i { GAME_ASSERT(common_.type == EventType::kWindowResize); return Vector2i{window_resize_.new_width, window_resize_.new_height}; }
+  auto SetNewWindowResolution(Vector2i new_window_resolution) noexcept -> Event & { GAME_ASSERT(common_.type == EventType::kWindowResize); window_resize_.new_width = new_window_resolution.x(); window_resize_.new_height = new_window_resolution.y(); return *this; }
+  [[nodiscard]] auto GetOldWindowResolution() const noexcept -> Vector2i { GAME_ASSERT(common_.type == EventType::kWindowResize); return Vector2i{window_resize_.old_width, window_resize_.old_height}; }
+  auto SetOldWindowResolution(Vector2i old_window_resolution) noexcept -> Event & { GAME_ASSERT(common_.type == EventType::kWindowResize); window_resize_.old_width = old_window_resolution.x(); window_resize_.old_height = old_window_resolution.y(); return *this; }
+
+  [[nodiscard]] constexpr auto GetNewRenderAreaWidth() const noexcept -> int { GAME_ASSERT(common_.type == EventType::kRenderAreaResize); return render_area_resize_.new_width; }
+  constexpr auto SetNewRenderAreaWidth(int new_width) noexcept -> Event & { GAME_ASSERT(common_.type == EventType::kRenderAreaResize); render_area_resize_.new_width = new_width; return *this; }
+  [[nodiscard]] constexpr auto GetOldRenderAreaWidth() const noexcept -> int { GAME_ASSERT(common_.type == EventType::kRenderAreaResize); return render_area_resize_.old_width; }
+  constexpr auto SetOldRenderAreaWidth(int old_width) noexcept -> Event & { GAME_ASSERT(common_.type == EventType::kRenderAreaResize); render_area_resize_.old_width = old_width; return *this; }
+  [[nodiscard]] constexpr auto GetNewRenderAreaHeight() const noexcept -> int { GAME_ASSERT(common_.type == EventType::kRenderAreaResize); return render_area_resize_.new_height; }
+  constexpr auto SetNewRenderAreaHeight(int new_height) noexcept -> Event & { GAME_ASSERT(common_.type == EventType::kRenderAreaResize); render_area_resize_.new_height = new_height; return *this; }
+  [[nodiscard]] constexpr auto GetOldRenderAreaHeight() const noexcept -> int { GAME_ASSERT(common_.type == EventType::kRenderAreaResize); return render_area_resize_.old_height; }
+  constexpr auto SetOldRenderAreaHeight(int old_height) noexcept -> Event & { GAME_ASSERT(common_.type == EventType::kRenderAreaResize); render_area_resize_.old_height = old_height; return *this; }
+  [[nodiscard]] auto GetNewRenderAreaResolution() const noexcept -> Vector2i { GAME_ASSERT(common_.type == EventType::kRenderAreaResize); return Vector2i{render_area_resize_.new_width, render_area_resize_.new_height}; }
+  auto SetNewRenderAreaResolution(Vector2i new_render_area_resolution) noexcept -> Event & { GAME_ASSERT(common_.type == EventType::kRenderAreaResize); render_area_resize_.new_width = new_render_area_resolution.x(); render_area_resize_.new_height = new_render_area_resolution.y(); return *this; }
+  [[nodiscard]] auto GetOldRenderAreaResolution() const noexcept -> Vector2i { GAME_ASSERT(common_.type == EventType::kRenderAreaResize); return Vector2i{render_area_resize_.old_width, render_area_resize_.old_height}; }
+  auto SetOldRenderAreaResolution(Vector2i old_render_area_resolution) noexcept -> Event & { GAME_ASSERT(common_.type == EventType::kRenderAreaResize); render_area_resize_.old_width = old_render_area_resolution.x(); render_area_resize_.old_height = old_render_area_resolution.y(); return *this; }
+
+  [[nodiscard]] constexpr auto GetNewMousePositionX() const noexcept -> int { GAME_ASSERT(common_.type == EventType::kMouseMotion); return mouse_motion_.new_mouse_position_x; }
+  constexpr auto SetNewMousePositionX(int new_mouse_position_x) noexcept -> Event & { GAME_ASSERT(common_.type == EventType::kMouseMotion); mouse_motion_.new_mouse_position_x = new_mouse_position_x; return *this; }
+  [[nodiscard]] constexpr auto GetMouseDeltaX() const noexcept -> int { GAME_ASSERT(common_.type == EventType::kMouseMotion); return mouse_motion_.mouse_delta_x; }
+  constexpr auto SetMouseDeltaX(int mouse_delta_x) noexcept -> Event & { GAME_ASSERT(common_.type == EventType::kMouseMotion); mouse_motion_.mouse_delta_x = mouse_delta_x; return *this; }
+  [[nodiscard]] constexpr auto GetNewMousePositionY() const noexcept -> int { GAME_ASSERT(common_.type == EventType::kMouseMotion); return mouse_motion_.new_mouse_position_y; }
+  constexpr auto SetNewMousePositionY(int new_mouse_position_y) noexcept -> Event & { GAME_ASSERT(common_.type == EventType::kMouseMotion); mouse_motion_.new_mouse_position_y = new_mouse_position_y; return *this; }
+  [[nodiscard]] constexpr auto GetMouseDeltaY() const noexcept -> int { GAME_ASSERT(common_.type == EventType::kMouseMotion); return mouse_motion_.mouse_delta_y; }
+  constexpr auto SetMouseDeltaY(int mouse_delta_y) noexcept -> Event & { GAME_ASSERT(common_.type == EventType::kMouseMotion); mouse_motion_.mouse_delta_y = mouse_delta_y; return *this; }
+  [[nodiscard]] auto GetNewMousePosition() const noexcept -> Vector2i { GAME_ASSERT(common_.type == EventType::kMouseMotion); return Vector2i{mouse_motion_.new_mouse_position_x, mouse_motion_.new_mouse_position_y}; }
+  auto SetNewMousePosition(Vector2i new_mouse_position) noexcept -> Event & { GAME_ASSERT(common_.type == EventType::kMouseMotion); mouse_motion_.new_mouse_position_x = new_mouse_position.x(); mouse_motion_.new_mouse_position_y = new_mouse_position.y(); return *this; }
+  [[nodiscard]] auto GetMouseDelta() const noexcept -> Vector2i { GAME_ASSERT(common_.type == EventType::kMouseMotion); return Vector2i{mouse_motion_.mouse_delta_x, mouse_motion_.mouse_delta_y}; }
+  auto SetMouseDelta(Vector2i mouse_delta) noexcept -> Event & { GAME_ASSERT(common_.type == EventType::kMouseMotion); mouse_motion_.mouse_delta_x = mouse_delta.x(); mouse_motion_.mouse_delta_y = mouse_delta.y(); return *this; }
+
+  template<typename T>
+  [[nodiscard]] auto GetCustomData() noexcept -> std::any & { GAME_ASSERT(common_.type & kCustomTypeMask); return custom_.data; }
 
 private:
-  struct Keyboard
+  struct Common
   {
-    explicit constexpr Keyboard(int new_keycode, int new_scancode, uint16_t new_mod_keys) noexcept
-    : keycode{new_keycode}
-    , scancode{new_scancode}
-    , mod_keys{new_mod_keys}
-    {}
+    EventType type;
+  };
+  Common common_;
+
+  struct KeyData : public Common
+  {
     int keycode;
     int scancode;
     uint16_t mod_keys;
   };
-  struct CommonKeyboard : Common, Keyboard
-  {};
+  KeyData key_data_;
 
-
-public:
-  struct KeyDown : Common, Keyboard
+  struct MouseButton : public Common
   {
-    explicit constexpr KeyDown(int new_keycode, int new_scancode, uint16_t new_mod_keys) noexcept
-    : Common{EventType::kKeyDown}
-    , Keyboard{new_keycode, new_scancode, new_mod_keys}
-    {}
+    uint8_t button;
   };
-  constexpr Event(const KeyDown &key_down) noexcept
-  : key_down_{key_down}
-  {}
+  MouseButton mouse_button_;
 
-
-  struct KeyUp : Common, Keyboard
+  struct MouseMotion : public Common
   {
-    explicit constexpr KeyUp(int new_keycode, int new_scancode, uint16_t new_mod_keys) noexcept
-    : Common{EventType::kKeyUp}
-    , Keyboard{new_keycode, new_scancode, new_mod_keys}
-    {}
+    int new_mouse_position_x;
+    int new_mouse_position_y;
+    int mouse_delta_x;
+    int mouse_delta_y;
   };
-  constexpr Event(const KeyUp &key_up) noexcept
-  : key_up_{key_up}
-  {}
+  MouseMotion mouse_motion_;
 
-
-  struct Quit : Common
+  struct WindowResize : public Common
   {
-    explicit constexpr Quit() noexcept
-      : Common{EventType::kQuit}
-    {}
+    int new_width;
+    int new_height;
+    int old_width;
+    int old_height;
   };
-  Event(const Quit &quit) noexcept
-    : quit_{quit}
-  {}
-
-
-private:
-  struct AreaResize
-  {
-  explicit constexpr AreaResize(int new_old_resolution_x, int new_old_resolution_y, int new_new_resolution_x, int new_new_resolution_y) noexcept
-    : old_resolution_x{new_old_resolution_x}
-    , old_resolution_y{new_old_resolution_y}
-    , new_resolution_x{new_new_resolution_x}
-    , new_resolution_y{new_new_resolution_y}
-    {}
-
-    int old_resolution_x;
-    int old_resolution_y;
-    int new_resolution_x;
-    int new_resolution_y;
-  };
-  struct CommonAreaResize : Common, AreaResize
-  {};
-
-
-public:
-  struct WindowResize : Common, AreaResize
-  {
-    explicit constexpr WindowResize(int new_old_resolution_x, int new_old_resolution_y, int new_new_resolution_x, int new_new_resolution_y) noexcept
-      : Common{EventType::kWindowResize}
-      , AreaResize{new_old_resolution_x, new_old_resolution_y, new_new_resolution_x, new_new_resolution_y}
-    {}
-  };
-  Event(const WindowResize &window_resize) noexcept
-    : window_resize_{window_resize}
-  {}
-
-
-  struct RenderAreaResize : Common, AreaResize
-  {
-    explicit constexpr RenderAreaResize(int new_old_resolution_x, int new_old_resolution_y, int new_new_resolution_x, int new_new_resolution_y) noexcept
-      : Common{EventType::kRenderAreaResize}
-      , AreaResize{new_old_resolution_x, new_old_resolution_y, new_new_resolution_x, new_new_resolution_y}
-    {}
-  };
-  Event(const RenderAreaResize &render_area_resize) noexcept
-    : render_area_resize_{render_area_resize}
-  {}
-
-
-  // Custom type should specify it's type for listeners and it's last bit should be 1 or contain just use kCustomTypeBitMask
-  struct Custom : Common
-  {
-    explicit constexpr Custom(EventType custom_type, void *new_data) noexcept
-    : Common{custom_type}
-    , data{new_data}
-    {
-      GAME_ASSERT_STD(custom_type & kCustomTypeBitMask);
-    }
-    void *data;
-  };
-  Event(const Custom &custom) noexcept
-  : custom_{custom}
-  {}
-
-public:
-  static constexpr std::underlying_type_t<EventType> kCustomTypeBitMask = std::underlying_type_t<EventType>{1} << (sizeof(EventType) * CHAR_BIT - 1);
-
-  
-  [[nodiscard]] constexpr auto GetType() const noexcept -> EventType { return common_.type; }
-  // Get name of event according to type
-  // If type is custom "Other: (type value)" is returned
-  // Mainly debuging feature
-  [[nodiscard]] auto GetName() const noexcept -> std::string;
-	
-	[[nodiscard]] auto GetKeycode() const noexcept -> int
-  {
-    GAME_ASSERT_STD(common_.type == EventType::kKeyDown
-                 || common_.type == EventType::kKeyUp);
-    return keyboard_.keycode;
-  }
-	[[nodiscard]] auto GetScancode() const noexcept -> int
-  {
-    GAME_ASSERT_STD(common_.type == EventType::kKeyDown
-                 || common_.type == EventType::kKeyUp);
-    return keyboard_.scancode;
-  }
-	[[nodiscard]] auto GetModKeys() const noexcept -> uint16_t
-  {
-    GAME_ASSERT_STD(common_.type == EventType::kKeyDown
-                 || common_.type == EventType::kKeyUp);
-    return keyboard_.mod_keys;
-  }
-	[[nodiscard]] auto GetCustomData() const noexcept -> void*
-  {
-    GAME_ASSERT_STD(GetType() & kCustomTypeBitMask);
-    return custom_.data;
-  }
-  [[nodiscard]] auto GetOldResolutionX() const noexcept -> int
-  {
-    GAME_ASSERT_STD(common_.type == EventType::kWindowResize
-                 || common_.type == EventType::kRenderAreaResize);
-    return area_resize_.old_resolution_x;
-  }
-  [[nodiscard]] auto GetOldResolutionY() const noexcept -> int
-  {
-    GAME_ASSERT_STD(common_.type == EventType::kWindowResize
-                 || common_.type == EventType::kRenderAreaResize);
-    return area_resize_.old_resolution_y;
-  }
-  [[nodiscard]] auto GetNewResolutionX() const noexcept -> int
-  {
-    GAME_ASSERT_STD(common_.type == EventType::kWindowResize
-                 || common_.type == EventType::kRenderAreaResize);
-    return area_resize_.new_resolution_x;
-  }
-  [[nodiscard]] auto GetNewResolutionY() const noexcept -> int
-  {
-    GAME_ASSERT_STD(common_.type == EventType::kWindowResize
-                 || common_.type == EventType::kRenderAreaResize);
-    return area_resize_.new_resolution_y;
-  }
-
-
-// private here is used as const to make it immutable by users
-private:
-  Common common_;
-  CommonKeyboard keyboard_;
-	KeyDown key_down_;
-	KeyUp key_up_;
-	Quit quit_;
-  CommonAreaResize area_resize_;
   WindowResize window_resize_;
+
+  struct RenderAreaResize : public Common
+  {
+    int new_width;
+    int new_height;
+    int old_width;
+    int old_height;
+  };
   RenderAreaResize render_area_resize_;
-	Custom custom_;
+
+  struct Custom : public Common
+  {
+    std::any data;
+  };
+  Custom custom_;
 };
 
 
@@ -304,7 +230,6 @@ inline void EventSystem::RemoveListener(EventCleaner &cleaner, std::size_t uid) 
 inline void EventSystem::DispatchEvent(const Event &event) noexcept
 {
   ZoneScopedC(0xe8bb25);
-
   ZoneText(event.GetName().c_str(), event.GetName().size());
 
   std::pair<EventMapType::const_iterator, EventMapType::const_iterator> range = events_.equal_range(event.GetType());
@@ -336,11 +261,9 @@ inline void EventSystem::ClearListeners(EventType type) noexcept
 
 inline auto EventSystem::AddListener(EventCleaner &cleaner, EventType type, void *data, CallbackType callback) noexcept -> std::size_t
 {
+  GAME_ASSERT(this == &cleaner.event_handler_);
   ZoneScopedC(0xe8bb25);
 
-  GAME_ASSERT(this == &cleaner.event_handler_) << "Same cleaner used for multiple EventSystems:\n"
-                                                  "This handler: " << this
-                                               << "\nHandler which EventCleaner is bound to: " << &cleaner.event_handler_;
   ++last_uid;
   listeners_.emplace(last_uid, ListenerMapValueType(data, callback));
   events_.emplace(type, last_uid);

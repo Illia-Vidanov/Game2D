@@ -19,8 +19,8 @@ public:
   void SetColor(const Vector4 &color) noexcept { color_ = color; }
   [[nodiscard]] auto GetColor() const noexcept -> const Vector4 & { return color_; }
 
-  [[nodiscard]] constexpr auto GetEntity() const noexcept -> const Entity * { return entity_; }
-  [[nodiscard]] constexpr auto GetEntity() noexcept -> Entity * { return entity_; }
+  [[nodiscard]] constexpr auto GetEntity() const noexcept -> const Entity & { return *entity_; }
+  [[nodiscard]] constexpr auto GetEntity() noexcept -> Entity & { return *entity_; }
 
 private:
   Entity *entity_;

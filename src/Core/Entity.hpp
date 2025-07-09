@@ -23,7 +23,11 @@ public:
   template<typename T>
   [[nodiscard]] auto GetComponent() noexcept -> T&;
   template<typename T>
+  [[nodiscard]] auto GetComponent() const noexcept -> const T&;
+  template<typename T>
   [[nodiscard]] auto TryGetComponent() noexcept -> T*;
+  template<typename T>
+  [[nodiscard]] auto TryGetComponent() const noexcept -> const T*;
   template<typename T>
   auto AddComponent() noexcept -> T&;
   template<typename T, typename... Args>

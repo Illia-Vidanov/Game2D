@@ -7,6 +7,7 @@
 #include "Utils/MathConstants.hpp"
 #include "Core/EventSystem.hpp"
 #include "Rendering/Utils.hpp"
+#include "Physics/TransformComponent.hpp"
 
 
 namespace game
@@ -48,7 +49,7 @@ Window::~Window() noexcept
 
 void Window::InitEvents() noexcept
 {
-  game_.GetEventSystem().DispatchEvent(Event{Event::WindowResize{0, 0, static_cast<int>(width_), static_cast<int>(height_)}});
+  game_.GetEventSystem().DispatchEvent(Event{EventType::kWindowResize}.SetOldWindowWidth(0).SetOldWindowHeight(0).SetNewWindowWidth(width_).SetNewWindowHeight(height_));
 }
 
 void Window::DispatchSDLEvents() noexcept
@@ -74,34 +75,60 @@ void Window::DispatchSDLEvents() noexcept
     switch(event.type)
     {
     case SDL_QUIT:
-      game_.GetEventSystem().DispatchEvent(Event{Event::Quit{}});
+      game_.GetEventSystem().DispatchEvent(Event{EventType::kQuit});
+      
       break;
+
     case SDL_KEYDOWN:
-      game_.GetEventSystem().DispatchEvent(Event{Event::KeyDown{
-        event.key.keysym.sym,
-        event.key.keysym.scancode,
-        event.key.keysym.mod
-      }});
+      if(ImGui::GetIO().WantCaptureKeyboard)
+        break;
+      game_.GetEventSystem().DispatchEvent(Event{EventType::kKeyDown}.SetKeycode(event.key.keysym.sym).SetScancode(event.key.keysym.scancode).SetModKeys(event.key.keysym.mod));
+      
       break;
+
     case SDL_KEYUP:
-      game_.GetEventSystem().DispatchEvent(Event{Event::KeyUp{
-        event.key.keysym.sym,
-        event.key.keysym.scancode,
-        event.key.keysym.mod
-      }});
+      if(ImGui::GetIO().WantCaptureKeyboard)
+        break;
+      game_.GetEventSystem().DispatchEvent(Event{EventType::kKeyUp}.SetKeycode(event.key.keysym.sym).SetScancode(event.key.keysym.scancode).SetModKeys(event.key.keysym.mod));
+      
       break;
+
+    case SDL_MOUSEMOTION:
+      game_.GetEventSystem().DispatchEvent(Event{EventType::kMouseMotion}.SetNewMousePositionX(event.motion.x).SetNewMousePositionY(event.motion.y).SetMouseDeltaX(event.motion.xrel).SetMouseDeltaY(event.motion.yrel));
+    
+      break;
+
+    case SDL_MOUSEBUTTONDOWN:
+      if(ImGui::GetIO().WantCaptureMouse)
+        break;
+      game_.GetEventSystem().DispatchEvent(Event{EventType::kMouseButtonDown}.SetMouseButton(event.button.button));
+
+      break;
+    
+    case SDL_MOUSEBUTTONUP:
+      if(ImGui::GetIO().WantCaptureMouse)
+        break;
+      game_.GetEventSystem().DispatchEvent(Event{EventType::kMouseButtonUp}.SetMouseButton(event.button.button));
+
+      break;
+    
     case SDL_WINDOWEVENT:
       switch(event.window.event)
       {
       case SDL_WINDOWEVENT_SIZE_CHANGED:
         if(width_ != event.window.data1 || height_ != event.window.data2)
-          game_.GetEventSystem().DispatchEvent(Event{Event::WindowResize{width_, height_, event.window.data1, event.window.data2}});
+          game_.GetEventSystem().DispatchEvent(Event{EventType::kWindowResize}.SetOldWindowWidth(width_).SetOldWindowHeight(height_).SetNewWindowWidth(event.window.data1).SetNewWindowHeight(event.window.data2));
+        
         break;
+
       default:
         break;
       }
+
       break;
+
     default:
+      
       break;
     }
   }
@@ -127,13 +154,14 @@ void Window::SetRenderResolution(const int render_width, const int render_height
   if(render_width_ == render_width && render_height_ == render_height)
     return;
     
+    
+  pixels_per_unit_x_ = static_cast<DefaultFloatType>(render_width) / static_cast<DefaultFloatType>(kUnitsPerScreenX);
+  pixels_per_unit_y_ = static_cast<DefaultFloatType>(render_height) / static_cast<DefaultFloatType>(kUnitsPerScreenY);
+    
+  game_.GetEventSystem().DispatchEvent(Event{EventType::kRenderAreaResize}.SetOldRenderAreaWidth(render_width_).SetOldRenderAreaHeight(render_height_).SetNewRenderAreaWidth(render_width).SetNewRenderAreaHeight(render_height));
+    
   render_width_ = render_width;
   render_height_ = render_height;
-  
-  pixels_per_unit_x_ = static_cast<DefaultFloatType>(render_width_) / static_cast<DefaultFloatType>(kUnitsPerScreenX);
-  pixels_per_unit_y_ = static_cast<DefaultFloatType>(render_height_) / static_cast<DefaultFloatType>(kUnitsPerScreenY);
-  
-  game_.GetEventSystem().DispatchEvent(Event::RenderAreaResize{render_width_, render_height_, render_width, render_height});
 }
 
 void Window::SetTitle(const std::string &title) noexcept
@@ -145,10 +173,16 @@ void Window::SetTitle(const std::string &title) noexcept
   SDL_SetWindowTitle(sdl_window_, title_.c_str());
 }
 
+auto Window::ScreenToWorldPosition(const Vector2i &screen_point) noexcept -> Vector2
+{
+  const Vector2 &camera_position = game_.GetCamera().GetEntity().GetComponent<TransformComponent>().GetPosition();
+  return camera_position + Vector2{kUnitsPerScreenX * (static_cast<DefaultFloatType>(screen_point.x() - render_pivot_x) / static_cast<DefaultFloatType>(render_width_) - 0.5f), kUnitsPerScreenY * -(static_cast<DefaultFloatType>(screen_point.y() - render_pivot_y) / static_cast<DefaultFloatType>(render_height_) - 0.5f)};
+}
+
 auto Window::WindowResizedEvent(const Event &event) noexcept -> bool
 {
-  width_ = event.GetNewResolutionX();
-  height_ = event.GetNewResolutionY();
+  width_ = event.GetNewWindowWidth();
+  height_ = event.GetNewWindowHeight();
   
   int smaller_axis = std::min(width_, height_);
   SetRenderResolution(smaller_axis, smaller_axis);

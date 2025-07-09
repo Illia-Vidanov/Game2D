@@ -39,9 +39,34 @@ void PhysicsSystem::FixedUpdate() noexcept
   for(entt::entity entity : rigidbodies)
   {
     TransformComponent &transform = game_.GetRegistry().get<TransformComponent>(entity);
-    transform.SetPosition(ToNormalVector2(b2Body_GetPosition(body_ids_[entity])));
-    b2Rot rotation = b2Body_GetRotation(body_ids_[entity]);
+    transform.SetPosition(ToNormalVector2(b2Body_GetPosition(entity_to_body_map_[&transform.GetEntity()])));
+    b2Rot rotation = b2Body_GetRotation(entity_to_body_map_[&transform.GetEntity()]);
     transform.SetSinAndCos(Vector2{rotation.s, rotation.c});
   }
+}
+
+void PhysicsSystem::Updateb2Transform(Entity *entity) const noexcept
+{
+  std::unordered_map<Entity*, b2BodyId>::const_iterator body_id = entity_to_body_map_.find(entity);
+  if(body_id != entity_to_body_map_.end())
+    b2Body_SetTransform(body_id->second, entity->GetComponent<TransformComponent>().Getb2Position(), entity->GetComponent<TransformComponent>().Getb2Rotation());
+}
+
+auto PhysicsSystem::TestPoint(const Vector2 &position) noexcept -> std::vector<Entity*>
+{
+  std::vector<Entity*> entities;
+  void *context = new std::pair<Game&, std::vector<Entity*>&>{game_, entities};
+  b2World_OverlapAABB(world_id_,
+                      b2AABB{b2Vec2{position.x() - (kPointTestSize / 2.0f), position.y() - (kPointTestSize / 2.0f)}, b2Vec2{position.x() + (kPointTestSize / 2.0f), position.y() + (kPointTestSize / 2.0f)}},
+                      b2DefaultQueryFilter(),
+                      [](b2ShapeId shape_id, void *context) -> bool
+                      {
+                        const std::pair<Game&, std::vector<Entity*>&> &data = *reinterpret_cast<std::pair<Game&, std::vector<Entity*>&>*>(context);
+                        data.second.emplace_back(data.first.GetPhysicsSystem().GetEntity(b2Shape_GetBody(shape_id)));
+                        return true;
+                      },
+                      context);
+  delete reinterpret_cast<std::pair<Game&, std::vector<Entity*>&>*>(context);
+  return entities;
 }
 } // game
