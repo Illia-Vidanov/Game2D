@@ -85,11 +85,11 @@ void UI::UpdateWindow() const noexcept
 
 void UI::DrawDebugWindow() const noexcept
 {
+  ImGui::SetNextWindowPos(ImVec2{10 * scale_multiplier_.x(), 10 * scale_multiplier_.y()}, ImGuiCond_Once);
+  ImGui::SetNextWindowSize(ImVec2{100 * scale_multiplier_.x(), 200 * scale_multiplier_.y()}, ImGuiCond_Once);
+  
   if(ImGui::Begin("Debug"))
   {
-    ImGui::SetWindowPos(ImVec2{10 * scale_multiplier_.x(), 10 * scale_multiplier_.y()}, ImGuiCond_Once);
-    ImGui::SetWindowSize(ImVec2{20 * scale_multiplier_.x(), 10 * scale_multiplier_.y()}, ImGuiCond_Once);
-
     if(window_resized_)
       UpdateWindow();
 
@@ -102,24 +102,69 @@ void UI::DrawDebugWindow() const noexcept
       bool first = true;
       for(Entity *entity : game_.GetDebug().GetSelectedEntities())
       {
-        if(!ImGui::CollapsingHeader("Entity", first ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None))
+        if(!ImGui::CollapsingHeader(entity->GetName().c_str(), first ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None))
           continue;
+
+        bool entity_active = entity->GetActive();
+        if(ImGui::Checkbox("Active", &entity_active))
+          entity->SetActive(entity_active);
+
+        if(!entity_active)
+          ImGui::BeginDisabled();
+
         first = false;
 
         TransformComponent *transform = entity->TryGetComponent<TransformComponent>();
 
-        if(transform && ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
+        if(transform && ImGui::TreeNodeEx("Transform", ImGuiTreeNodeFlags_DefaultOpen))
         {
-          Vector2 position = transform->GetPosition();
-          if(ImGui::InputFloat2("Position", position.data()))
-          {
-            transform->SetPosition(position);
-            game_.GetPhysicsSystem().Updateb2Transform(entity);
-          }
+          DrawTransformComponent(transform, entity);
+          ImGui::TreePop();
         }
+
+        if(!entity_active)
+          ImGui::EndDisabled();
       }
     }
   }
   ImGui::End();
+}
+
+void UI::DrawTransformComponent(TransformComponent *transform, Entity *entity) const noexcept
+{
+  bool component_active = transform->GetActive();
+  if(ImGui::Checkbox("Active", &component_active))
+    transform->SetActive(component_active);
+  
+  if(!component_active)
+    return;
+
+  bool changed = false;
+  Vector2 position = transform->GetPosition();
+  ImGui::SetNextItemWidth(100);
+  if(ImGui::DragFloat2("Position", position.data()))
+  {
+    transform->SetPosition(position);
+    changed = true;
+  }
+
+  float rotation = transform->GetRotationDegrees();
+  ImGui::SetNextItemWidth(100);
+  if(ImGui::DragFloat("Rotation", &rotation))
+  {
+    transform->SetRotationDegrees(rotation);
+    changed = true;
+  }
+
+  Vector2 scale = transform->GetScale();
+  ImGui::SetNextItemWidth(100);
+  if(ImGui::DragFloat2("Scale", scale.data()))
+  {
+    transform->SetScale(scale);
+    changed = true;
+  }
+  
+  if(changed)
+    game_.GetPhysicsSystem().Updateb2Transform(entity);
 }
 } // game

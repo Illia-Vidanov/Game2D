@@ -9,7 +9,7 @@
 
 namespace game
 {
-inline Entity::Entity(Game &game) noexcept : id_{game.GetRegistry().create()}, game_{game} {}
+inline Entity::Entity(Game &game, const std::string &name) noexcept : id_{game.GetRegistry().create()}, game_{game}, name_{name} {}
 
 template<typename T>
 [[nodiscard]] inline auto Entity::GetComponent() noexcept -> T & { GAME_ASSERT(HasComponent<T>()); return game_.GetRegistry().get<T>(id_); }

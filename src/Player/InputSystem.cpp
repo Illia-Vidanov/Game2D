@@ -50,7 +50,7 @@ auto InputSystem::KeyUpEvent(const Event &event) noexcept -> bool
 {
   ZoneScopedC(0x4907da);
 
-  up_keys_[event.GetScancode()] = false;
+  up_keys_[event.GetScancode()] = true;
   keys_[event.GetScancode()] = false;
   --pressed_keys_;
 
@@ -59,7 +59,6 @@ auto InputSystem::KeyUpEvent(const Event &event) noexcept -> bool
 
 auto InputSystem::MouseButtonDownEvent(const Event &event) noexcept -> bool
 {
-  GAME_DLOG(LogType::kInfo) << static_cast<std::size_t>(event.GetMouseButton()) + MouseButton::kOffset;
   down_keys_[static_cast<std::size_t>(event.GetMouseButton()) + MouseButton::kOffset] = true;
   keys_[static_cast<std::size_t>(event.GetMouseButton()) + MouseButton::kOffset] = true;
 
@@ -68,7 +67,7 @@ auto InputSystem::MouseButtonDownEvent(const Event &event) noexcept -> bool
 
 auto InputSystem::MouseButtonUpEvent(const Event &event) noexcept -> bool
 {
-  down_keys_[static_cast<std::size_t>(event.GetMouseButton()) + MouseButton::kOffset] = false;
+  up_keys_[static_cast<std::size_t>(event.GetMouseButton()) + MouseButton::kOffset] = true;
   keys_[static_cast<std::size_t>(event.GetMouseButton()) + MouseButton::kOffset] = false;
 
   return false;

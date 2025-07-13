@@ -54,17 +54,16 @@ public:
   [[nodiscard]] constexpr auto GetResourceManager() const noexcept -> const ResourceManager & { return resource_manager_; }
   [[nodiscard]] constexpr auto GetDeltaTime() const noexcept -> std::chrono::duration<double> { return delta_time_; }
   [[nodiscard]] constexpr auto GetFixedDeltaTime() const noexcept -> std::chrono::duration<double> { return fixed_delta_time_; }
-  [[nodiscard]] auto GetCamera() noexcept -> CameraComponent &;
+  [[nodiscard]] auto FindCamera() noexcept -> CameraComponent &;
   
-  [[nodiscard]] auto GetEntity(const std::string &name) noexcept -> Entity & { return entities_.at(name); }
-  [[nodiscard]] auto GetEntity(const std::string &name) const noexcept -> const Entity & { return entities_.at(name); }
-  auto CreateEntity(const std::string &name) noexcept -> Entity & { GAME_ASSERT(entities_.find(name) == entities_.end()); return (*entities_.emplace(name, Entity{*this}).first).second; }
+  [[nodiscard]] auto GetEntity(const std::string &name) noexcept -> Entity & { return *entities_.at(name); }
+  [[nodiscard]] auto GetEntity(const std::string &name) const noexcept -> const Entity & { return *entities_.at(name); }
+  auto CreateEntity(const std::string &name) noexcept -> Entity & { GAME_ASSERT(entities_.find(name) == entities_.end()); return *(*entities_.emplace(name, new Entity{*this, name}).first).second; }
   auto GetOrCreateEntity(const std::string &name) noexcept -> Entity &;
 
 
 private:
   auto QuitEvent() noexcept -> bool;
-  auto DebugEvent() noexcept -> bool;
 
   bool running_ = false;
   Flags flags_;
@@ -81,7 +80,7 @@ private:
   PhysicsSystem physics_system_;
   Debug debug_;
 
-  std::unordered_map<std::string, Entity> entities_;
+  std::unordered_map<std::string, Entity*> entities_; // name searching of entities. For debugging, might be deleted
 
   static constexpr inline uint64_t kFixedFPS = 60;
   static constexpr inline std::chrono::duration<double> kFixedDeltaTime = std::chrono::duration<double>{1.0f / static_cast<double>(kFixedFPS)};

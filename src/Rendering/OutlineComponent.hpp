@@ -5,26 +5,22 @@
 
 #include "Rendering/SpriteComponents.hpp"
 #include "Core/Entity.hpp"
+#include "Core/ComponentBase.hpp"
 
 
 namespace game
 {
-class OutlineComponent
+class OutlineComponent : public ComponentBase
 {
 public:
-  OutlineComponent(Entity *entity) : entity_{entity} {}
+  OutlineComponent(Entity *entity) : ComponentBase{entity} {}
 
   constexpr void SetWidth(DefaultFloatType width) noexcept { width_ = width; }
   [[nodiscard]] constexpr auto GetWidth() const noexcept -> DefaultFloatType { return width_; }
   void SetColor(const Vector4 &color) noexcept { color_ = color; }
   [[nodiscard]] auto GetColor() const noexcept -> const Vector4 & { return color_; }
 
-  [[nodiscard]] constexpr auto GetEntity() const noexcept -> const Entity & { return *entity_; }
-  [[nodiscard]] constexpr auto GetEntity() noexcept -> Entity & { return *entity_; }
-
 private:
-  Entity *entity_;
-
   Vector4 color_ = Vector4::Ones();
   DefaultFloatType width_ = 1.0f; // in units
 };

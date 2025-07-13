@@ -14,7 +14,7 @@
 namespace game
 {
 RectangleColliderComponent::RectangleColliderComponent(Entity *entity) noexcept
-  : entity_{entity}
+  : ComponentBase{entity}
 {
   ZoneScopedC(0xffa443);
 
@@ -55,6 +55,6 @@ auto RectangleColliderComponent::Getb2Polygon() const noexcept -> b2Polygon
   ZoneScopedC(0xffa443);
 
   const TransformComponent &transform = entity_->GetComponent<TransformComponent>();
-  return b2MakeOffsetBox(half_size_.x() * transform.GetScale().x(), half_size_.y() * transform.GetScale().y(), Tob2Vec2(offset_), Tob2Rot(angle_ + transform.GetRotationAngle()));
+  return b2MakeOffsetBox(half_size_.x() * transform.GetScale().x(), half_size_.y() * transform.GetScale().y(), Tob2Vec2(offset_), Tob2Rot(angle_radians_ + transform.GetRotationRadians()));
 }
 } // game

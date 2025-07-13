@@ -5,14 +5,15 @@
 
 #include "Utils/Logger.hpp"
 #include "Utils/MathConstants.hpp"
+#include "Core/ComponentBase.hpp"
+#include "Utils/Math.hpp"
 
 
 namespace game
 {
-class Game;
 class Entity;
 
-class RectangleColliderComponent
+class RectangleColliderComponent : public ComponentBase
 {
 public:
   RectangleColliderComponent(Entity *entity) noexcept;
@@ -22,8 +23,10 @@ public:
   void SetHalfSize(const Vector2 &half_size) noexcept { half_size_ = half_size; Updateb2(); }
   [[nodiscard]] constexpr auto GetOffset() const noexcept -> const Vector2 & { return offset_; }
   void SetOffset(const Vector2 &offset) noexcept { offset_ = offset; Updateb2(); }
-  [[nodiscard]] constexpr auto GetAngle() const noexcept -> DefaultFloatType { return angle_; }
-  void SetAngle(DefaultFloatType angle) noexcept { angle_ = angle; Updateb2(); }
+  [[nodiscard]] constexpr auto GetAngleRadians() const noexcept -> DefaultFloatType { return angle_radians_; }
+  void SetAngleRadians(DefaultFloatType angle_radians) noexcept { angle_radians_ = angle_radians; Updateb2(); }
+  [[nodiscard]] constexpr auto GetAngleDegrees() const noexcept -> DefaultFloatType { return RadiansToDegrees(angle_radians_); }
+  void SetAngleDegrees(DefaultFloatType angle_degrees) noexcept { angle_radians_ = DegreesToRadians(angle_degrees); Updateb2(); }
 
   void SetFriction(DefaultFloatType friction) const noexcept { b2Shape_SetFriction(shape_id_, friction); }
   void SetRestitution(DefaultFloatType restitution) const noexcept { b2Shape_SetRestitution(shape_id_, restitution); }
@@ -31,16 +34,11 @@ public:
   
   void Updateb2() const noexcept;
 
-  [[nodiscard]] constexpr auto GetEntity() const noexcept -> const Entity & { return *entity_; }
-  [[nodiscard]] constexpr auto GetEntity() noexcept -> Entity & { return *entity_; }
-  
 private:
-  Entity *entity_;
-
   b2ShapeId shape_id_;
   Vector2 half_size_ = Vector2{0.5f, 0.5f};
   Vector2 offset_ = Vector2::Zero();
-  DefaultFloatType angle_ = 0;
+  DefaultFloatType angle_radians_ = 0;
 
   [[nodiscard]] auto Getb2Polygon() const noexcept -> b2Polygon;
 };

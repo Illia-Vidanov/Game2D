@@ -12,7 +12,7 @@
 namespace game
 {
 RigidbodyComponent::RigidbodyComponent(Entity *entity) noexcept
-  : entity_{entity}
+  : ComponentBase{entity}
 {
   ZoneScopedC(0xd4ff8f);
 

@@ -39,8 +39,20 @@ void PhysicsSystem::FixedUpdate() noexcept
   for(entt::entity entity : rigidbodies)
   {
     TransformComponent &transform = game_.GetRegistry().get<TransformComponent>(entity);
-    transform.SetPosition(ToNormalVector2(b2Body_GetPosition(entity_to_body_map_[&transform.GetEntity()])));
-    b2Rot rotation = b2Body_GetRotation(entity_to_body_map_[&transform.GetEntity()]);
+    b2BodyId body_id = entity_to_body_map_[&transform.GetEntity()];
+
+    if(!rigidbodies.get<RigidbodyComponent>(entity).GetActive() || !transform.GetEntity().GetActive())
+    {
+      if(b2Body_IsEnabled(body_id))
+        b2Body_Disable(body_id);
+      continue;
+    }
+
+    if(!b2Body_IsEnabled(body_id))
+      b2Body_Enable(body_id);
+
+    transform.SetPosition(ToNormalVector2(b2Body_GetPosition(body_id)));
+    b2Rot rotation = b2Body_GetRotation(body_id);
     transform.SetSinAndCos(Vector2{rotation.s, rotation.c});
   }
 }

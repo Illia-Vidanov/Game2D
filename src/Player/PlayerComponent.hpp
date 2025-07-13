@@ -4,6 +4,7 @@
 #include "Setup.hpp"
 
 #include "Utils/Logger.hpp"
+#include "Core/ComponentBase.hpp"
 #include "Utils/MathConstants.hpp"
 
 
@@ -11,17 +12,11 @@ namespace game
 {
 class Entity;
 
-class PlayerComponent
+class PlayerComponent : public ComponentBase
 {
 public:
   PlayerComponent(Entity *entity) noexcept;
   void Update() noexcept;
-
-  [[nodiscard]] constexpr auto GetEntity() const noexcept -> const Entity & { return *entity_; }
-  [[nodiscard]] constexpr auto GetEntity() noexcept -> Entity & { return *entity_; }
-
-private:
-  Entity *entity_;
 };
 } // game
 

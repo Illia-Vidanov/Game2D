@@ -8,6 +8,7 @@
 #include "Rendering/DataStructures.hpp"
 #include "Physics/TransformComponent.hpp"
 #include "Core/Entity.hpp"
+#include "Core/ComponentBase.hpp"
 
 
 namespace game
@@ -32,15 +33,15 @@ public:
   [[nodiscard]] virtual auto GetCopy() const noexcept -> Owner<SpriteDataBase*> { return new SpriteDataBase{*this}; }
 };
 
-class SpriteComponent
+class SpriteComponent : public ComponentBase
 {
 public:
-  SpriteComponent(Entity *entity) : entity_{entity} {}
+  SpriteComponent(Entity *entity) : ComponentBase{entity} {}
   ~SpriteComponent() noexcept { delete data_; }
-  SpriteComponent(const SpriteComponent &other) noexcept : entity_{other.entity_}, type_{other.type_}, data_{other.data_->GetCopy()}, layer_{other.layer_} {}
-  SpriteComponent(SpriteComponent &&other) noexcept : entity_{other.entity_}, type_{other.type_}, data_{other.data_}, layer_{other.layer_} { other.data_ = nullptr; }
-  SpriteComponent &operator=(const SpriteComponent &other) noexcept { entity_ = other.entity_; type_ = other.type_; data_ = other.data_->GetCopy(); layer_ = other.layer_;  return *this; };
-  SpriteComponent &operator=(SpriteComponent &&other) noexcept { entity_ = other.entity_; type_ = other.type_; data_ = other.data_; other.data_ = nullptr; layer_ = other.layer_;  return *this; }
+  SpriteComponent(const SpriteComponent &other) noexcept : ComponentBase{other.entity_}, type_{other.type_}, data_{other.data_->GetCopy()}, layer_{other.layer_} {}
+  SpriteComponent(SpriteComponent &&other) noexcept : ComponentBase{other.entity_}, type_{other.type_}, data_{other.data_}, layer_{other.layer_} { other.data_ = nullptr; }
+  SpriteComponent &operator=(const SpriteComponent &other) noexcept { ComponentBase::operator=(other); type_ = other.type_; data_ = other.data_->GetCopy(); layer_ = other.layer_;  return *this; };
+  SpriteComponent &operator=(SpriteComponent &&other) noexcept { ComponentBase::operator=(other); type_ = other.type_; data_ = other.data_; other.data_ = nullptr; layer_ = other.layer_;  return *this; }
 
   [[nodiscard]] constexpr auto GetType() const noexcept -> SpriteType { return type_; }
   constexpr void SetType(const SpriteType type) noexcept { type_ = type; }
@@ -50,12 +51,7 @@ public:
   [[nodiscard]] constexpr auto GetLayer() const noexcept -> int { return layer_; }
   constexpr void SetLayer(int layer) noexcept { layer_ = layer; }
 
-  [[nodiscard]] constexpr auto GetEntity() const noexcept -> const Entity & { return *entity_; }
-  [[nodiscard]] constexpr auto GetEntity() noexcept -> Entity & { return *entity_; }
-
 private:
-  Entity *entity_;
-
   SpriteType type_;
   Owner<SpriteDataBase*> data_;
   int layer_ = 0;
@@ -76,6 +72,7 @@ public:
 
   constexpr void SetShader(Shader *shader) noexcept { shader_ = shader; }
   [[nodiscard]] auto GetShader() noexcept -> Shader & { GAME_ASSERT(shader_ != nullptr); return *shader_; }
+  [[nodiscard]] auto GetShader() const noexcept -> const Shader & { GAME_ASSERT(shader_ != nullptr); return *shader_; }
   constexpr void SetTexture(const Texture *texture) noexcept { texture_ = texture; }
   [[nodiscard]] auto GetTexture() const noexcept -> const Texture & { GAME_ASSERT(texture_ != nullptr); return *texture_; }
 
@@ -97,6 +94,7 @@ public:
   [[nodiscard]] auto GetAtlasStep() const noexcept -> DefaultFloatType { return atlas_step_; }
   constexpr void SetShader(Shader *shader) noexcept { shader_ = shader; }
   [[nodiscard]] auto GetShader() noexcept -> Shader & { GAME_ASSERT(shader_ != nullptr); return *shader_; }
+  [[nodiscard]] auto GetShader() const noexcept -> const Shader & { GAME_ASSERT(shader_ != nullptr); return *shader_; }
   constexpr void SetTexture(const Texture *texture) noexcept { texture_ = texture; }
   [[nodiscard]] auto GetTexture() const noexcept -> const Texture & { GAME_ASSERT(texture_ != nullptr); return *texture_; }
 

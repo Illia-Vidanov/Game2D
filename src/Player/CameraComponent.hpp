@@ -6,23 +6,18 @@
 #include "Utils/Logger.hpp"
 #include "Utils/MathConstants.hpp"
 #include "Physics/TransformComponent.hpp"
+#include "Core/ComponentBase.hpp"
 #include "Core/Entity.hpp"
 
 
 namespace game
 {
-class CameraComponent
+class CameraComponent : public ComponentBase
 {
 public:
-  CameraComponent(Entity *entity) noexcept : entity_{entity} {}
+  CameraComponent(Entity *entity) noexcept : ComponentBase{entity} {}
 
   [[nodiscard]] auto GetViewMatrix() const noexcept -> const Matrix3& { return entity_->GetComponent<TransformComponent>().matrix(); }
-
-  [[nodiscard]] constexpr auto GetEntity() const noexcept -> const Entity & { return *entity_; }
-  [[nodiscard]] constexpr auto GetEntity() noexcept -> Entity & { return *entity_; }
-  
-private:
-  Entity *entity_;
 };
 } // game
 

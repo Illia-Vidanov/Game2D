@@ -20,7 +20,7 @@ TransformComponent &TransformComponent::operator=(const Transform &other) noexce
   sin_ = sin_and_cos(1);
   cos_ = sin_and_cos(0);
   scale_ = Vector2{linear()(1, 1) / sin_, linear()(0, 0) / cos_};
-  angle_ = std::atan2(sin_, cos_);
+  angle_radians_ = std::atan2(sin_, cos_);
 
   return *this;
 }
@@ -35,7 +35,7 @@ TransformComponent &TransformComponent::operator=(Transform &&other) noexcept
   sin_ = sin_and_cos(1);
   cos_ = sin_and_cos(0);
   scale_ = Vector2{linear()(1, 1) / sin_, linear()(0, 0) / cos_};
-  angle_ = std::atan2(sin_, cos_);
+  angle_radians_ = std::atan2(sin_, cos_);
 
   return *this;
 }

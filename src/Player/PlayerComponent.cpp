@@ -20,7 +20,7 @@
 namespace game
 {
 PlayerComponent::PlayerComponent(Entity *entity) noexcept
-  : entity_{entity}
+  : ComponentBase{entity}
 {
   ZoneScopedC(0x31ff98);
 }
@@ -30,7 +30,7 @@ void PlayerComponent::Update() noexcept
   ZoneScopedC(0x31ff98);
 
   TransformComponent &transform = entity_->GetComponent<TransformComponent>();
-  TransformComponent &camera_transform = entity_->GetGame().GetCamera().GetEntity().GetComponent<TransformComponent>();
+  TransformComponent &camera_transform = entity_->GetGame().FindCamera().GetEntity().GetComponent<TransformComponent>();
 
   entity_->GetComponent<RigidbodyComponent>().AddForce(Vector2{
     (static_cast<float>(entity_->GetGame().GetInputSystem().GetKey(SDL_SCANCODE_D)) - static_cast<float>(entity_->GetGame().GetInputSystem().GetKey(SDL_SCANCODE_A))),

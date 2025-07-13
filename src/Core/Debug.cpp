@@ -11,6 +11,13 @@
 
 namespace game
 {
+Debug::Debug(Game &game) noexcept
+  : game_{game}
+  , event_cleaner_{game_.GetEventSystem()}
+{
+  game_.GetEventSystem().AddListener(event_cleaner_, EventType::kKeyDown, this, [](const Event &event, void *debug){ if(event.GetKeycode() == static_cast<int>(SDLK_RIGHTBRACKET)) { return reinterpret_cast<Debug*>(debug)->SwitchEvent(); } return false; });
+}
+
 void Debug::Update() noexcept
 {
   UpdateSelected();
@@ -21,12 +28,33 @@ void Debug::UpdateSelected() noexcept
   if(!select_mode_)
     return;
 
-  if(game_.GetInputSystem().GetMouseButton(MouseButton::kLeft))
+  if(game_.GetInputSystem().GetMouseButtonUp(MouseButton::kLeft))
   {
-    selected_entities_.clear();
+    if((last_mouse_position_ - game_.GetInputSystem().GetMousePosition()).squaredNorm() < kSquaredSameMousePositionElipson)
+      ++select_entity_layer_;
+    else
+      select_entity_layer_ = 0;
+
+    GAME_DLOG(LogType::kInfo) << select_entity_layer_ << ' ' << (last_mouse_position_ - game_.GetInputSystem().GetMousePosition()).squaredNorm();
+
+    last_mouse_position_ = game_.GetInputSystem().GetMousePosition();
+    
+    if(!game_.GetInputSystem().GetKey(SDLK_LCTRL))
+      selected_entities_.clear();
+
     std::vector<Entity*> found_entities = game_.GetPhysicsSystem().TestPoint(game_.GetWindow().ScreenToWorldPosition(game_.GetInputSystem().GetMousePosition()));
     if(!found_entities.empty())
-      selected_entities_.emplace_back(found_entities[0]);
+    {
+      Entity *selected_entity = found_entities[std::min(found_entities.size() - 1, static_cast<std::size_t>(select_entity_layer_))];
+      if(std::find(selected_entities_.begin(), selected_entities_.end(), selected_entity) == selected_entities_.end())
+        selected_entities_.emplace_back(selected_entity);
+    }
   }
+}
+
+auto Debug::SwitchEvent() noexcept -> bool
+{
+  active_ = !active_;
+  return false;
 }
 } // game

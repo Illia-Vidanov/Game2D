@@ -175,7 +175,7 @@ void Window::SetTitle(const std::string &title) noexcept
 
 auto Window::ScreenToWorldPosition(const Vector2i &screen_point) noexcept -> Vector2
 {
-  const Vector2 &camera_position = game_.GetCamera().GetEntity().GetComponent<TransformComponent>().GetPosition();
+  const Vector2 &camera_position = game_.FindCamera().GetEntity().GetComponent<TransformComponent>().GetPosition();
   return camera_position + Vector2{kUnitsPerScreenX * (static_cast<DefaultFloatType>(screen_point.x() - render_pivot_x) / static_cast<DefaultFloatType>(render_width_) - 0.5f), kUnitsPerScreenY * -(static_cast<DefaultFloatType>(screen_point.y() - render_pivot_y) / static_cast<DefaultFloatType>(render_height_) - 0.5f)};
 }
 

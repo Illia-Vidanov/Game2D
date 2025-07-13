@@ -10,6 +10,8 @@
 namespace game
 {
 class Game;
+class Entity;
+class TransformComponent;
 
 class UI
 {
@@ -28,6 +30,7 @@ private:
   void UpdateWindow() const noexcept;
 
   void DrawDebugWindow() const noexcept;
+  void DrawTransformComponent(TransformComponent *transform, Entity *entity) const noexcept;
 
   Game &game_;
   EventCleaner event_cleaner_;

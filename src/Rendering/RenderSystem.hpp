@@ -11,6 +11,9 @@
 namespace game
 {
 class Game;
+class TransformComponent;
+class SpriteComponent;
+class OutlineComponent;
 
 class RenderSystem
 {
@@ -28,11 +31,15 @@ public:
   [[nodiscard]] auto GetSDLGLContext() const noexcept -> SDL_GLContext { return sdl_gl_context_; }
   
 private:
-  void DrawUI() noexcept;
-  void DrawSprites() noexcept;
-  void DrawColoredScreenQuad(const Vector4 &color) noexcept;
+  void DrawUI() const noexcept;
+  void DrawSprites() const noexcept;
+  void DrawColoredScreenQuad(const Vector4 &color) const noexcept;
 
-  void InitializeOutline() noexcept;
+  void DrawDefaultSprite(SpriteComponent &sprite, TransformComponent &transform, const OutlineComponent *outline, const Matrix3 &view_projection_matrix) const noexcept;
+  void DrawTexturedSprite(SpriteComponent &sprite, TransformComponent &transform, const OutlineComponent *outline, const Matrix3 &view_projection_matrix) const noexcept;
+  void DrawAnimatedSprite(SpriteComponent &sprite, TransformComponent &transform, const OutlineComponent *outline, const Matrix3 &view_projection_matrix) const noexcept;
+
+  void InitializeOutline() const noexcept;
 
   auto WindowResizeEvent(const Event &event) const noexcept -> bool;
 

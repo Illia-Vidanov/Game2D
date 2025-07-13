@@ -47,7 +47,6 @@ Game::Game(const int argc, const char * const *argv) noexcept
 
   event_system_.AddListener(event_cleaner_, EventType::kQuit, this, []([[maybe_unused]] const Event &event, void *game){ return reinterpret_cast<Game*>(game)->QuitEvent(); });
   event_system_.AddListener(event_cleaner_, EventType::kKeyDown, this, [](const Event &event, void *game){ if(event.GetKeycode() == static_cast<int>(SDLK_ESCAPE)) { return reinterpret_cast<Game*>(game)->QuitEvent(); } return false; });
-  event_system_.AddListener(event_cleaner_, EventType::kKeyDown, this, [](const Event &event, void *game){ if(event.GetKeycode() == static_cast<int>(SDLK_F3)) { return reinterpret_cast<Game*>(game)->DebugEvent(); } return false; });
 
   window_.InitEvents();
 }
@@ -89,10 +88,10 @@ void Game::Run() noexcept
   box_transform.SetScale(Vector2{100, 10});
   SpriteComponent &box_sprite = box.AddComponent<SpriteComponent>();
   TexturedSpriteData *box_sprite_data = new TexturedSpriteData();
-  box_sprite.SetType(SpriteType::kTextured);
-  box_sprite.SetData(box_sprite_data);
   box_sprite_data->SetShader(&resource_manager_.GetShader(ShaderType::kTexturedSprite));
   box_sprite_data->SetTexture(&resource_manager_.GetTexture(TextureType::kNoTexture64));
+  box_sprite.SetType(SpriteType::kTextured);
+  box_sprite.SetData(box_sprite_data);
   RectangleColliderComponent &box_collider = box.AddComponent<RectangleColliderComponent>();
 
   delta_time_ = std::chrono::high_resolution_clock::now() - frame_start_;
@@ -102,12 +101,12 @@ void Game::Run() noexcept
   {
     frame_start_ = std::chrono::high_resolution_clock::now();
 
+    input_system_.Update();
     window_.DispatchSDLEvents();
     event_system_.DispatchEnquedEvents();
     
     render_system_.StartFrame();
 
-    input_system_.Update();
     player_component.Update();
     debug_.Update();
 
@@ -132,7 +131,7 @@ void Game::Run() noexcept
   }
 }
 
-auto Game::GetCamera() noexcept -> CameraComponent &
+auto Game::FindCamera() noexcept -> CameraComponent &
 {
   entt::view<entt::get_t<CameraComponent>> cameras = registry_.view<CameraComponent>();
   for(entt::entity entity : cameras)
@@ -148,23 +147,16 @@ auto Game::GetCamera() noexcept -> CameraComponent &
 
 auto Game::GetOrCreateEntity(const std::string &name) noexcept -> Entity &
 {
-  std::unordered_map<std::string, Entity>::iterator it = entities_.find(name);
+  std::unordered_map<std::string, Entity*>::iterator it = entities_.find(name);
   if(it == entities_.end())
-    return (*entities_.emplace(name, Entity{*this}).first).second;
+    return CreateEntity(name);
   
-  return it->second;
+  return *it->second;
 }
 
 auto Game::QuitEvent() noexcept -> bool
 {
   running_ = false;
-
-  return false;
-}
-
-auto Game::DebugEvent() noexcept -> bool
-{
-  debug_.SetActive(!debug_.GetActive());
 
   return false;
 }

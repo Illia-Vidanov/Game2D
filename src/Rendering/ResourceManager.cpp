@@ -26,7 +26,7 @@ ResourceManager::ResourceManager(Game &game) noexcept
     {-0.5f, -0.5f}, {0.5f, -0.5f}, {-0.5f, 0.5f}, {0.5f, 0.5f}
   });
   sprite_ebo_.BufferData({
-    0, 1, 2,
+    0, 2, 1,
     1, 2, 3
   });
   sprite_vao_.AddVBO(sprite_vbo_, BufferLayout{GL_FLOAT, 2, GL_FALSE});
@@ -36,7 +36,7 @@ ResourceManager::ResourceManager(Game &game) noexcept
     {-1.0f, -1.0f}, {1.0f, -1.0f}, {-1.0f, 1.0f}, {1.0f, 1.0f}
   });
   screen_plane_ebo_.BufferData({
-    0, 1, 2,
+    0, 2, 1,
     1, 2, 3
   });
   screen_plane_vao_.AddVBO(screen_plane_vbo_, BufferLayout{GL_FLOAT, 2, GL_FALSE});
