@@ -1,8 +1,6 @@
 #ifndef FILE_HASH_HPP
 #define FILE_HASH_HPP
 
-#include "Setup.hpp"
-
 #include <stdint.h>
 
 

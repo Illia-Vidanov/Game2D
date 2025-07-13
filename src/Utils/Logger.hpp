@@ -1,12 +1,11 @@
 #ifndef GAME_LOGGER_HPP
 #define GAME_LOGGER_HPP
 
-#include "Setup.hpp"
-
 #include <iostream>
 #include <chrono>
 #include <string>
 #include <fstream>
+#include <functional>
 #include <stdint.h>
 
 #include "Utils/Enum.hpp"
@@ -28,7 +27,7 @@
   #define GAME_DLOG(type) GAME_LOG(type)
   // DLOG if verbose level is smaller than current Logger's verbose level
   #define GAME_VDLOG(level, type) GAME_VLOG(level, type)
-  #define GAME_ASSERT(condition) if(GAME_IS_UNLIKELY(!(static_cast<bool>(condition)))) tolik::LogStream{tolik::LogData{__LINE__, __FILE__, tolik::LogType::kFatal, std::chrono::system_clock::now(), #condition, static_cast<tolik::Logger::VerboseLevelType>(-1)}}
+  #define GAME_ASSERT(condition) if(__builtin_expect(!static_cast<bool>(condition), 0)) tolik::LogStream{tolik::LogData{__LINE__, __FILE__, tolik::LogType::kFatal, std::chrono::system_clock::now(), #condition, static_cast<tolik::Logger::VerboseLevelType>(-1)}}
   // DLOG if condition is true
   #define GAME_DLOG_IF(condition, type) GAME_LOG_IF(condition, type)
   // DLOG if verbose level is smaller than current Logger's verbose level and condition is true

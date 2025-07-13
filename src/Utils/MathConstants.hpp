@@ -8,7 +8,6 @@
 
 namespace tolik
 {
-// In Setup.hpp
 //using DefaultFloatType = float;
 
 constexpr inline DefaultFloatType kPI = static_cast<DefaultFloatType>(3.141592);

@@ -1,8 +1,6 @@
 #ifndef FILE_TYPE_HPP
 #define FILE_TYPE_HPP
 
-#include "Setup.hpp"
-
 #include <type_traits>
 #include <stdint.h>
 

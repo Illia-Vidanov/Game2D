@@ -1,11 +1,13 @@
 #include "FlagParser.hpp"
 
-#include "Setup.hpp"
-
 #include <unordered_map>
 #include <utility>
 #include <string>
 #include <stdint.h>
+
+#ifdef TRACY_ENABLE
+#include <tracy/Tracy.hpp>
+#endif
 
 #include "Utils/String.hpp"
 #include "Utils/Logger.hpp"

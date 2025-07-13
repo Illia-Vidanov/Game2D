@@ -1,8 +1,6 @@
 #ifndef FILE_FLAG_PARSER_HPP
 #define FILE_FLAG_PARSER_HPP
 
-#include "Setup.hpp"
-
 #include <unordered_map>
 #include <utility>
 #include <string>

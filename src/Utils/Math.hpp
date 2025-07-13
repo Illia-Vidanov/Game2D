@@ -1,8 +1,6 @@
 #ifndef FILE_MATH_HPP
 #define FILE_MATH_HPP
 
-#include "Setup.hpp"
-
 #include <limits>
 #include <stdint.h>
 

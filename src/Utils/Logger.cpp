@@ -1,12 +1,14 @@
 #include "Logger.hpp"
 
-#include "Setup.hpp"
-
 #include <iostream>
 #include <chrono>
 #include <string>
 #include <fstream>
 #include <stdint.h>
+
+#ifdef TRACY_ENABLE
+#include <tracy/Tracy.hpp>
+#endif
 
 #include "Utils/Enum.hpp"
 #include "Utils/String.hpp"

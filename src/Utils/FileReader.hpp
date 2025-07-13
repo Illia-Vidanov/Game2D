@@ -1,7 +1,7 @@
 #ifndef FILE_FILE_READER_HPP
 #define FILE_FILE_READER_HPP
 
-#include "Setup.hpp"
+#define USE_STB_IMAGE true
 
 #include <fstream>
 #include <string>
@@ -9,7 +9,9 @@
 #include <filesystem>
 #include <stdint.h>
 
+#if USE_STB_IMAGE
 #include "stb_image.h"
+#endif
 
 #include "Utils/Logger.hpp"
 #include "Utils/MathConstants.hpp"
@@ -17,6 +19,7 @@
 
 namespace tolik
 {
+#if USE_STB_IMAGE
 struct ImageData
 {
 public:
@@ -29,6 +32,7 @@ public:
 
   void Free() noexcept;
 };
+#endif
 
 class FileReader
 {
@@ -38,7 +42,9 @@ public:
   // Read txt file
   // Path can be either relative to executable or whole
   static auto Txt(const std::string &path) noexcept -> std::string;
+  #if USE_STB_IMAGE
   static auto Image(const std::string &path) noexcept -> ImageData;
+  #endif
 
 private:
 };

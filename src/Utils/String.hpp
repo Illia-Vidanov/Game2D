@@ -1,11 +1,16 @@
 #ifndef FILE_STRING_UTILS_HPP
 #define FILE_STRING_UTILS_HPP
 
-#include "Setup.hpp"
-
 #include <string>
 #include <stdint.h>
 #include <algorithm>
+#include <filesystem>
+#include <vector>
+#include <cassert>
+
+#ifdef TRACY_ENABLE
+#include <tracy/Tracy.hpp>
+#endif
 
 #include "Utils/MathConstants.hpp"
 
@@ -85,13 +90,13 @@ auto ConcatRawStringArray(detail::ConstRawStrArray<CharT> first, const detail::C
 // default delim = ""
 // return raw string with elements from first to last separated by delim 
 template<typename CharT>
-auto ConcatRawStringArrayToRaw(detail::ConstRawStrArray<CharT> first, const detail::ConstRawStrArray<CharT> last, const CharT * const delim = "") noexcept -> Owner<CharT*>;
+auto ConcatRawStringArrayToRaw(detail::ConstRawStrArray<CharT> first, const detail::ConstRawStrArray<CharT> last, const CharT * const delim = "") noexcept -> CharT*;
 
 // Connect raw string array into single raw string with delimetr
 // default delim = ""
 // return raw string with elements from first to last separated by delim 
 template<typename CharT>
-auto ConcatRawStringArrayToRaw(std::initializer_list<const CharT*> raw_strings, const CharT * const delim = "") noexcept -> Owner<CharT*> { return ConcatRawStringArrayToRaw(&*raw_strings.begin(), &*raw_strings.end(), delim); }
+auto ConcatRawStringArrayToRaw(std::initializer_list<const CharT*> raw_strings, const CharT * const delim = "") noexcept -> CharT* { return ConcatRawStringArrayToRaw(&*raw_strings.begin(), &*raw_strings.end(), delim); }
 
 
 
@@ -113,7 +118,7 @@ auto RemoveCurrentPathFromString(const std::basic_string<CharT> &str) -> std::ba
 template<typename CharT>
 auto SplitString(const std::basic_string<CharT> &str, const std::basic_string<CharT> &delim) noexcept -> std::vector<std::basic_string<CharT>>
 {
-  GAME_ASSERT_STD(delim.size() != 0);
+  assert(delim.size() != 0);
 
   #ifdef TRACY_ENABLE
 	ZoneScopedC(0x3e2ed1);
@@ -145,7 +150,7 @@ auto SplitString(const std::basic_string<CharT> &str, const std::basic_string<Ch
 template<typename CharT>
 auto StringStartsWith(const std::basic_string<CharT> &prefix, const std::basic_string<CharT> &str) noexcept -> bool
 {
-  GAME_ASSERT_STD(str.size() == 0);
+  assert(str.size() == 0);
 
   #ifdef TRACY_ENABLE
 	ZoneScopedC(0x3e2ed1);
@@ -184,7 +189,7 @@ auto SubstringCount(const std::basic_string<CharT> &str, const std::basic_string
 template<typename CharT>
 constexpr auto RawStringArrayLength(detail::ConstRawStrArray<CharT> first, const detail::ConstRawStrArray<CharT> last) noexcept -> std::size_t
 {
-  GAME_ASSERT_STD(first != nullptr && last != nullptr && first < last);
+  assert(first != nullptr && last != nullptr && first < last);
 
   std::size_t result = 0;
 	for(; first != last; first++)
@@ -196,7 +201,7 @@ constexpr auto RawStringArrayLength(detail::ConstRawStrArray<CharT> first, const
 template<typename CharT>
 auto ConcatRawStringArray(detail::ConstRawStrArray<CharT> first, const detail::ConstRawStrArray<CharT> last, const std::basic_string<CharT> &delim) noexcept -> std::basic_string<CharT>
 {
-  GAME_ASSERT_STD(first != nullptr && last != nullptr && first < last);
+  assert(first != nullptr && last != nullptr && first < last);
 
   #ifdef TRACY_ENABLE
 	ZoneScopedC(0x3e2ed1);
@@ -215,9 +220,9 @@ auto ConcatRawStringArray(detail::ConstRawStrArray<CharT> first, const detail::C
 }
 
 template<typename CharT>
-auto ConcatRawStringArrayToRaw(detail::ConstRawStrArray<CharT> first, const detail::ConstRawStrArray<CharT> last, const CharT * const delim) noexcept -> Owner<CharT*>
+auto ConcatRawStringArrayToRaw(detail::ConstRawStrArray<CharT> first, const detail::ConstRawStrArray<CharT> last, const CharT * const delim) noexcept -> CharT*
 {
-  GAME_ASSERT_STD(first != nullptr && last != nullptr && first < last);
+  assert(first != nullptr && last != nullptr && first < last);
 
   #ifdef TRACY_ENABLE
 	ZoneScopedC(0x3e2ed1);

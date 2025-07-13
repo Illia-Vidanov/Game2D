@@ -1,8 +1,6 @@
 #ifndef GAME_ENUM_HPP
 #define GAME_ENUM_HPP
 
-#include "Setup.hpp"
-
 #include <type_traits>
 #include <stdint.h>
 
