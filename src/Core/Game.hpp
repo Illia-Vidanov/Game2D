@@ -7,7 +7,6 @@
 #include "Utils/MathConstants.hpp"
 #include "Utils/FlagParser.hpp"
 #include "Core/Window.hpp"
-#include "Core/EventSystem.hpp"
 #include "Rendering/RenderSystem.hpp"
 #include "UI/UI.hpp"
 #include "Rendering/ResourceManager.hpp"
@@ -44,8 +43,6 @@ public:
   [[nodiscard]] constexpr auto GetRegistry() const noexcept -> const entt::registry & { return registry_; }
   [[nodiscard]] constexpr auto GetInputSystem() noexcept -> InputSystem & { return input_system_; }
   [[nodiscard]] constexpr auto GetInputSystem() const noexcept -> const InputSystem & { return input_system_; }
-  [[nodiscard]] constexpr auto GetEventSystem() noexcept -> EventSystem & { return event_system_; }
-  [[nodiscard]] constexpr auto GetEventSystem() const noexcept -> const EventSystem & { return event_system_; }
   [[nodiscard]] constexpr auto GetRenderSystem() noexcept -> RenderSystem & { return render_system_; }
   [[nodiscard]] constexpr auto GetRenderSystem() const noexcept -> const RenderSystem & { return render_system_; }
   [[nodiscard]] constexpr auto GetPhysicsSystem() noexcept -> PhysicsSystem & { return physics_system_; }
@@ -61,15 +58,12 @@ public:
   auto CreateEntity(const std::string &name) noexcept -> Entity & { GAME_ASSERT(entities_.find(name) == entities_.end()); return *(*entities_.emplace(name, new Entity{*this, name}).first).second; }
   auto GetOrCreateEntity(const std::string &name) noexcept -> Entity &;
 
+  void QuitEvent() noexcept;
 
 private:
-  auto QuitEvent() noexcept -> bool;
-
   bool running_ = false;
   Flags flags_;
   
-  EventSystem event_system_;
-  EventCleaner event_cleaner_;
   Window window_;
   RenderSystem render_system_;
   UI ui_;

@@ -3,7 +3,6 @@
 
 #include "Setup.hpp"
 
-#include "Core/EventSystem.hpp"
 
 namespace game
 {
@@ -22,11 +21,9 @@ public:
   [[nodiscard]] auto GetSelectedEntities() const noexcept -> const std::vector<Entity*> & { return selected_entities_; }
 
   void Update() noexcept;
-
-private:
+  
+  private:
   void UpdateSelected() noexcept;
-
-  auto SwitchEvent() noexcept -> bool;
 
   static constexpr inline int kSquaredSameMousePositionElipson = gcem::pow(2, 2);
 
@@ -36,7 +33,6 @@ private:
   std::vector<Entity*> selected_entities_;
   Vector2i last_mouse_position_;
   int select_entity_layer_;
-  EventCleaner event_cleaner_;
 };
 } // game
 

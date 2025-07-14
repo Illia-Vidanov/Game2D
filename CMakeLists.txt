@@ -61,7 +61,6 @@ set(GAME_OBJ_LIB_NAME "${PROJECT_NAME}objlib")
 add_library(${GAME_OBJ_LIB_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/Game.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/Window.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/EventSystem.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Core/Debug.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/FlagParser.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/Logger.cpp

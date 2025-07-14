@@ -5,7 +5,6 @@
 
 #include "Utils/MathConstants.hpp"
 #include "Utils/Logger.hpp"
-#include "Core/EventSystem.hpp"
 
 
 class SDL_Window;
@@ -50,7 +49,7 @@ public:
 
   
 private:
-  auto WindowResizedEvent(const Event &event) noexcept -> bool;
+  void WindowResizeEvent() noexcept;
 
   
   Game &game_;
@@ -68,7 +67,6 @@ private:
   DefaultFloatType pixels_per_unit_y_;
 
   SDL_Window *sdl_window_;
-  EventCleaner event_cleaner_;
 };
 }
 

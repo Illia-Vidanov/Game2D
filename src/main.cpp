@@ -6,6 +6,8 @@ Todo:
 - FPS counter in Debug menu
 - Input
 - Debug Menu
+- Game
+- Wireframe rebdering for colliders
 */
 #include "Setup.hpp"
 

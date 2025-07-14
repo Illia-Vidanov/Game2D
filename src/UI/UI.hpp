@@ -3,7 +3,6 @@
 
 #include "Setup.hpp"
 
-#include "Core/EventSystem.hpp"
 #include "Utils/MathConstants.hpp"
 
 
@@ -24,16 +23,16 @@ public:
   UI &operator=(UI &&) noexcept = delete;
 
   void Update() noexcept;
+  
+  void WindowResizeEvent() noexcept;
 
 private:
-  auto WindowResizeEvent(const Event &event) noexcept -> bool;
   void UpdateWindow() const noexcept;
 
   void DrawDebugWindow() const noexcept;
   void DrawTransformComponent(TransformComponent *transform, Entity *entity) const noexcept;
 
   Game &game_;
-  EventCleaner event_cleaner_;
 
   Vector2 global_scale_;
   Vector2 scale_multiplier_;

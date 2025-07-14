@@ -3,7 +3,6 @@
 #include "Setup.hpp"
 
 #include "Core/Game.hpp"
-#include "Core/EventSystem.hpp"
 #include "Utils/Logger.hpp"
 #include "Rendering/OutlineComponent.hpp"
 #include "Physics/TransformComponent.hpp"
@@ -14,7 +13,6 @@ namespace game
 {
 UI::UI(Game &game) noexcept
   : game_{game}
-  , event_cleaner_{game_.GetEventSystem()}
   , global_scale_{static_cast<DefaultFloatType>(game_.GetWindow().kUnitsPerScreenX) / static_cast<DefaultFloatType>(game_.GetWindow().GetWidth()), static_cast<DefaultFloatType>(game_.GetWindow().kUnitsPerScreenY) / static_cast<DefaultFloatType>(game_.GetWindow().GetHeight())}
   , scale_multiplier_{global_scale_}
 {
@@ -29,8 +27,6 @@ UI::UI(Game &game) noexcept
 
   ImGui_ImplSDL2_InitForOpenGL(game_.GetWindow().GetSDLWindow(), game_.GetRenderSystem().GetSDLGLContext());
   ImGui_ImplOpenGL3_Init("#version 460");
-
-  game_.GetEventSystem().AddListener(event_cleaner_, EventType::kWindowResize, this, [](const Event &event, void *ui) -> bool { return reinterpret_cast<UI*>(ui)->WindowResizeEvent(event); });
 }
 
 UI::~UI() noexcept
@@ -61,7 +57,7 @@ void UI::Update() noexcept
   ImGui::Render();
 }
 
-auto UI::WindowResizeEvent(const Event &event) noexcept -> bool
+void UI::WindowResizeEvent() noexcept
 {
   ZoneScopedC(0xa5bfc7);
 
@@ -69,8 +65,6 @@ auto UI::WindowResizeEvent(const Event &event) noexcept -> bool
   Vector2 last_global_scale = global_scale_;
   global_scale_ = Vector2{static_cast<DefaultFloatType>(game_.GetWindow().kUnitsPerScreenX) / static_cast<DefaultFloatType>(game_.GetWindow().GetWidth()), static_cast<DefaultFloatType>(game_.GetWindow().kUnitsPerScreenY) / static_cast<DefaultFloatType>(game_.GetWindow().GetHeight())};
   scale_multiplier_ = Vector2{last_global_scale.x() / global_scale_.x(), last_global_scale.y() / global_scale_.y()};
-  
-  return false;
 }
 
 void UI::UpdateWindow() const noexcept
@@ -159,10 +153,7 @@ void UI::DrawTransformComponent(TransformComponent *transform, Entity *entity) c
   Vector2 scale = transform->GetScale();
   ImGui::SetNextItemWidth(100);
   if(ImGui::DragFloat2("Scale", scale.data()))
-  {
     transform->SetScale(scale);
-    changed = true;
-  }
   
   if(changed)
     game_.GetPhysicsSystem().Updateb2Transform(entity);

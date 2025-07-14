@@ -18,7 +18,6 @@ namespace game
 {
 RenderSystem::RenderSystem(Game &game) noexcept
   : game_{game}
-  , event_cleaner_{game_.GetEventSystem()}
 {
   ZoneScopedC(0x07dbd4);
 
@@ -55,8 +54,6 @@ RenderSystem::RenderSystem(Game &game) noexcept
   GAME_GL_CALL(glEnable(GL_STENCIL_TEST));
   GAME_GL_CALL(glClearStencil(0));
   GAME_GL_CALL(glDisable(GL_STENCIL_TEST));
-
-  game_.GetEventSystem().AddListener(event_cleaner_, EventType::kWindowResize, this, [](const Event &event, void *render_system) -> bool { return reinterpret_cast<RenderSystem*>(render_system)->WindowResizeEvent(event); });
 }
 
 RenderSystem::~RenderSystem() noexcept
@@ -91,7 +88,7 @@ void RenderSystem::EndFrame() noexcept
   SDL_GL_SwapWindow(game_.GetWindow().GetSDLWindow());
 }
 
-auto RenderSystem::WindowResizeEvent(const Event &event) const noexcept -> bool
+void RenderSystem::WindowResizeEvent() const noexcept
 {
   ZoneScopedC(0x07dbd4);
 
@@ -108,8 +105,6 @@ auto RenderSystem::WindowResizeEvent(const Event &event) const noexcept -> bool
     game_.GetWindow().GetRenderWidth(),
     game_.GetWindow().GetRenderHeight()
   ));
-
-  return false;
 }
 
 void RenderSystem::DrawSprites() const noexcept
@@ -224,13 +219,13 @@ void RenderSystem::DrawTexturedSprite(SpriteComponent &sprite, TransformComponen
     InitializeOutline();
     
     sprite_data->GetShader().Use();
-    transform.SetScale(Vector2(transform.GetScale().x() + outline->GetWidth() * 2, transform.GetScale().y() + outline->GetWidth() * 2));
+    transform.SetScale(Vector2(transform.GetScale().x() + Sign(transform.GetScale().x()) * outline->GetWidth() * 2, transform.GetScale().y() + Sign(transform.GetScale().y()) * outline->GetWidth() * 2));
     sprite_data->GetShader().SetUniformMatrix3("mvp", 1, false, Matrix3{view_projection_matrix * transform.matrix()}.data());
     
     game_.GetResourceManager().BindSpriteVAO();
     GAME_GL_CALL(glDrawElements(GL_TRIANGLES, game_.GetResourceManager().GetSpriteIndexCount(), GL_UNSIGNED_INT, 0));
 
-    transform.SetScale(Vector2(transform.GetScale().x() - outline->GetWidth() * 2, transform.GetScale().y() - outline->GetWidth() * 2));
+    transform.SetScale(Vector2(transform.GetScale().x() - Sign(transform.GetScale().x()) * outline->GetWidth() * 2, transform.GetScale().y() - Sign(transform.GetScale().y()) * outline->GetWidth() * 2));
     sprite_data->GetShader().SetUniformMatrix3("mvp", 1, false, Matrix3{view_projection_matrix * transform.matrix()}.data());
     
     GAME_GL_CALL(glStencilFunc(GL_EQUAL, 1, 0xFF));

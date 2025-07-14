@@ -5,22 +5,15 @@
 #include "Utils/Logger.hpp"
 #include "Utils/MathConstants.hpp"
 #include "Core/Game.hpp"
-#include "Core/EventSystem.hpp"
 #include "Utils/Enum.hpp"
+#include "Core/Events.hpp"
 
 namespace game
 {
   InputSystem::InputSystem(Game &game) noexcept
   : game_(game)
-  , event_cleaner_(game_.GetEventSystem())
 {
   ZoneScopedC(0x4907da);
-
-  game_.GetEventSystem().AddListener(event_cleaner_, EventType::kKeyDown, this, [](const Event &event, void *input) -> bool { return reinterpret_cast<InputSystem*>(input)->KeyDownEvent(event); });
-  game_.GetEventSystem().AddListener(event_cleaner_, EventType::kKeyUp, this, [](const Event &event, void *input) -> bool { return reinterpret_cast<InputSystem*>(input)->KeyUpEvent(event); });
-  game_.GetEventSystem().AddListener(event_cleaner_, EventType::kMouseMotion, this, [](const Event &event, void *input) -> bool { return reinterpret_cast<InputSystem*>(input)->MouseMotionEvent(event); });
-  game_.GetEventSystem().AddListener(event_cleaner_, EventType::kMouseButtonDown, this, [](const Event &event, void *input) -> bool { return reinterpret_cast<InputSystem*>(input)->MouseButtonDownEvent(event); });
-  game_.GetEventSystem().AddListener(event_cleaner_, EventType::kMouseButtonUp, this, [](const Event &event, void *input) -> bool { return reinterpret_cast<InputSystem*>(input)->MouseButtonUpEvent(event); });
 }
 
 void InputSystem::Update() noexcept
@@ -34,50 +27,40 @@ void InputSystem::Update() noexcept
   std::fill(up_keys_.begin(), up_keys_.end(), 0);
 }
 
-auto InputSystem::KeyDownEvent(const Event &event) noexcept -> bool
+void InputSystem::KeyDownEvent(const events::Key &event) noexcept
 {
   ZoneScopedC(0x4907da);
 
-  down_keys_[event.GetScancode()] = true;
-  keys_[event.GetScancode()] = true;
+  down_keys_[event.scancode] = true;
+  keys_[event.scancode] = true;
   ++pressed_keys_;
-  last_pressed_key_ = event.GetScancode();
-
-  return false;
+  last_pressed_key_ = event.scancode;
 }
 
-auto InputSystem::KeyUpEvent(const Event &event) noexcept -> bool
+void InputSystem::KeyUpEvent(const events::Key &event) noexcept
 {
   ZoneScopedC(0x4907da);
 
-  up_keys_[event.GetScancode()] = true;
-  keys_[event.GetScancode()] = false;
+  up_keys_[event.scancode] = true;
+  keys_[event.scancode] = false;
   --pressed_keys_;
-
-  return false;
 }
 
-auto InputSystem::MouseButtonDownEvent(const Event &event) noexcept -> bool
+void InputSystem::MouseButtonDownEvent(const events::MouseButton &event) noexcept
 {
-  down_keys_[static_cast<std::size_t>(event.GetMouseButton()) + MouseButton::kOffset] = true;
-  keys_[static_cast<std::size_t>(event.GetMouseButton()) + MouseButton::kOffset] = true;
-
-  return false;
+  down_keys_[static_cast<std::size_t>(event.button) + MouseButton::kOffset] = true;
+  keys_[static_cast<std::size_t>(event.button) + MouseButton::kOffset] = true;
 }
 
-auto InputSystem::MouseButtonUpEvent(const Event &event) noexcept -> bool
+void InputSystem::MouseButtonUpEvent(const events::MouseButton &event) noexcept
 {
-  up_keys_[static_cast<std::size_t>(event.GetMouseButton()) + MouseButton::kOffset] = true;
-  keys_[static_cast<std::size_t>(event.GetMouseButton()) + MouseButton::kOffset] = false;
-
-  return false;
+  up_keys_[static_cast<std::size_t>(event.button) + MouseButton::kOffset] = true;
+  keys_[static_cast<std::size_t>(event.button) + MouseButton::kOffset] = false;
 }
 
-auto InputSystem::MouseMotionEvent(const Event &event) noexcept -> bool
+void InputSystem::MouseMotionEvent(const events::MouseMotion &event) noexcept
 {
-  mouse_position_ = event.GetNewMousePosition();
-  mouse_delta_ = event.GetMouseDelta();
-
-  return false;
+  mouse_position_ = Vector2i{event.position_x, event.position_y};
+  mouse_delta_ = Vector2i{event.delta_x, event.delta_y};
 }
 } // game

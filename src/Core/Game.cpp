@@ -6,7 +6,6 @@
 #include "Utils/MathConstants.hpp"
 #include "Utils/FlagParser.hpp"
 #include "Core/Window.hpp"
-#include "Core/EventSystem.hpp"
 #include "Core/Entity.hpp"
 #include "Rendering/RenderSystem.hpp"
 #include "Rendering/ResourceManager.hpp"
@@ -30,7 +29,6 @@ Game::Game(const int argc, const char * const *argv) noexcept
       Logger::Get().SetVerboseLevel(10);
     }(), false)) // pre initialization functions
   , flags_(argc, argv) // args are UTF8 encoded because we use SDL2main
-  , event_cleaner_{event_system_}
   , window_{*this}
   , render_system_{*this}
   , ui_{*this}
@@ -44,9 +42,6 @@ Game::Game(const int argc, const char * const *argv) noexcept
   GAME_VLOG(1, LogType::kInfo) << "Running!!!";
 
   frame_start_ = std::chrono::high_resolution_clock::now();
-
-  event_system_.AddListener(event_cleaner_, EventType::kQuit, this, []([[maybe_unused]] const Event &event, void *game){ return reinterpret_cast<Game*>(game)->QuitEvent(); });
-  event_system_.AddListener(event_cleaner_, EventType::kKeyDown, this, [](const Event &event, void *game){ if(event.GetKeycode() == static_cast<int>(SDLK_ESCAPE)) { return reinterpret_cast<Game*>(game)->QuitEvent(); } return false; });
 
   window_.InitEvents();
 }
@@ -103,7 +98,8 @@ void Game::Run() noexcept
 
     input_system_.Update();
     window_.DispatchSDLEvents();
-    event_system_.DispatchEnquedEvents();
+    if(input_system_.GetKeyDown(SDLK_ESCAPE))
+      QuitEvent();
     
     render_system_.StartFrame();
 
@@ -154,10 +150,8 @@ auto Game::GetOrCreateEntity(const std::string &name) noexcept -> Entity &
   return *it->second;
 }
 
-auto Game::QuitEvent() noexcept -> bool
+void Game::QuitEvent() noexcept
 {
   running_ = false;
-
-  return false;
 }
 } // game

@@ -10,7 +10,6 @@
 #include "Rendering/Texture.hpp"
 #include "Rendering/DataStructures.hpp"
 #include "Core/Game.hpp"
-#include "Core/EventSystem.hpp"
 #include "Utils/Math.hpp"
 #include "Physics/TransformComponent.hpp"
 

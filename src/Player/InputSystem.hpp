@@ -5,7 +5,7 @@
 
 #include "Utils/Logger.hpp"
 #include "Utils/MathConstants.hpp"
-#include "Core/EventSystem.hpp"
+#include "Core/Events.hpp"
 
 
 namespace game
@@ -41,11 +41,11 @@ public:
   [[nodiscard]] auto GetMouseButtonUp(const MouseButton mouse_button) const noexcept -> bool { return up_keys_[static_cast<std::size_t>(mouse_button)]; }
   [[nodiscard]] auto GetMouseButton(const MouseButton mouse_button) const noexcept -> bool { return keys_[static_cast<std::size_t>(mouse_button)]; }
 
-  auto KeyDownEvent(const Event &event) noexcept -> bool;
-  auto KeyUpEvent(const Event &event) noexcept -> bool;
-  auto MouseButtonDownEvent(const Event &event) noexcept -> bool;
-  auto MouseButtonUpEvent(const Event &event) noexcept -> bool;
-  auto MouseMotionEvent(const Event &event) noexcept -> bool;
+  void KeyDownEvent(const events::Key &event) noexcept;
+  void KeyUpEvent(const events::Key &event) noexcept;
+  void MouseButtonDownEvent(const events::MouseButton &event) noexcept;
+  void MouseButtonUpEvent(const events::MouseButton &event) noexcept;
+  void MouseMotionEvent(const events::MouseMotion &event) noexcept;
 
   [[nodiscard]] auto GetMousePosition() const noexcept -> const Vector2i & { return mouse_position_; }
   [[nodiscard]] auto GetMousePositionX() const noexcept -> int { return mouse_position_.x(); }
@@ -66,7 +66,6 @@ private:
   Vector2i mouse_delta_ = Vector2i::Zero();
 
   Game &game_;
-  EventCleaner event_cleaner_;
 };
 } // game
 

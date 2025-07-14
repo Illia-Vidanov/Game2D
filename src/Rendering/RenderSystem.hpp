@@ -5,7 +5,6 @@
 
 #include "Utils/Logger.hpp"
 #include "Utils/MathConstants.hpp"
-#include "Core/EventSystem.hpp"
 
 
 namespace game
@@ -30,6 +29,8 @@ public:
 
   [[nodiscard]] auto GetSDLGLContext() const noexcept -> SDL_GLContext { return sdl_gl_context_; }
   
+  void WindowResizeEvent() const noexcept;
+
 private:
   void DrawUI() const noexcept;
   void DrawSprites() const noexcept;
@@ -41,12 +42,8 @@ private:
 
   void InitializeOutline() const noexcept;
 
-  auto WindowResizeEvent(const Event &event) const noexcept -> bool;
-
   Game &game_;
   SDL_GLContext sdl_gl_context_;
-
-  EventCleaner event_cleaner_;
 };
 } // game
 

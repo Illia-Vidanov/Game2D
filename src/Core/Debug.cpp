@@ -13,9 +13,8 @@ namespace game
 {
 Debug::Debug(Game &game) noexcept
   : game_{game}
-  , event_cleaner_{game_.GetEventSystem()}
 {
-  game_.GetEventSystem().AddListener(event_cleaner_, EventType::kKeyDown, this, [](const Event &event, void *debug){ if(event.GetKeycode() == static_cast<int>(SDLK_RIGHTBRACKET)) { return reinterpret_cast<Debug*>(debug)->SwitchEvent(); } return false; });
+
 }
 
 void Debug::Update() noexcept
@@ -25,6 +24,9 @@ void Debug::Update() noexcept
 
 void Debug::UpdateSelected() noexcept
 {
+  if(game_.GetInputSystem().GetKeyDown(SDLK_RIGHTBRACKET))
+    active_ = !active_;
+
   if(!select_mode_)
     return;
 
@@ -50,11 +52,5 @@ void Debug::UpdateSelected() noexcept
         selected_entities_.emplace_back(selected_entity);
     }
   }
-}
-
-auto Debug::SwitchEvent() noexcept -> bool
-{
-  active_ = !active_;
-  return false;
 }
 } // game
