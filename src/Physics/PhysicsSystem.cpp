@@ -4,9 +4,7 @@
 
 #include "Utils/Logger.hpp"
 #include "Utils/MathConstants.hpp"
-#include "Physics/ColliderComponents.hpp"
-#include "Physics/TransformComponent.hpp"
-#include "Physics/RigidbodyComponent.hpp"
+#include "Core/AllComponents.hpp"
 #include "Core/Game.hpp"
 
 
@@ -51,7 +49,7 @@ void PhysicsSystem::FixedUpdate() noexcept
     if(!b2Body_IsEnabled(body_id))
       b2Body_Enable(body_id);
 
-    transform.SetPosition(ToNormalVector2(b2Body_GetPosition(body_id)));
+    transform.SetPosition(ToVector2(b2Body_GetPosition(body_id)));
     b2Rot rotation = b2Body_GetRotation(body_id);
     transform.SetSinAndCos(Vector2{rotation.s, rotation.c});
   }
@@ -64,13 +62,24 @@ void PhysicsSystem::Updateb2Transform(Entity *entity) const noexcept
     b2Body_SetTransform(body_id->second, entity->GetComponent<TransformComponent>().Getb2Position(), entity->GetComponent<TransformComponent>().Getb2Rotation());
 }
 
-auto PhysicsSystem::TestPoint(const Vector2 &position) noexcept -> std::vector<Entity*>
+auto PhysicsSystem::Createb2Body(Entity *entity, const b2BodyDef &body_defenition) noexcept -> b2BodyId
+{
+  GAME_ASSERT(!Hasb2BodyId(entity));
+
+  b2BodyId body_id = b2CreateBody(world_id_, &body_defenition);
+  entity_to_body_map_[entity] = body_id;
+  body_to_entity_map_[body_id] = entity;
+
+  return body_id;
+}
+
+auto PhysicsSystem::TestPoint(const Vector2 &position, const b2QueryFilter &filter) noexcept -> std::vector<Entity*>
 {
   std::vector<Entity*> entities;
   void *context = new std::pair<Game&, std::vector<Entity*>&>{game_, entities};
   b2World_OverlapAABB(world_id_,
                       b2AABB{b2Vec2{position.x() - (kPointTestSize / 2.0f), position.y() - (kPointTestSize / 2.0f)}, b2Vec2{position.x() + (kPointTestSize / 2.0f), position.y() + (kPointTestSize / 2.0f)}},
-                      b2DefaultQueryFilter(),
+                      filter,
                       [](b2ShapeId shape_id, void *context) -> bool
                       {
                         const std::pair<Game&, std::vector<Entity*>&> &data = *reinterpret_cast<std::pair<Game&, std::vector<Entity*>&>*>(context);
@@ -80,5 +89,23 @@ auto PhysicsSystem::TestPoint(const Vector2 &position) noexcept -> std::vector<E
                       context);
   delete reinterpret_cast<std::pair<Game&, std::vector<Entity*>&>*>(context);
   return entities;
+}
+
+auto PhysicsSystem::Raycast(const Vector2 &origin, const Vector2 &translation, const b2QueryFilter &filter) noexcept -> RaycastHit
+{
+  RaycastHit hit;
+  std::pair<Game&, RaycastHit&> context = std::pair<Game&, RaycastHit&>{game_, hit};
+  b2World_CastRay(world_id_,
+                  Tob2Vec2(origin),
+                  Tob2Vec2(translation),
+                  filter,
+                  [](b2ShapeId shape_id, b2Vec2 point, b2Vec2 normal, float fraction, void *context) -> float
+                  {
+                    const std::pair<Game&, RaycastHit&> &data = *reinterpret_cast<std::pair<Game&, RaycastHit&>*>(context);
+                    data.second = RaycastHit{data.first.GetPhysicsSystem().GetEntity(b2Shape_GetBody(shape_id)), ToVector2(point), ToVector2(normal)};
+                    return 0.0f;
+                  },
+                  &context);
+  return hit;
 }
 } // game

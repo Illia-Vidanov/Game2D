@@ -7,7 +7,7 @@
 #include "Utils/MathConstants.hpp"
 #include "Core/Events.hpp"
 #include "Rendering/Utils.hpp"
-#include "Physics/TransformComponent.hpp"
+#include "Core/AllComponents.hpp"
 
 
 namespace game

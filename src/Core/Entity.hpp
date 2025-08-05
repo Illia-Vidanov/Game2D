@@ -4,7 +4,7 @@
 #include "Setup.hpp"
 
 #include "Utils/Logger.hpp"
-#include "Utils/MathConstants.hpp"
+#include "Utils/Type.hpp"
 
 
 namespace game
@@ -43,12 +43,25 @@ public:
   [[nodiscard]] auto HasComponent() const noexcept -> bool;
   template<typename... Args>
   [[nodiscard]] auto HasAllComponents() const noexcept -> bool;
+  template<typename... Args>
+  [[nodiscard]] auto HasAnyComponent() const noexcept -> bool;
+  template<typename Pack>
+  [[nodiscard]] auto HasAnyComponentPack() const noexcept -> bool;
 
 private:
   entt::entity id_;
   Game &game_;
   bool active_ = true;
   std::string name_; // Mostly for debugging purpuses. We might delete it in the future
+
+  template<typename T>
+  struct UnfoldHasAnyComponentPack {};
+
+  template<typename... Args>
+  struct UnfoldHasAnyComponentPack<TypePack<Args...>>
+  {
+    static inline auto Check(const Entity &entity) noexcept -> bool { return entity.HasAnyComponent<Args...>(); } 
+  };
 };
 } // game
 

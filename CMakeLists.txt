@@ -77,6 +77,7 @@ add_library(${GAME_OBJ_LIB_NAME}
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Physics/TransformComponent.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Physics/RigidbodyComponent.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/UI/UI.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Game/Scene.cpp
 )
 
 target_compile_options(

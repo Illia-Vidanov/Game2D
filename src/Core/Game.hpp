@@ -11,14 +11,16 @@
 #include "UI/UI.hpp"
 #include "Rendering/ResourceManager.hpp"
 #include "Player/InputSystem.hpp"
-#include "Player/CameraComponent.hpp"
 #include "Physics/PhysicsSystem.hpp"
 #include "Core/Entity.hpp"
 #include "Core/Debug.hpp"
+#include "Game/Scene.hpp"
 
 
 namespace game
 {
+class CameraComponent;
+
 // Main class of a game
 class Game
 {
@@ -52,6 +54,7 @@ public:
   [[nodiscard]] constexpr auto GetDeltaTime() const noexcept -> std::chrono::duration<double> { return delta_time_; }
   [[nodiscard]] constexpr auto GetFixedDeltaTime() const noexcept -> std::chrono::duration<double> { return fixed_delta_time_; }
   [[nodiscard]] auto FindCamera() noexcept -> CameraComponent &;
+  void ChangeScene(Owner<Scene*> scene) noexcept { delete scene; scene_ = scene; }
   
   [[nodiscard]] auto GetEntity(const std::string &name) noexcept -> Entity & { return *entities_.at(name); }
   [[nodiscard]] auto GetEntity(const std::string &name) const noexcept -> const Entity & { return *entities_.at(name); }
@@ -61,6 +64,9 @@ public:
   void QuitEvent() noexcept;
 
 private:
+  template<typename T, typename... Args>
+  void UpdateComponents() noexcept;
+
   bool running_ = false;
   Flags flags_;
   
@@ -82,7 +88,20 @@ private:
   std::chrono::duration<double> fixed_delta_time_ = kFixedDeltaTime;
   std::chrono::duration<double> fixed_delta_time_counter_ = kFixedDeltaTime;
   std::chrono::time_point<std::chrono::high_resolution_clock> frame_start_;
+
+  Owner<Scene*> scene_;
 };
+
+template <typename T, typename... Args>
+inline void Game::UpdateComponents() noexcept
+{
+  entt::view<entt::get_t<T>> entities = registry_.view<T>();
+  for(entt::entity entity : entities)
+    entities.template get<T>(entity).Update();
+
+  if constexpr(sizeof...(Args) > 0)
+    UpdateComponents<Args...>();
+}
 } // game
 
 #include "Core/Entity.tpp"

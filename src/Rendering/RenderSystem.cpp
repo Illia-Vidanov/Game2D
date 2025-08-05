@@ -8,9 +8,7 @@
 #include "Utils/MathConstants.hpp"
 #include "Utils/Math.hpp"
 #include "Rendering/Utils.hpp"
-#include "Rendering/SpriteComponents.hpp"
-#include "Rendering/OutlineComponent.hpp"
-#include "Physics/TransformComponent.hpp"
+#include "Core/AllComponents.hpp"
 #include "UI/UI.hpp"
 
 

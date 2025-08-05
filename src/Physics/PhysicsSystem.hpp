@@ -4,7 +4,7 @@
 #include "Setup.hpp"
 
 #include "Utils/Logger.hpp"
-#include "Utils/MathConstants.hpp"
+#include "Utils/Type.hpp"
 
 
 template<>
@@ -25,6 +25,16 @@ namespace game
 class Game;
 class Entity;
 
+class RectangleColliderComponent;
+class RigidbodyComponent;
+
+struct RaycastHit
+{
+  Entity *entity = nullptr;
+  Vector2 point = Vector2::Zero();
+  Vector2 normal = Vector2::Zero();
+};
+
 class PhysicsSystem
 {
 public:
@@ -35,6 +45,9 @@ public:
   PhysicsSystem &operator=(const PhysicsSystem &) noexcept = delete;
   PhysicsSystem &operator=(PhysicsSystem &&) noexcept = delete;
 
+  // Before use in Entity::HasComponents*Pack include "AllComponents.hpp" or all components used by pack
+  using UseBodyIdComponentsPack = TypePack<RectangleColliderComponent, RigidbodyComponent>;
+
   void FixedUpdate() noexcept;
 
   void Updateb2Transform(Entity *entity) const noexcept;
@@ -43,7 +56,7 @@ public:
   [[nodiscard]] auto TryGetb2BodyId(Entity* entity) const noexcept -> b2BodyId { std::unordered_map<Entity*, b2BodyId>::const_iterator it = entity_to_body_map_.find(entity); return it == entity_to_body_map_.end() ? b2_nullBodyId : it->second; }
   [[nodiscard]] auto Getb2BodyId(Entity* entity) const noexcept -> b2BodyId { GAME_ASSERT(Hasb2BodyId(entity)); return entity_to_body_map_.find(entity)->second; }
   [[nodiscard]] auto Hasb2BodyId(Entity* entity) const noexcept -> bool { return entity_to_body_map_.find(entity) != entity_to_body_map_.end(); }
-  void Addb2BodyId(Entity* entity, b2BodyId body_id) noexcept { GAME_ASSERT(!Hasb2BodyId(entity)); entity_to_body_map_[entity] = body_id; body_to_entity_map_[body_id] = entity; }
+  auto Createb2Body(Entity *entity, const b2BodyDef &body_defenition) noexcept -> b2BodyId;
   void RemoveEntity(Entity* entity) noexcept { GAME_ASSERT(Hasb2BodyId(entity)); std::unordered_map<Entity*, b2BodyId>::const_iterator it = entity_to_body_map_.find(entity); body_to_entity_map_.erase(it->second); entity_to_body_map_.erase(entity);}
   
   [[nodiscard]] auto GetEntity(b2BodyId body_id) const noexcept -> Entity* { GAME_ASSERT(HasEntity(body_id)); return body_to_entity_map_.find(body_id)->second; }
@@ -51,7 +64,10 @@ public:
 
   [[nodiscard]] static auto Isb2BodyIdNull(b2BodyId body_id) noexcept -> bool { return body_id.index1 == b2_nullBodyId.index1; } // The only way I found to check for validity. It might be also advisable to check for generation, but I am not sure...
 
-  [[nodiscard]] auto TestPoint(const Vector2 &position) noexcept -> std::vector<Entity*>;
+  [[nodiscard]] auto TestPoint(const Vector2 &position, const b2QueryFilter &filter) noexcept -> std::vector<Entity*>;
+  [[nodiscard]] auto TestPoint(const Vector2 &position) noexcept -> std::vector<Entity*> { return TestPoint(position, b2DefaultQueryFilter()); }
+  [[nodiscard]] auto Raycast(const Vector2 &origin, const Vector2 &translation, const b2QueryFilter &filter) noexcept -> RaycastHit;
+  [[nodiscard]] auto Raycast(const Vector2 &origin, const Vector2 &translation) noexcept -> RaycastHit { return Raycast(origin, translation, b2DefaultQueryFilter()); }
 
 private:
   static constexpr inline DefaultFloatType kPointTestSize = 0.1f;

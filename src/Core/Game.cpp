@@ -8,17 +8,12 @@
 #include "Core/Window.hpp"
 #include "Core/Entity.hpp"
 #include "Rendering/RenderSystem.hpp"
-#include "Rendering/ResourceManager.hpp"
-#include "Rendering/OutlineComponent.hpp"
 #include "Player/InputSystem.hpp"
-#include "Player/CameraComponent.hpp"
-#include "Player/PlayerComponent.hpp"
 #include "Utils/Type.hpp"
 #include "Physics/PhysicsSystem.hpp"
-#include "Rendering/SpriteComponents.hpp"
-#include "Physics/TransformComponent.hpp"
-#include "Physics/ColliderComponents.hpp"
-#include "Physics/RigidbodyComponent.hpp"
+#include "Game/Scene.hpp"
+#include "UI/UI.hpp"
+#include "Core/AllComponents.hpp"
 
 
 namespace game
@@ -36,6 +31,7 @@ Game::Game(const int argc, const char * const *argv) noexcept
   , input_system_{*this}
   , physics_system_{*this}
   , debug_{*this}
+  , scene_{new Scene1{*this}}
 {
   ZoneScopedC(0xb3041b);
 
@@ -57,38 +53,6 @@ void Game::Run() noexcept
 {
   ZoneScopedC(0xb3041b);
 
-  Entity &player = CreateEntity("player");
-  OutlineComponent &player_outline = player.AddComponent<OutlineComponent>();
-  TransformComponent &player_transform = player.AddComponent<TransformComponent>();
-  player_transform.SetScale(Vector2{10, 10});
-  SpriteComponent &player_sprite = player.AddComponent<SpriteComponent>();
-  AnimatedSpriteData *player_sprite_data = new AnimatedSpriteData();
-  player_sprite_data->SetShader(&resource_manager_.GetShader(ShaderType::kAnimatedSprite));
-  player_sprite_data->SetTexture(&resource_manager_.GetTexture(TextureType::kPlayer));
-  player_sprite_data->SetAtlasStep(0.5f);
-  player_sprite.SetType(SpriteType::kAnimated);
-  player_sprite.SetData(player_sprite_data);
-  player_sprite.SetLayer(-1);
-  RectangleColliderComponent &player_collider = player.AddComponent<RectangleColliderComponent>();
-  player_collider.SetFriction(1.0f);
-  player_collider.SetRestitution(0.3f);
-  RigidbodyComponent &player_rigidbody = player.AddComponent<RigidbodyComponent>();
-  player_rigidbody.SetGravityScale(0.0f);
-  PlayerComponent &player_component = player.AddComponent<PlayerComponent>();
-
-  Entity &box = CreateEntity("box");
-  OutlineComponent &box_outline = box.AddComponent<OutlineComponent>();
-  TransformComponent &box_transform = box.AddComponent<TransformComponent>();
-  box_transform.SetPosition(Vector2{5, 5});
-  box_transform.SetScale(Vector2{100, 10});
-  SpriteComponent &box_sprite = box.AddComponent<SpriteComponent>();
-  TexturedSpriteData *box_sprite_data = new TexturedSpriteData();
-  box_sprite_data->SetShader(&resource_manager_.GetShader(ShaderType::kTexturedSprite));
-  box_sprite_data->SetTexture(&resource_manager_.GetTexture(TextureType::kNoTexture64));
-  box_sprite.SetType(SpriteType::kTextured);
-  box_sprite.SetData(box_sprite_data);
-  RectangleColliderComponent &box_collider = box.AddComponent<RectangleColliderComponent>();
-
   delta_time_ = std::chrono::high_resolution_clock::now() - frame_start_;
 
   running_ = true;
@@ -103,7 +67,8 @@ void Game::Run() noexcept
     
     render_system_.StartFrame();
 
-    player_component.Update();
+    scene_->Update();
+    UpdateComponents<PlayerComponent>();
     debug_.Update();
 
     ui_.Update();

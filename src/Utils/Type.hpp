@@ -269,6 +269,13 @@ struct OperatorDefined : detail::OperatorDefinedImpl<Operator, T, U>
 
 template<OperatorType Operator, typename T, typename U>
 constexpr inline bool kOperatorDefined = OperatorDefined<Operator, T, U>::value;
+
+
+template<typename... Args>
+struct TypePack
+{
+  constexpr TypePack() noexcept = default;
+};
 } // tolik
 
 #endif // FILE_TYPE_HPP

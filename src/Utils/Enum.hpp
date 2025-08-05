@@ -12,7 +12,7 @@ namespace tolik
 namespace detail
 {
 template<OperatorType Operator, typename T, typename U>
-constexpr bool kCanDefineEnumOperator = ((std::is_enum_v<T> && std::is_arithmetic_v<U>) || (std::is_enum_v<U> && std::is_arithmetic_v<T>)) && !kOperatorDefined<Operator, T, U>;
+constexpr bool kCanDefineEnumOperator = ((std::is_enum_v<T> && std::is_arithmetic_v<U>) || (std::is_enum_v<U> && std::is_arithmetic_v<T>) || (std::is_enum_v<T> && std::is_enum_v<U>)) && !kOperatorDefined<Operator, T, U>;
 
 template<typename T, bool = std::is_enum_v<T>>
 struct SoftUnderlyingImpl

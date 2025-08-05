@@ -17,6 +17,7 @@ class RectangleColliderComponent : public ComponentBase
 {
 public:
   RectangleColliderComponent(Entity *entity) noexcept;
+  RectangleColliderComponent(Entity *entity, const b2ShapeDef &shape_definition) noexcept;
   ~RectangleColliderComponent() noexcept;
 
   [[nodiscard]] constexpr auto GetHalfSize() const noexcept -> const Vector2 & { return half_size_; }
@@ -25,8 +26,8 @@ public:
   void SetOffset(const Vector2 &offset) noexcept { offset_ = offset; Updateb2(); }
   [[nodiscard]] constexpr auto GetAngleRadians() const noexcept -> DefaultFloatType { return angle_radians_; }
   void SetAngleRadians(DefaultFloatType angle_radians) noexcept { angle_radians_ = angle_radians; Updateb2(); }
-  [[nodiscard]] constexpr auto GetAngleDegrees() const noexcept -> DefaultFloatType { return RadiansToDegrees(angle_radians_); }
-  void SetAngleDegrees(DefaultFloatType angle_degrees) noexcept { angle_radians_ = DegreesToRadians(angle_degrees); Updateb2(); }
+  [[nodiscard]] constexpr auto GetAngleDegrees() const noexcept -> DefaultFloatType { return ToDegrees(angle_radians_); }
+  void SetAngleDegrees(DefaultFloatType angle_degrees) noexcept { angle_radians_ = ToRadians(angle_degrees); Updateb2(); }
 
   void SetFriction(DefaultFloatType friction) const noexcept { b2Shape_SetFriction(shape_id_, friction); }
   void SetRestitution(DefaultFloatType restitution) const noexcept { b2Shape_SetRestitution(shape_id_, restitution); }
@@ -35,12 +36,13 @@ public:
   void Updateb2() const noexcept;
 
 private:
+  [[nodiscard]] auto Calculateb2Polygon() const noexcept -> b2Polygon;
+  [[nodiscard]] auto GetOrCreateb2BodyId() const noexcept -> b2BodyId;
+
   b2ShapeId shape_id_;
   Vector2 half_size_ = Vector2{0.5f, 0.5f};
   Vector2 offset_ = Vector2::Zero();
   DefaultFloatType angle_radians_ = 0;
-
-  [[nodiscard]] auto Getb2Polygon() const noexcept -> b2Polygon;
 };
 } // game
 

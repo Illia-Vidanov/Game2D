@@ -5,8 +5,7 @@
 #include "Utils/Logger.hpp"
 #include "Utils/MathConstants.hpp"
 #include "Core/Game.hpp"
-#include "Physics/RigidbodyComponent.hpp"
-#include "Physics/ColliderComponents.hpp"
+#include "Core/AllComponents.hpp"
 
 
 namespace game

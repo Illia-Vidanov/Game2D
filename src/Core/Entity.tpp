@@ -5,6 +5,8 @@
 
 #include "Setup.hpp"
 
+#include "Utils/Logger.hpp"
+#include "Utils/Type.hpp"
 #include "Core/Game.hpp"
 
 namespace game
@@ -27,6 +29,10 @@ template<typename T>
 [[nodiscard]] inline auto Entity::HasComponent() const noexcept -> bool { return game_.GetRegistry().all_of<T>(id_); }
 template<typename... Args>
 [[nodiscard]] inline auto Entity::HasAllComponents() const noexcept -> bool { return game_.GetRegistry().all_of<Args...>(id_); }
+template<typename... Args>
+[[nodiscard]] inline auto Entity::HasAnyComponent() const noexcept -> bool { return game_.GetRegistry().any_of<Args...>(id_); }
+template<typename Pack>
+[[nodiscard]] inline auto Entity::HasAnyComponentPack() const noexcept -> bool { return UnfoldHasAnyComponentPack<Pack>::Check(*this); }
 } // game
 
 #endif // GAME_ENTITY_TPP

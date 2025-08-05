@@ -4,9 +4,7 @@
 
 #include "Core/Game.hpp"
 #include "Utils/Logger.hpp"
-#include "Rendering/OutlineComponent.hpp"
-#include "Physics/TransformComponent.hpp"
-#include "Physics/RigidbodyComponent.hpp"
+#include "Core/AllComponents.hpp"
 
 
 namespace game
@@ -97,7 +95,10 @@ void UI::DrawDebugWindow() const noexcept
       for(Entity *entity : game_.GetDebug().GetSelectedEntities())
       {
         if(!ImGui::CollapsingHeader(entity->GetName().c_str(), first ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None))
+        {
           continue;
+          first = false;
+        }
 
         bool entity_active = entity->GetActive();
         if(ImGui::Checkbox("Active", &entity_active))
@@ -106,13 +107,17 @@ void UI::DrawDebugWindow() const noexcept
         if(!entity_active)
           ImGui::BeginDisabled();
 
-        first = false;
-
         TransformComponent *transform = entity->TryGetComponent<TransformComponent>();
-
         if(transform && ImGui::TreeNodeEx("Transform", ImGuiTreeNodeFlags_DefaultOpen))
         {
           DrawTransformComponent(transform, entity);
+          ImGui::TreePop();
+        }
+
+        PlayerComponent *player = entity->TryGetComponent<PlayerComponent>();
+        if(player && ImGui::TreeNodeEx("Player", ImGuiTreeNodeFlags_AllowOverlap))
+        {
+          DrawPlayerComponent(player, entity);
           ImGui::TreePop();
         }
 
@@ -157,5 +162,89 @@ void UI::DrawTransformComponent(TransformComponent *transform, Entity *entity) c
   
   if(changed)
     game_.GetPhysicsSystem().Updateb2Transform(entity);
+}
+
+void UI::DrawPlayerComponent(PlayerComponent *player, Entity *entity) const noexcept
+{
+  bool component_active = player->GetActive();
+  if(ImGui::Checkbox("Active", &component_active))
+    player->SetActive(component_active);
+  
+  if(!component_active)
+    return;
+
+  if(ImGui::TreeNodeEx("State", ImGuiTreeNodeFlags_AllowOverlap))
+  {
+    ImGui::BeginDisabled(); // To make it readonly
+
+    ImGui::Text("Movement");
+    Vector2 directed_speed = player->directed_speed_;
+    ImGui::DragFloat2("Directed Speed", directed_speed.data());
+    
+    float desired_speed = player->desired_speed_;
+    ImGui::DragFloat("Desired Speed", &desired_speed);
+
+    Vector2 move_direction = player->move_direction_;
+    ImGui::DragFloat2("Move Direction", move_direction.data());
+    
+    ImGui::Text("Jumping");
+    bool grounded = (player->state_ & PlayerState::kGroundedBit) != PlayerState::kNone;
+    ImGui::Checkbox("Grounded", &grounded);
+
+    Vector2 gravity_direction = player->gravity_direction_;
+    ImGui::DragFloat2("Gravity Direction", gravity_direction.data());
+
+    float gravity_strength = player->gravity_strength_;
+    ImGui::DragFloat("Gravity Strength", &gravity_strength);
+
+    ImGui::EndDisabled();
+    ImGui::TreePop();
+  }
+
+  if(ImGui::TreeNodeEx("Jump"))
+  {
+    float default_gravity_strength = player->kDefaultGravityStrength;
+    ImGui::DragFloat("Default Gravity Strength", &default_gravity_strength);
+    player->kDefaultGravityStrength = default_gravity_strength;
+
+    float max_jump_height = player->kMaxJumpHeight;
+    ImGui::DragFloat("Max Jump Height", &max_jump_height);
+    player->kMaxJumpHeight = max_jump_height;
+
+    float min_jump_height = player->kMinJumpHeight;
+    ImGui::DragFloat("Min Jump Height", &min_jump_height);
+    player->kMinJumpHeight = min_jump_height;
+
+    float ascend_time = player->kAscendTime;
+    ImGui::DragFloat("Ascend Time", &ascend_time);
+    player->kAscendTime = ascend_time;
+
+    float descend_time = player->kDescendTime;
+    ImGui::DragFloat("Descend Time", &descend_time);
+    player->kDescendTime = descend_time;
+
+    ImGui::TreePop();
+  }
+
+  if(ImGui::TreeNodeEx("Movement"))
+  {
+    float ground_acceleration = player->kGroundAcceleration;
+    ImGui::DragFloat("Ground Acceleration", &ground_acceleration);
+    player->kGroundAcceleration = ground_acceleration;
+
+    float ground_deceleration = player->kGroundDeceleration;
+    ImGui::DragFloat("Ground Deceleration", &ground_deceleration);
+    player->kGroundDeceleration = ground_deceleration;
+
+    float air_acceleration = player->kAirAcceleration;
+    ImGui::DragFloat("Air Acceleration", &air_acceleration);
+    player->kAirAcceleration = air_acceleration;
+
+    float air_deceleration = player->kAirDeceleration;
+    ImGui::DragFloat("Air Deceleration", &air_deceleration);
+    player->kAirDeceleration = air_deceleration;
+
+    ImGui::TreePop();
+  }
 }
 } // game

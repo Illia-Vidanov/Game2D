@@ -11,7 +11,7 @@
 #include "Rendering/DataStructures.hpp"
 #include "Core/Game.hpp"
 #include "Utils/Math.hpp"
-#include "Physics/TransformComponent.hpp"
+#include "Core/AllComponents.hpp"
 
 
 namespace game

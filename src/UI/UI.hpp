@@ -11,6 +11,7 @@ namespace game
 class Game;
 class Entity;
 class TransformComponent;
+class PlayerComponent;
 
 class UI
 {
@@ -31,6 +32,7 @@ private:
 
   void DrawDebugWindow() const noexcept;
   void DrawTransformComponent(TransformComponent *transform, Entity *entity) const noexcept;
+  void DrawPlayerComponent(PlayerComponent *player, Entity *entity) const noexcept;
 
   Game &game_;
 

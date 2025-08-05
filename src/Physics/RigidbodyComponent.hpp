@@ -20,12 +20,15 @@ class RigidbodyComponent : public ComponentBase
 {
 public:
   RigidbodyComponent(Entity *entity) noexcept;
+  RigidbodyComponent(Entity *entity, const b2BodyDef &body_defenition) noexcept;
   ~RigidbodyComponent() noexcept;
 
-  [[nodiscard]] auto GetVelocity() const noexcept -> Vector2 { return ToNormalVector2(b2Body_GetLinearVelocity(body_id_)); }
+  [[nodiscard]] auto GetVelocity() const noexcept -> Vector2 { return ToVector2(b2Body_GetLinearVelocity(body_id_)); }
   void SetVelocity(const Vector2 &velocity) const { b2Body_SetLinearVelocity(body_id_, Tob2Vec2(velocity)); }
   void AddForce(const Vector2 &force) const { b2Body_ApplyForceToCenter(body_id_, Tob2Vec2(force), true); }
   void SetGravityScale(DefaultFloatType gravity_scale) const { b2Body_SetGravityScale(body_id_, gravity_scale); }
+  void SetBodyType(b2BodyType body_type) { b2Body_SetType(body_id_, body_type); }
+  void SetLinearDamping(DefaultFloatType linear_damping) { b2Body_SetLinearDamping(body_id_, linear_damping); }
 
 private:
   b2BodyId body_id_;
